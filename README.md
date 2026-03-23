@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="assets/banner.png" alt="FamilyCare Banner" width="100%" height="auto" />
-
 # 🏥 FamilyCare – Eldercare Monitoring System
 
 **"Stay connected. Stay caring. Anytime, anywhere ❤️"**
