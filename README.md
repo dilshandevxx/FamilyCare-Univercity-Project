@@ -25,19 +25,6 @@ FamilyCare is a premium web platform that allows families working abroad to moni
 
 ---
 
-<div align="center">
-
-### 🖼️ ✨ Premium Interface Experience
-
-| 🖥️ **Desktop Dashboard** | 📱 **Mobile Caregiver App** |
-|:---:|:---:|
-| <img src="assets/dashboard.png" width="400" /> | <img src="assets/mobile.png" width="180" /> |
-| *Real-time analytics and health tracking* | *Seamless daily logging for caregivers* |
-
-</div>
-
----
-
 ### 🚀 ✨ Key Capabilities
 
 - **🔐 Authenticated Roles:** Distinct interfaces for **Children (Family)** and professional **Caregivers**.
