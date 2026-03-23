@@ -107,8 +107,12 @@ npm run dev:frontend # Vite starts at localhost:5173
 
 <div align="center">
 
-**𝓜𝓪𝓭𝓮 𝔀𝓲𝓽𝓱 ❤️ 𝓯𝓸𝓻 𝓽𝓱𝓮 𝓔𝓵𝓭𝓮𝓻𝓵𝔂**
+---
 
-*𝓕𝓪𝓶𝓲𝓵𝔂𝓒𝓪𝓻𝓮 – 𝓑𝓮𝓬𝓪𝓾𝓼𝓮 𝓓𝓲𝓼𝓽𝓪𝓷𝓬𝓮 𝓢𝓱𝓸𝓾𝓵𝓭𝓷'𝓽 𝓜𝓮𝓪𝓷 𝓓𝓲𝓼𝓬𝓸𝓷𝓷𝓮𝓬𝓽𝓮𝓭*
+⭐ **If you find this project helpful, please consider giving it a star!** ⭐
+
+[**Report Bug**](https://github.com/dilshandevxx/FamilyCare-Univercity-Project/issues) • [**Request Feature**](https://github.com/dilshandevxx/FamilyCare-Univercity-Project/issues) • [**Contribute**](https://github.com/dilshandevxx/FamilyCare-Univercity-Project/pulls)
+
+© 2026 FamilyCare Team. Licensed under [MIT](LICENSE).
 
 </div>
