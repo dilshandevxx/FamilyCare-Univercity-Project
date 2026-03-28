@@ -29,7 +29,7 @@ const Navbar = () => {
             <Link to="/register">Register</Link>
           </>
         )}
-      </div>
+      </div> 
     </nav>
   );
 };
