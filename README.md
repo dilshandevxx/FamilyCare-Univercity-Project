@@ -94,6 +94,13 @@ npm run dev:frontend # Vite starts at localhost:5173
 
 <div align="center">
 
+### 🚀 ✨ Deployment
+
+To host this project on **Vercel**:
+1. Connect this GitHub repository to your Vercel account.
+2. In the **Build Settings**, Vercel will automatically use the `vercel.json` file in the root.
+3. Your frontend will be live at a custom `.vercel.app` URL!
+
 ---
 
 ⭐ **If you find this project helpful, please consider giving it a star!** ⭐
