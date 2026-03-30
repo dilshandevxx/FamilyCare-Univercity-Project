@@ -1,102 +1,108 @@
 <div align="center">
 
-# 𝓕𝓪𝓶𝓲𝓵𝔂𝓒𝓪𝓻𝓮 – 𝓔𝓵𝓭𝓮𝓻𝓬𝓪𝓻𝓮 𝓜𝓸𝓷𝓲𝓽𝓸𝓻𝓲𝓷𝓰 𝓢𝔂𝓼𝓽𝓮𝓶
-
-### 𝓢𝓽𝓪𝔂 𝓒𝓸𝓷𝓷𝓮𝓬𝓽𝓮𝓭. 𝓢𝓽𝓪𝔂 𝓒𝓪𝓻𝓲𝓷𝓰. 𝓐𝓷𝔂𝓽𝓲𝓶𝓮, 𝓐𝓷𝔂𝔀𝓱𝓮𝓻𝓮 ❤️
-
-[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![React](https://img.shields.io/badge/React-18-61DAFB.svg?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-v18-339933.svg?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+# 👋 ✨ 𝓦𝓮𝓵𝓬𝓸𝓶𝓮 𝓔𝓿𝓮𝓻𝔂𝓸𝓷𝓮! 
+### *𝓗𝓮𝓵𝓵𝓸 𝓔𝓿𝓮𝓻𝔂𝓸𝓷𝓮 – 𝓖𝓵𝓪𝓭 𝓽𝓸 𝓱𝓪𝓿𝓮 𝔂𝓸𝓾 𝓱𝓮𝓻𝓮!*
 
 ---
 
-FamilyCare is a premium web platform that allows families working abroad to monitor and manage the health of their elderly parents in real-time. By bridging clinical care with professional caregivers, we provide transparency and peace of mind for loved ones, no matter the distance.
+# 🏥 𝓕𝓪𝓶𝓲𝓵𝔂𝓒𝓪𝓻𝓮 – 𝓔𝓵𝓭𝓮𝓻𝓬𝓪𝓻𝓮 𝓜𝓸𝓷𝓲𝓽𝓸𝓻𝓲𝓷𝓰 𝓢𝔂𝓼𝓽𝓮𝓶
+
+### *Stay connected. Stay caring. Anytime, anywhere ❤️*
+
+[![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![MySQL](https://img.shields.io/badge/MySQL-005C84?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+
+---
+
+**𝓕𝓪𝓶𝓲𝓵𝔂𝓒𝓪𝓻𝓮** 𝓲𝓼 𝓪 𝓹𝓻𝓮𝓶𝓲𝓾𝓶 𝓹𝓵𝓪𝓽𝓯𝓸𝓻𝓶 𝓭𝓮𝓼𝓲𝓰𝓷𝓮𝓭 𝓯𝓸𝓻 𝓯𝓪𝓶𝓲𝓵𝔂 𝓶𝓮𝓶𝓫𝓮𝓻𝓼 𝓵𝓲𝓿𝓲𝓷𝓰 𝓪𝓫𝓻𝓸𝓪𝓭 𝓽𝓸 𝓶𝓸𝓷𝓲𝓽𝓸𝓻 𝓪𝓷𝓭 𝓶𝓪𝓷𝓪𝓰𝓮 𝓽𝓱𝓮 𝓱𝓮𝓪𝓵𝓽𝓱 𝓸𝓯 𝓽𝓱𝓮𝓲𝓻 𝓮𝓵𝓭𝓮𝓻𝓵𝔂 𝓹𝓪𝓻𝓮𝓷𝓽𝓼 𝔀𝓲𝓽𝓱 𝓬𝓸𝓷𝓯𝓲𝓭𝓮𝓷𝓬𝓮.
 
 </div>
-
----
-
-> [!NOTE]
-> **The Problem:** Children abroad often miss critical health trends for their parents. Traditional check-ins lack clinical data, creating anxiety and monitoring gaps.
-
-> [!TIP]
-> **The Solution:** A centralized, data-driven platform where caregivers log vitals (BP, Heart Rate, Meals) directly into a real-time dashboard accessible by family members globally.
-
----
 
 ### 🚀 ✨ Key Capabilities
 
-- **🔐 Authenticated Roles:** Distinct interfaces for **Children (Family)** and professional **Caregivers**.
-- **👴 Elder Profile Management:** Create and manage distinct profiles for each parent with medical history.
-- **📋 Expert Matchmaking:** Browse and assign caregivers based on experience, rating, and specialization.
-- **🩺 Precision Health Logging:** Daily reporting for blood pressure, heart rate, temperature, and medication.
-- **⚡ Real-time Synchronization:** Built with **Socket.io** for instantaneous health updates.
-- **📊 Health Trends:** Beautifully visualized health data using **Chart.js** for early anomaly detection.
+<details open>
+<summary><b>🌐 Public Access</b></summary>
+
+- **🏠 Home:** Elegant landing page overview.
+- **⚙️ Features:** Deep dive into system capabilities.
+- **👩‍⚕️ Caregivers:** verified listing for easy discovery.
+- **🔐 Secure Access:** JWT-protected Login & Registration.
+</details>
+
+<details>
+<summary><b>👨‍👩‍👧 Family Dashboard (Child)</b></summary>
+
+- **⭐ Dashboard:** Real-time summary of vitals and alerts.
+- **📁 Parent Management:** Profiles for mother, father, etc.
+- **🏥 Health Feed:** Live log of BP, temperature, and activities.
+- **💬 Messaging:** Direct communication with signed caregivers.
+</details>
+
+<details>
+<summary><b>👩‍⚕️ Professional Caregiver</b></summary>
+
+- **📅 Task List:** View and manage daily logs for assigned elders.
+- **📝 Health Log:** Easy interface to upload health data (vitals, meals).
+- **🔔 Notifications:** Instant alerts for critical updates.
+</details>
 
 ---
 
-### 🏗️ ✨ System Architecture
+### 🛠️ ✨ Technology Stack
 
-<div align="center">
-
-```mermaid
-graph TD
-    A[𝓡𝓮𝓪𝓬𝓽 𝓕𝓻𝓸𝓷𝓽𝓮𝓷𝓭] <-->|𝓢𝓸𝓬𝓴𝓮𝓽.𝓲𝓸 / 𝓐𝔁𝓲𝓸𝓼| B[𝓔𝔁𝓹𝓻𝓮𝓼𝓼 𝓐𝓟𝓘]
-    B <-->|𝓢𝓮𝓺𝓾𝓮𝓵𝓲𝔃𝓮| C[(𝓜𝔂𝓢𝓠𝓛 𝓓𝓪𝓽𝓪𝔫𝓪𝓼𝓮)]
-```
-
-*Relational data integrity ensures clinical accuracy across all modules.*
-
-</div>
-
----
-
-### ⚙️ ✨ Tech Stack
-
-| 𝓛𝓪𝔂𝓮𝓻 | 𝓣𝓮𝓬𝓱𝓷𝓸𝓵𝓸𝓰𝔂 |
+| 𝗟𝗮𝘆𝗲𝗿 | 𝗧𝗲𝗰𝗵𝗻𝗼𝗹𝗼𝗴𝗶𝗲𝘀 |
 | :--- | :--- |
-| **𝓕𝓻𝓸𝓷𝓽𝓮𝓷𝓭** | React 18, Vite, React Router, Chart.js |
-| **𝓑𝓪𝓬𝓴𝓮𝓷𝓭** | Node.js, Express.js |
-| **𝓡𝓮𝓪𝓵-𝓽𝓲𝓶𝓮** | Socket.io |
-| **𝓓𝓪𝓽𝓪𝓫𝓪𝓼𝓮** | MySQL 8.0+, Sequelize ORM |
-| **𝓓𝓮𝓹𝓵𝓸𝔂𝓶𝓮𝓷𝓽** | Vercel (UI), Render (API) |
+| **🎨 Frontend** | `React` `Vite` `Context API` `Axios` |
+| **⚙️ Backend** | `Node.js` `Express.js` `JWT` `Bcrypt` |
+| **🗄️ Database** | `MySQL` `mysql2/promise` |
+| **🚀 Deploy** | `Vercel` `GitHub Actions` |
 
 ---
 
-### 🛠️ ✨ Setup & Installation
+### 📂 ✨ Project Architecture
 
-#### 📦 1. Clone & Install
-```bash
-git clone https://github.com/dilshandevxx/FamilyCare-Univercity-Project.git
-npm run install:all
-```
-
-#### 🔑 2. Environment Configuration
-Create a `.env` in both folders matching the `.env.example` templates for your MySQL credentials.
-
-#### 🚀 3. Start Development
-```bash
-npm run dev:backend  # API starts at localhost:5000
-npm run dev:frontend # Vite starts at localhost:5173
+```text
+📦 FamilyCare (Monorepo)
+ ┣ 📂 backend          # Node/Express API
+ ┃ ┣ 📂 src
+ ┃ ┃ ┣ 📂 controllers  # Business Logic
+ ┃ ┃ ┣ 📂 routes       # API Endpoints
+ ┃ ┃ ┗ 📂 database     # MySQL Schema
+ ┣ 📂 frontend         # React/Vite UI
+ ┃ ┣ 📂 src
+ ┃ ┃ ┣ 📂 context      # Auth State
+ ┃ ┃ ┣ 📂 pages        # Role-based Screens
+ ┃ ┃ ┗ 📂 services     # API Integration
+ ┗ 📄 vercel.json      # Deployment Config
 ```
 
 ---
 
-### 🔮 ✨ Roadmap: The Future of Care
+### 🏁 ✨ Quick Start
 
-- **🚑 One-Tap Emergency:** Instant integration with local emergency responder APIs.
-- **💊 AI Med-Reminders:** Smart notifications based on logged health records.
-- **📞 Direct Consultation:** Integrated video calls with family doctors.
-- **📱 Native Performance:** Dedicated apps for iOS and Android.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/dilshandevxx/FamilyCare-Univercity-Project.git
+   ```
+2. **Setup Backend**
+   ```bash
+   cd backend && npm install && cp .env.example .env
+   ```
+3. **Setup Frontend**
+   ```bash
+   cd frontend && npm install && npm run dev
+   ```
 
 ---
 
 <div align="center">
 
----
+### 🚀 ✨ Live Deployment
 
-⭐ **If you find this project helpful, please consider giving it a star!** ⭐
+⭐ **[Click here to see the Frontend live on Vercel]** ⭐
 
 [**Report Bug**](https://github.com/dilshandevxx/FamilyCare-Univercity-Project/issues) • [**Request Feature**](https://github.com/dilshandevxx/FamilyCare-Univercity-Project/issues) • [**Contribute**](https://github.com/dilshandevxx/FamilyCare-Univercity-Project/pulls)
 
