@@ -1,54 +1,74 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 
 const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('child');
-  const [error, setError] = useState('');
-  const { register } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      await register({ name, email, password, role });
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err.response?.data?.error || 'Registration failed');
-    }
+    // Functional logic removed as per project requirements
+    console.log('Registration details:', { name, email, password, role });
+    navigate('/dashboard');
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '2rem auto', padding: '1rem', border: '1px solid #ddd', borderRadius: '8px' }}>
-      <h2>Register</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+    <div className="container" style={{ maxWidth: '450px', margin: '140px auto', padding: '2.5rem', backgroundColor: '#fff', borderRadius: '24px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.05)', border: '1px solid #edf2f7' }}>
+      <h2 style={{ fontSize: '2rem', marginBottom: '1.5rem', textAlign: 'center' }}>Create Account</h2>
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '1rem' }}>
-          <label>Name</label>
-          <input type="text" value={name} onChange={(e) => setName(e.target.value)} required style={{ width: '100%', padding: '0.5rem', marginTop: '0.25rem' }} />
+          <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.9rem', fontWeight: '500' }}>Full Name</label>
+          <input 
+            type="text" 
+            value={name} 
+            onChange={(e) => setName(e.target.value)} 
+            placeholder="John Doe"
+            required 
+            style={{ width: '100%', padding: '0.7rem', borderRadius: '12px', border: '1px solid #E2E8F0', outline: 'none' }} 
+          />
         </div>
         <div style={{ marginBottom: '1rem' }}>
-          <label>Email</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ width: '100%', padding: '0.5rem', marginTop: '0.25rem' }} />
+          <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.9rem', fontWeight: '500' }}>Email Address</label>
+          <input 
+            type="email" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            placeholder="name@company.com"
+            required 
+            style={{ width: '100%', padding: '0.7rem', borderRadius: '12px', border: '1px solid #E2E8F0', outline: 'none' }} 
+          />
         </div>
         <div style={{ marginBottom: '1rem' }}>
-          <label>Password</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required style={{ width: '100%', padding: '0.5rem', marginTop: '0.25rem' }} />
+          <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.9rem', fontWeight: '500' }}>Password</label>
+          <input 
+            type="password" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            placeholder="••••••••"
+            required 
+            style={{ width: '100%', padding: '0.7rem', borderRadius: '12px', border: '1px solid #E2E8F0', outline: 'none' }} 
+          />
         </div>
-        <div style={{ marginBottom: '1rem' }}>
-          <label>Role</label>
-          <select value={role} onChange={(e) => setRole(e.target.value)} style={{ width: '100%', padding: '0.5rem', marginTop: '0.25rem' }}>
+        <div style={{ marginBottom: '1.5rem' }}>
+          <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.9rem', fontWeight: '500' }}>I am a...</label>
+          <select 
+            value={role} 
+            onChange={(e) => setRole(e.target.value)} 
+            style={{ width: '100%', padding: '0.7rem', borderRadius: '12px', border: '1px solid #E2E8F0', outline: 'none', backgroundColor: 'white' }}
+          >
             <option value="child">Child (Family Member)</option>
-            <option value="caregiver">Caregiver</option>
+            <option value="caregiver">Professional Caregiver</option>
           </select>
         </div>
-        <button type="submit" style={{ width: '100%', padding: '0.75rem', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Register</button>
+        <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '0.9rem', fontSize: '1rem' }}>
+          Register
+        </button>
       </form>
-      <p style={{ marginTop: '1rem', textAlign: 'center' }}>
-        Already have an account? <Link to="/login">Login</Link>
+      <p style={{ marginTop: '1.5rem', textAlign: 'center', fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
+        Already have an account? <Link to="/login" style={{ color: 'var(--color-primary)', fontWeight: '600', textDecoration: 'none' }}>Login</Link>
       </p>
     </div>
   );

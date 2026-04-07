@@ -1,17 +1,28 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Hero from '../../../components/Landing/Hero';
+import Features from '../../../components/Landing/Features';
+import ProcessSteps from '../../../components/Landing/ProcessSteps';
+import Testimonials from '../../../components/Landing/Testimonials';
+import CallToAction from '../../../components/Landing/CallToAction';
+import Footer from '../../../components/Landing/Footer';
 
-const Home = () => {
+const Landing = () => {
   return (
-    <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-      <h1>Welcome to FamilyCare</h1>
-      <p>Helping you manage the care of your elderly parents from anywhere in the world.</p>
-      <div style={{ marginTop: '2rem' }}>
-        <Link to="/register" style={{ padding: '0.75rem 1.5rem', background: '#007bff', color: 'white', textDecoration: 'none', borderRadius: '4px', marginRight: '1rem' }}>Get Started</Link>
-        <Link to="/login" style={{ padding: '0.75rem 1.5rem', border: '1px solid #007bff', textDecoration: 'none', borderRadius: '4px' }}>Login</Link>
-      </div>
+    <div className="landing-page">
+      <Hero />
+      <Features />
+      <ProcessSteps />
+      <Testimonials />
+      <CallToAction />
+      <Footer />
+      
+      <style>{`
+        .landing-page {
+          overflow-x: hidden;
+        }
+      `}</style>
     </div>
   );
 };
 
-export default Home;
+export default Landing;
