@@ -98,32 +98,8 @@ const CheckItem = ({ text }) => (
 
 /* ─── Main Page ───────────────────────────────────────────────────── */
 const FeaturesPage = () => {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
     <div className="fp-root">
-      {/* ── Navbar ── */}
-      <nav className={`fp-nav ${scrolled ? 'fp-nav--scrolled' : ''}`}>
-        <div className="container fp-nav__inner">
-          <Link to="/" className="fp-nav__logo">FamilyCare</Link>
-          <div className="fp-nav__links">
-            <Link to="/">Home</Link>
-            <Link to="/features" className="active">Features</Link>
-            <Link to="/about">About</Link>
-            <Link to="/caregivers">Caregivers</Link>
-          </div>
-          <div className="fp-nav__auth">
-            <Link to="/login" className="fp-btn fp-btn--ghost">Login</Link>
-            <Link to="/register" className="fp-btn fp-btn--primary">Sign Up</Link>
-          </div>
-        </div>
-      </nav>
 
       {/* ── Hero ── */}
       <header className="fp-hero">
@@ -229,7 +205,7 @@ const FeaturesPage = () => {
                   ))}
                 </div>
                 <div className="fp-mockup__family-avatar">
-                  <div className="fp-family-img" />
+                  <img src="/assets/images/family_app.png" alt="Family App" className="fp-family-img" style={{ objectFit: 'cover' }} />
                   <div className="fp-mockup__line fp-mockup__line--sm" style={{ marginTop: '8px' }} />
                   <div className="fp-mockup__line fp-mockup__line--xs" />
                 </div>
@@ -243,7 +219,7 @@ const FeaturesPage = () => {
               <div className="fp-mockup fp-mockup--blue">
                 <div className="fp-mockup__bar" />
                 <div className="fp-caregiver-avatar">
-                  <div className="fp-caregiver-img" />
+                  <img src="/assets/images/caregiver_tablet.png" alt="Caregiver Tablet" className="fp-caregiver-img" style={{ objectFit: 'cover' }} />
                 </div>
                 <div className="fp-mockup__line fp-mockup__line--md" style={{ marginTop: '12px' }} />
                 <div className="fp-mockup__line fp-mockup__line--sm" />
@@ -303,54 +279,7 @@ const FeaturesPage = () => {
           color: #1A202C;
         }
 
-        /* ---- Navbar ---- */
-        .fp-nav {
-          position: fixed;
-          top: 0; left: 0; right: 0;
-          z-index: 1000;
-          padding: 1.1rem 0;
-          transition: background 0.3s, box-shadow 0.3s;
-          background: rgba(255,255,255,0.85);
-          backdrop-filter: blur(12px);
-        }
-        .fp-nav--scrolled {
-          box-shadow: 0 1px 20px rgba(0,0,0,0.08);
-          background: rgba(255,255,255,0.97);
-        }
-        .fp-nav__inner {
-          display: flex;
-          align-items: center;
-          gap: 2rem;
-        }
-        .fp-nav__logo {
-          font-size: 1.35rem;
-          font-weight: 800;
-          color: #00A896;
-          text-decoration: none;
-          white-space: nowrap;
-        }
-        .fp-nav__links {
-          display: flex;
-          gap: 2rem;
-          flex: 1;
-          justify-content: center;
-        }
-        .fp-nav__links a {
-          text-decoration: none;
-          color: #4A5568;
-          font-size: 0.95rem;
-          font-weight: 500;
-          transition: color 0.2s;
-        }
-        .fp-nav__links a:hover,
-        .fp-nav__links a.active {
-          color: #00A896;
-        }
-        .fp-nav__auth {
-          display: flex;
-          gap: 0.75rem;
-          align-items: center;
-        }
+
 
         /* ---- Buttons ---- */
         .fp-btn {
@@ -424,7 +353,7 @@ const FeaturesPage = () => {
 
         /* ---- Hero ---- */
         .fp-hero {
-          padding: 140px 0 80px;
+          padding: 160px 0 80px;
           background: #fff;
         }
         .fp-hero__inner {
