@@ -1,16 +1,26 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const { login } = useAuth();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Functional logic removed as per project requirements
-    console.log('Login attempt with:', { email, password });
-    navigate('/dashboard');
+    
+    // Call the mock login
+    await login(email, password);
+    
+    // If the email has 'caregiver' in it, go to caregiver dashboard, else regular dashboard
+    if (email.includes('caregiver')) {
+      navigate('/caregiver/dashboard');
+    } else {
+      navigate('/dashboard');
+    }
   };
 
   return (

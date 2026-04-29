@@ -13,6 +13,8 @@ import Register   from './pages/public/Register/Register';
 
 // Protected pages
 import Dashboard  from './pages/child/Dashboard/Dashboard';
+import CaregiverDashboard from './pages/caregiver/Dashboard/CaregiverDashboard';
+import AssignedElders from './pages/caregiver/AssignedElders/AssignedElders';
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
@@ -38,6 +40,16 @@ function App() {
             <Route path="/dashboard" element={
               <PrivateRoute>
                 <Dashboard />
+              </PrivateRoute>
+            } />
+            <Route path="/caregiver/dashboard" element={
+              <PrivateRoute>
+                <CaregiverDashboard />
+              </PrivateRoute>
+            } />
+            <Route path="/caregiver/residents" element={
+              <PrivateRoute>
+                <AssignedElders />
               </PrivateRoute>
             } />
 
