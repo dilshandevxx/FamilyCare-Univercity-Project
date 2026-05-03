@@ -15,6 +15,7 @@ import Register   from './pages/public/Register/Register';
 import Dashboard  from './pages/child/Dashboard/Dashboard';
 import CaregiverDashboard from './pages/caregiver/Dashboard/CaregiverDashboard';
 import AssignedElders from './pages/caregiver/AssignedElders/AssignedElders';
+import CaregiverMessage from './pages/caregiver/CaregiverMessages/caregiverMessage';
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
@@ -50,6 +51,11 @@ function App() {
             <Route path="/caregiver/residents" element={
               <PrivateRoute>
                 <AssignedElders />
+              </PrivateRoute>
+            } />
+            <Route path="/caregiver/messages" element={
+              <PrivateRoute>
+                <CaregiverMessage />
               </PrivateRoute>
             } />
 
