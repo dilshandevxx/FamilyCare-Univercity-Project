@@ -1,0 +1,607 @@
+/* caregiverMessage.css */
+.messages-container {
+  display: flex;
+  height: calc(100vh - 144px);
+  background: white;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid #f1f5f9;
+}
+
+/* Columns */
+.conversations-column {
+  width: 320px;
+  border-right: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  background: white;
+}
+
+.chat-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #fafafa;
+}
+
+.patient-info-column {
+  width: 300px;
+  border-left: 1px solid #f1f5f9;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  overflow-y: auto;
+  background: white;
+}
+
+/* Conversations List */
+.search-bar {
+  padding: 16px;
+  border-bottom: 1px solid #f1f5f9;
+  position: relative;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 12px 12px 12px 40px;
+  border-radius: 12px;
+  border: none;
+  background-color: #f1f5f9;
+  font-size: 14px;
+  outline: none;
+  color: #334155;
+}
+
+.search-icon {
+  position: absolute;
+  left: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+
+.conversations-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.conversation-item {
+  padding: 16px;
+  border-bottom: 1px solid #f8fafc;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  gap: 12px;
+}
+
+.conversation-item:hover {
+  background-color: #f8fafc;
+}
+
+.conversation-item.active {
+  background-color: #f0fdfa;
+  border-left: 4px solid #0d9488;
+}
+
+.conv-avatar-wrapper {
+  display: none; /* Hide on desktop */
+}
+
+.conv-details {
+  flex: 1;
+}
+
+.conv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.conv-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: #1e293b;
+}
+
+.conv-time {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.conv-regarding-mobile {
+  display: none;
+}
+
+.conv-regarding-desktop {
+  font-size: 11px;
+  color: #0d9488;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.conv-preview-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.conv-preview {
+  font-size: 12px;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+  margin: 0;
+}
+
+.unread-badge {
+  background-color: #0d9488;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+/* Chat Area */
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f1f5f9;
+  background: white;
+}
+
+.chat-header-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chat-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.chat-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.status-badge {
+  font-size: 9px;
+  background-color: #ecfdf5;
+  color: #059669;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.chat-regarding {
+  font-size: 12px;
+  color: #64748b;
+  margin: 4px 0 0 0;
+}
+
+.chat-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background-color: #fafafa;
+}
+
+.message-bubble {
+  max-width: 70%;
+  padding: 16px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  position: relative;
+}
+
+.message-bubble.them {
+  align-self: flex-start;
+  background-color: #e2e8f0;
+  color: #334155;
+  border-bottom-left-radius: 4px;
+}
+
+.message-bubble.me {
+  align-self: flex-end;
+  background-color: #0d9488;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.message-time {
+  font-size: 10px;
+  margin-top: 8px;
+  opacity: 0.7;
+  text-align: right;
+}
+
+.chat-input-area {
+  padding: 16px 24px;
+  background: white;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  outline: none;
+  font-size: 14px;
+}
+
+.chat-input:focus {
+  border-color: #0d9488;
+}
+
+.send-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #0d9488;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.send-btn:hover {
+  background-color: #0f766e;
+}
+
+/* Patient Info Column */
+.patient-profile {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.patient-avatar-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 12px;
+}
+
+.patient-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px 0;
+}
+
+.patient-id {
+  font-size: 12px;
+  color: #64748b;
+  margin: 0;
+}
+
+.info-section {
+  margin-bottom: 24px;
+}
+
+.section-subtitle {
+  font-size: 10px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 12px 0;
+}
+
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background-color: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+  cursor: pointer;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.action-card:hover {
+  background-color: #f1f5f9;
+}
+
+.schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.schedule-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background-color: #f8fafc;
+  border-radius: 12px;
+}
+
+.schedule-item.upcoming {
+  background-color: #ecfdf5;
+}
+
+.time-badge {
+  background-color: #e2e8f0;
+  color: #475569;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.time-badge.green {
+  background-color: #059669;
+  color: white;
+}
+
+.schedule-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 2px 0;
+}
+
+.schedule-title.green {
+  color: #059669;
+}
+
+.schedule-desc {
+  font-size: 11px;
+  color: #64748b;
+  margin: 0;
+}
+
+.schedule-desc.green {
+  color: #059669;
+}
+
+.document-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 12px;
+}
+
+.doc-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.doc-icon {
+  color: #94a3b8;
+}
+
+.doc-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.download-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.download-btn:hover {
+  color: #64748b;
+}
+
+.mobile-fab {
+  display: none;
+}
+
+.mobile-bottom-nav {
+  display: none;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .messages-container {
+    height: auto;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    margin: -16px; /* Negate layout padding */
+    background-color: #f8fafc; /* Light grey background for the whole mobile view */
+    min-height: calc(100vh - 64px);
+    padding-bottom: 80px; /* Space for bottom nav */
+  }
+
+  .chat-column, .patient-info-column {
+    display: none;
+  }
+
+  .conversations-column {
+    width: 100%;
+    border-right: none;
+    position: relative;
+    background-color: transparent;
+    height: auto;
+  }
+
+  /* Search Bar */
+  .search-bar {
+    background-color: white;
+    border-bottom: none;
+    padding: 16px;
+  }
+
+  .conversations-list {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: visible;
+  }
+
+  .conv-avatar-wrapper {
+    display: block;
+    position: relative;
+  }
+
+  .conv-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  
+  .conv-avatar.initials {
+    border-radius: 50%;
+  }
+
+  .online-indicator {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background-color: #22c55e;
+    border-radius: 50%;
+    border: 2px solid white;
+  }
+
+  .conversation-item {
+    border-bottom: none;
+    padding: 16px;
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.02);
+    align-items: flex-start;
+  }
+
+  .conversation-item.active {
+    background-color: white;
+    border-left: none;
+  }
+
+  .conv-regarding-mobile {
+    display: inline-block;
+    font-size: 10px;
+    color: #64748b;
+    margin-bottom: 6px;
+    background-color: #e2e8f0;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+  }
+  
+  /* Color for Marcus as in mockup */
+  .conversation-item:first-child .conv-regarding-mobile {
+     background-color: #fff7ed;
+     color: #c2410c;
+  }
+  
+  .conv-regarding-desktop {
+    display: none;
+  }
+  
+  .conv-preview-row {
+     align-items: flex-start;
+  }
+  
+  .unread-badge {
+     margin-left: 8px;
+     flex-shrink: 0;
+  }
+
+  .mobile-fab {
+    display: flex;
+    position: fixed;
+    bottom: 96px; /* Above bottom nav */
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px; /* Squircle as in mockup */
+    background-color: #0d9488;
+    border: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.4);
+    z-index: 100;
+    cursor: pointer;
+  }
+  
+  /* Bottom Nav */
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 72px;
+    background-color: white;
+    border-top: 1px solid #f1f5f9;
+    z-index: 100;
+    justify-content: space-around;
+    align-items: center;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  .bottom-nav-item.active {
+    color: #0d9488;
+  }
+}
