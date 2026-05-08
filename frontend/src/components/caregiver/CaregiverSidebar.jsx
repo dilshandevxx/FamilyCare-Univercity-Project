@@ -36,7 +36,7 @@ const CaregiverSidebar = () => {
         </NavLink>
 
         <NavLink 
-          to="/caregiver/logs" 
+          to="/caregiver/healthlog/add" 
           className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
         >
           <FilePlus size={18} className="stroke-[2px]" />

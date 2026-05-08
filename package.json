@@ -9,5 +9,8 @@
     "install:backend": "cd backend && npm install",
     "install:frontend": "cd frontend && npm install",
     "install:all": "npm run install:backend && npm run install:frontend"
+  },
+  "dependencies": {
+    "lucide-react": "^1.14.0"
   }
 }
