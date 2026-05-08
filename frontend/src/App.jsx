@@ -17,6 +17,7 @@ import CaregiverDashboard from './pages/caregiver/Dashboard/CaregiverDashboard';
 import AssignedElders from './pages/caregiver/AssignedElders/AssignedElders';
 import CaregiverMessage from './pages/caregiver/CaregiverMessages/caregiverMessage';
 import CaregiverSettings from './pages/caregiver/CaregiverSettings/caregiversettings';
+import AddHealthLog from './pages/caregiver/HealthLog/AddHealthLog';
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
@@ -39,31 +40,12 @@ function App() {
             <Route path="/register"  element={<Register />} />
 
             {/* Protected */}
-            <Route path="/dashboard" element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            } />
-            <Route path="/caregiver/dashboard" element={
-              <PrivateRoute>
-                <CaregiverDashboard />
-              </PrivateRoute>
-            } />
-            <Route path="/caregiver/residents" element={
-              <PrivateRoute>
-                <AssignedElders />
-              </PrivateRoute>
-            } />
-            <Route path="/caregiver/messages" element={
-              <PrivateRoute>
-                <CaregiverMessage />
-              </PrivateRoute>
-            } />
-            <Route path="/caregiver/settings" element={
-              <PrivateRoute>
-                <CaregiverSettings />
-              </PrivateRoute>
-            } />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/caregiver/dashboard" element={<CaregiverDashboard />} />
+            <Route path="/caregiver/residents" element={<AssignedElders />} />
+            <Route path="/caregiver/messages" element={<CaregiverMessage />} />
+            <Route path="/caregiver/settings" element={<CaregiverSettings />} />
+            <Route path="/caregiver/healthlog/add" element={<AddHealthLog />} />
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" />} />
