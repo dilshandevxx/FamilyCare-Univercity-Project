@@ -18,6 +18,7 @@ import AssignedElders from './pages/caregiver/AssignedElders/AssignedElders';
 import CaregiverMessage from './pages/caregiver/CaregiverMessages/caregiverMessage';
 import CaregiverSettings from './pages/caregiver/CaregiverSettings/caregiversettings';
 import AddHealthLog from './pages/caregiver/HealthLog/AddHealthLog';
+import CaregiverVisitHistory from './pages/caregiver/CaregiverVisitHistory/caregivervisithistor';
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
@@ -46,6 +47,7 @@ function App() {
             <Route path="/caregiver/messages" element={<CaregiverMessage />} />
             <Route path="/caregiver/settings" element={<CaregiverSettings />} />
             <Route path="/caregiver/healthlog/add" element={<AddHealthLog />} />
+            <Route path="/caregiver/history" element={<CaregiverVisitHistory />} />
 
             {/* Fallback */}
             <Route path="*" element={<Navigate to="/" />} />
