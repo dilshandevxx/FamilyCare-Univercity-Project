@@ -1,0 +1,482 @@
+/* Caregivers Page Styles */
+.caregivers-page {
+  padding: 4rem 0;
+  background-color: var(--color-white);
+  min-height: 100vh;
+}
+
+.caregivers-header {
+  margin-bottom: 2.5rem;
+  max-width: 600px;
+}
+
+.caregivers-header h1 {
+  font-size: 2.5rem;
+  color: var(--color-text-main);
+  margin-bottom: 1rem;
+}
+
+.caregivers-subtitle {
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* Filters */
+.filters-container {
+  display: flex;
+  background-color: #F8FAFC;
+  border-radius: 12px;
+  padding: 0.75rem;
+  margin-bottom: 3rem;
+  gap: 1rem;
+  align-items: center;
+}
+
+.search-input-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  color: #A0AEC0;
+}
+
+.search-input-wrapper input {
+  width: 100%;
+  padding: 0.8rem 1rem 0.8rem 2.8rem;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: var(--font-main);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-input-wrapper input:focus {
+  border-color: var(--color-primary);
+}
+
+.dropdowns-group {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.filter-select {
+  padding: 0.8rem 2rem 0.8rem 1rem;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  background-color: white;
+  font-size: 0.95rem;
+  color: var(--color-text-main);
+  font-family: var(--font-main);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23718096'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1em;
+  outline: none;
+}
+
+.filter-select:focus {
+  border-color: var(--color-primary);
+}
+
+.update-btn {
+  padding: 0.8rem 1.5rem;
+  white-space: nowrap;
+}
+
+.mobile-filters {
+  display: none;
+  flex-direction: column;
+  background-color: transparent;
+  padding: 0;
+}
+
+.mobile-search-row {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  background-color: #F8FAFC;
+  padding: 0.5rem;
+  border-radius: 12px;
+  margin-bottom: 0.75rem;
+}
+
+.btn-icon-filter {
+  background-color: #EDFDFB;
+  color: var(--color-primary);
+  border: 1px solid #B2EBF2;
+  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.btn-icon-filter svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.mobile-pills {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  width: 100%;
+  scrollbar-width: none;
+}
+
+.mobile-pills::-webkit-scrollbar {
+  display: none;
+}
+
+.pill {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  border: 1px solid #E2E8F0;
+  background-color: white;
+  color: var(--color-text-main);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pill.active {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* Grid */
+.caregivers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.caregiver-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #F1F5F9;
+}
+
+.caregiver-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.card-top-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.avatar-wrapper {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.avatar-bg {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 60%;
+  background-color: #E6F6F4;
+  border-radius: 8px;
+  z-index: 0;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.verified-badge {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--color-primary);
+  color: white;
+  font-size: 0.55rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  white-space: nowrap;
+}
+
+.price-rating {
+  text-align: right;
+}
+
+.price {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  line-height: 1;
+}
+
+.price .unit {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.rating {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.star {
+  color: #F59E0B;
+}
+
+.reviews {
+  color: var(--color-text-muted);
+  font-weight: 400;
+  font-size: 0.8rem;
+}
+
+.caregiver-name {
+  font-size: 1.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.caregiver-title {
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 1rem;
+}
+
+.tags-container {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.tag {
+  background-color: #F1F5F9;
+  color: #475569;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.caregiver-quote {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+.btn-view-profile {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #F1F5F9;
+  color: var(--color-text-main);
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-view-profile:hover {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+/* Promo Banner */
+.promo-banner {
+  background-color: #115E59;
+  border-radius: 16px;
+  padding: 2.5rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  grid-column: 1 / -1;
+}
+
+.promo-content {
+  position: relative;
+  z-index: 1;
+  max-width: 600px;
+}
+
+.promo-content h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.promo-content p {
+  color: #CCFBF1;
+  margin-bottom: 2rem;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.promo-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.btn-talk {
+  background-color: #5EEAD4;
+  color: #0F766E;
+  font-weight: 700;
+}
+
+.btn-talk:hover {
+  background-color: #2DD4BF;
+}
+
+.btn-outline-white {
+  background-color: transparent;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-outline-white:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: white;
+}
+
+.promo-graphic {
+  position: absolute;
+  right: -5%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 300px;
+  height: 300px;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.page-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #E2E8F0;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--color-text-main);
+  transition: all 0.2s;
+}
+
+.page-btn:hover {
+  background-color: #F8FAFC;
+  border-color: #CBD5E1;
+}
+
+.page-btn svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.page-text {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .promo-banner {
+    flex-direction: column;
+    padding: 2rem;
+    align-items: flex-start;
+  }
+  
+  .promo-graphic {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .desktop-filters {
+    display: none;
+  }
+
+  .mobile-filters {
+    display: flex;
+  }
+
+  .caregivers-header h1 {
+    font-size: 2rem;
+  }
+
+  .caregivers-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .promo-buttons {
+    flex-direction: column;
+  }
+
+  .promo-buttons button {
+    width: 100%;
+  }
+}
