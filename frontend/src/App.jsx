@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 
@@ -22,47 +22,56 @@ const PrivateRoute = ({ children }) => {
   return user ? children : <Navigate to="/login" />;
 };
 
+const AppContent = () => {
+  const location = useLocation();
+  const isDashboardRoute = location.pathname.includes('/dashboard') || location.pathname.includes('/caregiver');
+
+  return (
+    <div className="App">
+      {!isDashboardRoute && <Navbar />}
+      <Routes>
+        {/* Public */}
+        <Route path="/"          element={<Home />} />
+        <Route path="/features"  element={<FeaturesPage />} />
+        <Route path="/caregivers" element={<Caregivers />} />
+        <Route path="/about"     element={<About />} />
+        <Route path="/login"     element={<Login />} />
+        <Route path="/register"  element={<Register />} />
+
+        {/* Protected */}
+        <Route path="/dashboard" element={
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        } />
+        <Route path="/caregiver/dashboard" element={
+          <PrivateRoute>
+            <CaregiverDashboard />
+          </PrivateRoute>
+        } />
+        <Route path="/caregiver/residents" element={
+          <PrivateRoute>
+            <AssignedElders />
+          </PrivateRoute>
+        } />
+        <Route path="/caregiver/messages" element={
+          <PrivateRoute>
+            <CaregiverMessage />
+          </PrivateRoute>
+        } />
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" />} />
+      </Routes>
+    </div>
+  );
+};
+
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="App">
-          <Navbar />
-          <Routes>
-            {/* Public */}
-            <Route path="/"          element={<Home />} />
-            <Route path="/features"  element={<FeaturesPage />} />
-            <Route path="/caregivers" element={<Caregivers />} />
-            <Route path="/about"     element={<About />} />
-            <Route path="/login"     element={<Login />} />
-            <Route path="/register"  element={<Register />} />
-
-            {/* Protected */}
-            <Route path="/dashboard" element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            } />
-            <Route path="/caregiver/dashboard" element={
-              <PrivateRoute>
-                <CaregiverDashboard />
-              </PrivateRoute>
-            } />
-            <Route path="/caregiver/residents" element={
-              <PrivateRoute>
-                <AssignedElders />
-              </PrivateRoute>
-            } />
-            <Route path="/caregiver/messages" element={
-              <PrivateRoute>
-                <CaregiverMessage />
-              </PrivateRoute>
-            } />
-
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </div>
+        <AppContent />
       </AuthProvider>
     </Router>
   );
