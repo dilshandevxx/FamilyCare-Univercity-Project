@@ -16,6 +16,9 @@ import Dashboard  from './pages/child/Dashboard/Dashboard';
 import CaregiverDashboard from './pages/caregiver/Dashboard/CaregiverDashboard';
 import AssignedElders from './pages/caregiver/AssignedElders/AssignedElders';
 import CaregiverMessage from './pages/caregiver/CaregiverMessages/caregiverMessage';
+import CaregiverSettings from './pages/caregiver/CaregiverSettings/caregiversettings';
+import AddHealthLog from './pages/caregiver/HealthLog/AddHealthLog';
+import CaregiverVisitHistory from './pages/caregiver/CaregiverVisitHistory/caregivervisithistor';
 
 const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
@@ -38,27 +41,27 @@ const AppContent = () => {
         <Route path="/login"     element={<Login />} />
         <Route path="/register"  element={<Register />} />
 
-        {/* Protected */}
-        <Route path="/dashboard" element={
-          <PrivateRoute>
-            <Dashboard />
-          </PrivateRoute>
-        } />
-        <Route path="/caregiver/dashboard" element={
-          <PrivateRoute>
-            <CaregiverDashboard />
-          </PrivateRoute>
-        } />
-        <Route path="/caregiver/residents" element={
-          <PrivateRoute>
-            <AssignedElders />
-          </PrivateRoute>
-        } />
-        <Route path="/caregiver/messages" element={
-          <PrivateRoute>
-            <CaregiverMessage />
-          </PrivateRoute>
-        } />
+            {/* Protected */}
+            <Route path="/dashboard" element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            } />
+            <Route path="/caregiver/dashboard" element={
+              <PrivateRoute>
+                <CaregiverDashboard />
+              </PrivateRoute>
+            } />
+            <Route path="/caregiver/residents" element={
+              <PrivateRoute>
+                <AssignedElders />
+              </PrivateRoute>
+            } />
+            <Route path="/caregiver/messages" element={
+              <PrivateRoute>
+                <CaregiverMessage />
+              </PrivateRoute>
+            } />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" />} />
