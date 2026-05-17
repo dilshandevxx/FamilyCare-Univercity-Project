@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -8,11 +9,20 @@ const Register = () => {
   const [role, setRole] = useState('child');
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const { register } = useAuth();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Functional logic removed as per project requirements
-    console.log('Registration details:', { name, email, password, role });
-    navigate('/dashboard');
+    
+    // Call mock register
+    await register({ name, email, password, role });
+    
+    // Redirect based on role
+    if (role === 'caregiver') {
+      navigate('/caregiver/dashboard');
+    } else {
+      navigate('/dashboard');
+    }
   };
 
   return (

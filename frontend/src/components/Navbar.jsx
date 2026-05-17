@@ -58,7 +58,7 @@ const Navbar = () => {
           <div className="navbar__auth">
             {user ? (
               <>
-                <Link to="/dashboard" className="nav-link">Dashboard</Link>
+                <Link to={user.role === 'caregiver' ? '/caregiver/dashboard' : '/dashboard'} className="nav-link">Dashboard</Link>
                 <button onClick={handleLogout} className="btn btn-secondary navbar__cta">
                   Logout
                 </button>
@@ -99,7 +99,7 @@ const Navbar = () => {
           <div className="drawer-divider" />
           {user ? (
             <>
-              <Link to="/dashboard" className="drawer-link" onClick={() => setMenuOpen(false)}>
+              <Link to={user.role === 'caregiver' ? '/caregiver/dashboard' : '/dashboard'} className="drawer-link" onClick={() => setMenuOpen(false)}>
                 Dashboard
               </Link>
               <button onClick={handleLogout} className="btn btn-secondary drawer-btn">

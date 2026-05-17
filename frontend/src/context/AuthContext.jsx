@@ -37,11 +37,15 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (userData) => {
-    const { data } = await api.post('/auth/register', userData);
-    localStorage.setItem('token', data.token);
-    const profile = await api.get('/users/profile');
-    setUser(profile.data);
-    return data;
+    // Mock registration for any credentials
+    const dummyUser = {
+      name: userData.name || 'New User',
+      email: userData.email,
+      role: userData.role || 'child'
+    };
+    setUser(dummyUser);
+    localStorage.setItem('token', 'dummy-token');
+    return { token: 'dummy-token', user: dummyUser };
   };
 
   const logout = () => {
