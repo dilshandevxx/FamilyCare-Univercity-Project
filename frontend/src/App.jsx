@@ -40,7 +40,9 @@ const PrivateRoute = ({ children }) => {
 const AppContent = () => {
   const location = useLocation();
   const hideNav = DASHBOARD_PATHS.some(p => location.pathname.startsWith(p))
-    || location.pathname.startsWith('/caregiver/');
+    || location.pathname.startsWith('/caregiver/')
+    || location.pathname === '/login'
+    || location.pathname === '/register';
 
   return (
     <div className="App">

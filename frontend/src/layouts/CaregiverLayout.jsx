@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Bell, HelpCircle, Menu } from 'lucide-react';
 import CaregiverSidebar from '../components/caregiver/CaregiverSidebar';
+import { useAuth } from '../context/AuthContext';
 import './CaregiverLayout.css';
 
 const CaregiverLayout = ({ children, title = "Dashboard" }) => {
+  const { user } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => {
@@ -47,11 +49,11 @@ const CaregiverLayout = ({ children, title = "Dashboard" }) => {
 
             <div className="profile-group">
               <div className="profile-info hide-on-mobile">
-                <p className="profile-name">Sarah Mitchell</p>
-                <p className="profile-role">Senior Caregiver</p>
+                <p className="profile-name">{user?.name || 'Caregiver'}</p>
+                <p className="profile-role">Caregiver</p>
               </div>
               <div className="profile-avatar">
-                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah" alt="Avatar" />
+                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user?.name || 'Caregiver')}`} alt="Avatar" />
               </div>
             </div>
           </div>

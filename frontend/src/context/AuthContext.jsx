@@ -24,28 +24,18 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const login = async (email, password) => {
-    // Mock successful login for any credentials
-    const dummyUser = { 
-      name: 'Demo User', 
-      email: email, 
-      role: email.includes('caregiver') ? 'caregiver' : 'parent' 
-    };
-    setUser(dummyUser);
-    localStorage.setItem('token', 'dummy-token');
-    return { token: 'dummy-token', user: dummyUser };
+  const login = async (email, password, role) => {
+    const { data } = await api.post('/auth/login', { email, password, role });
+    setUser(data.user);
+    localStorage.setItem('token', data.token);
+    return data;
   };
 
   const register = async (userData) => {
-    // Mock registration for any credentials
-    const dummyUser = {
-      name: userData.name || 'New User',
-      email: userData.email,
-      role: userData.role || 'child'
-    };
-    setUser(dummyUser);
-    localStorage.setItem('token', 'dummy-token');
-    return { token: 'dummy-token', user: dummyUser };
+    const { data } = await api.post('/auth/register', userData);
+    setUser(data.user);
+    localStorage.setItem('token', data.token);
+    return data;
   };
 
   const logout = () => {
