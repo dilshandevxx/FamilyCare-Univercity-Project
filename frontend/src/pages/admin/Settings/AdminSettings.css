@@ -90,3 +90,10 @@
 }
 
 .as-toggle.on .as-toggle-thumb { left: 23px; }
+
+@media (max-width: 640px) {
+  .as-header { flex-direction: column; align-items: stretch; }
+  .as-save-btn { width: 100%; justify-content: center; }
+  .as-input { max-width: 100%; }
+  .as-toggle-row { flex-wrap: wrap; gap: 12px; }
+}

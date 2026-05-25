@@ -81,16 +81,23 @@ const Login = () => {
   };
 
   return (
+    <>
+    <style>{`
+      @media (max-width: 768px) {
+        .login-hero-panel { display: none !important; }
+        .login-form-panel { flex: unset !important; width: 100% !important; }
+      }
+    `}</style>
     <div style={{ display: 'flex', minHeight: '100vh', fontFamily: "'Inter', sans-serif", backgroundColor: '#f8fafc' }}>
-      
+
       {/* Left panel — hero image */}
-      <div style={{
+      <div className="login-hero-panel" style={{
         flex: 1,
         backgroundImage: `url(${nurseImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         position: 'relative',
-        display: window.innerWidth > 768 ? 'flex' : 'none',
+        display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
         padding: '3rem',
@@ -145,7 +152,7 @@ const Login = () => {
       </div>
 
       {/* Right panel — form */}
-      <div style={{
+      <div className="login-form-panel" style={{
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
@@ -341,6 +348,7 @@ const Login = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

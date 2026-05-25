@@ -83,3 +83,13 @@
 .sm-status.warn { background: #fef3c7; color: #b45309; }
 
 .sm-td-sub { font-size: 12.5px; color: #64748b; }
+
+@media (max-width: 768px) {
+  .sm-resources { grid-template-columns: 1fr 1fr; }
+  .sm-services-card { overflow: auto; }
+  .sm-table { min-width: 480px; }
+}
+
+@media (max-width: 480px) {
+  .sm-resources { grid-template-columns: 1fr; }
+}

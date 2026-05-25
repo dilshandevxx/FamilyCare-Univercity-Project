@@ -3,6 +3,15 @@ import { ArrowRight, CheckCircle } from 'lucide-react';
 
 const Hero = () => {
   return (
+    <>
+    <style>{`
+      @media (max-width: 768px) {
+        section.hero { padding-top: 100px !important; padding-bottom: 60px !important; }
+        section.hero .container { grid-template-columns: 1fr !important; gap: 2rem !important; }
+        section.hero .hero-content h1 { font-size: 2.4rem !important; }
+        section.hero .hero-visual { display: none !important; }
+      }
+    `}</style>
     <section className="hero" style={{ paddingTop: '160px', paddingBottom: '100px', backgroundColor: '#fff' }}>
       <div className="container" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '4rem', alignItems: 'center' }}>
         <div className="hero-content">
@@ -66,6 +75,7 @@ const Hero = () => {
         </div>
       </div>
     </section>
+    </>
   );
 };
 

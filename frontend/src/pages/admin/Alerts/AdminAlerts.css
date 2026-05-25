@@ -94,3 +94,14 @@
   gap: 12px; padding: 60px 0;
   font-size: 14px; font-weight: 600; color: #64748b;
 }
+
+@media (max-width: 640px) {
+  .aa-counts { flex-wrap: wrap; }
+  .aa-tabs   { flex-wrap: wrap; }
+  .aa-item   { flex-wrap: wrap; }
+  .aa-icon   { display: none; }
+  .aa-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
