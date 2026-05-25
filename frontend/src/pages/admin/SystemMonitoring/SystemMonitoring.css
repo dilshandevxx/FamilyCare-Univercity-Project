@@ -1,0 +1,85 @@
+.sm-page { display: flex; flex-direction: column; gap: 24px; }
+
+.sm-header { display: flex; flex-direction: column; gap: 8px; }
+.sm-title   { font-size: 22px; font-weight: 800; color: #0f172a; margin: 0; }
+.sm-subtitle { font-size: 13px; color: #64748b; margin: 0; }
+
+.sm-overall-status {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 13px; font-weight: 600; color: #16a34a;
+  background: #f0fdf4; border: 1px solid #bbf7d0;
+  padding: 7px 14px; border-radius: 10px;
+  width: fit-content;
+}
+
+.sm-resources {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.sm-resource-card {
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sm-res-top { display: flex; align-items: center; gap: 12px; }
+
+.sm-res-icon {
+  width: 42px; height: 42px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.sm-res-label { font-size: 12px; color: #64748b; font-weight: 600; margin: 0 0 2px; }
+.sm-res-value { font-size: 24px; font-weight: 800; margin: 0; }
+
+.sm-res-bar-track {
+  height: 6px; background: #f1f5f9; border-radius: 999px; overflow: hidden;
+}
+
+.sm-res-bar-fill { height: 100%; border-radius: 999px; transition: width 0.4s; }
+
+.sm-services-card {
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.sm-services-title { font-size: 14px; font-weight: 700; color: #0f172a; margin: 0 0 16px; }
+
+.sm-table { width: 100%; border-collapse: collapse; }
+.sm-table th {
+  padding: 10px 14px; text-align: left;
+  font-size: 11px; font-weight: 700; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: 0.05em;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.sm-table td { padding: 13px 14px; border-bottom: 1px solid #f8fafc; }
+.sm-table tbody tr:last-child td { border-bottom: none; }
+.sm-table tbody tr:hover { background: #f8fafc; }
+
+.sm-td-name {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 13.5px; font-weight: 700; color: #0f172a;
+}
+
+.sm-status {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 12px; font-weight: 700;
+  padding: 4px 10px; border-radius: 999px;
+}
+
+.sm-status.ok   { background: #f0fdf4; color: #16a34a; }
+.sm-status.warn { background: #fef3c7; color: #b45309; }
+
+.sm-td-sub { font-size: 12.5px; color: #64748b; }
