@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { Home, Users, FilePlus, Clock, Mail, Settings, Phone, X, AlertTriangle } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { Home, Users, FilePlus, Clock, Mail, Settings, Phone, LogOut, X, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './CaregiverSidebar.css';
 
 const CaregiverSidebar = () => {
   const { logout } = useAuth();
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   const handleEmergencyCall = () => {
     window.location.href = 'tel:911';
@@ -79,6 +85,10 @@ const CaregiverSidebar = () => {
         <button className="btn-emergency" onClick={() => setShowModal(true)}>
           <Phone size={16} fill="currentColor" />
           Emergency Call
+        </button>
+        <button className="btn-logout" onClick={handleLogout}>
+          <LogOut size={16} />
+          Logout
         </button>
       </div>
 

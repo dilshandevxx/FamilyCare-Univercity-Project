@@ -112,10 +112,17 @@ const Register = () => {
   };
 
   return (
+    <>
+    <style>{`
+      @media (max-width: 768px) {
+        .register-hero-panel { display: none !important; }
+        .register-form-panel { width: 100% !important; }
+      }
+    `}</style>
     <div style={{ display: 'flex', minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
 
       {/* ── Left panel ── */}
-      <div style={{
+      <div className="register-hero-panel" style={{
         flex: 1,
         backgroundImage: `url(${nurseImage})`,
         backgroundSize: 'cover',
@@ -174,7 +181,7 @@ const Register = () => {
       </div>
 
       {/* ── Right panel ── */}
-      <div style={{
+      <div className="register-form-panel" style={{
         width: '500px',
         flexShrink: 0,
         display: 'flex',
@@ -417,6 +424,7 @@ const Register = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
