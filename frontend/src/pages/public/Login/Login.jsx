@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-import { Home, Contact, CheckCircle2, Lock, Mail, Info } from 'lucide-react';
+import { Home, Contact, Shield, Lock, Mail, Info } from 'lucide-react';
 import nurseImage from '../../../assets/about/nurse_holding_hands.png';
 
 const TEAL = '#00A896';
@@ -26,10 +26,12 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // Authenticate user with role context
-      await login(email, password, selectedRole);
-      
-      if (selectedRole === 'caregiver') {
+      const data = await login(email, password, selectedRole);
+      // Use actual role from DB, not the UI selector
+      const dbRole = data.role;
+      if (dbRole === 'admin') {
+        navigate('/admin/dashboard');
+      } else if (dbRole === 'caregiver') {
         navigate('/caregiver/dashboard');
       } else {
         navigate('/dashboard');
@@ -161,7 +163,7 @@ const Login = () => {
           </p>
 
           {/* Role selector */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '1.8rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '1.8rem' }}>
             <RoleCard
               role="family"
               label="Family Member"
@@ -173,6 +175,12 @@ const Login = () => {
               label="Caregiver"
               description="Access care logs and schedules"
               icon={<Contact size={20} color={selectedRole === 'caregiver' ? TEAL : '#64748b'} />}
+            />
+            <RoleCard
+              role="admin"
+              label="Admin"
+              description="Manage platform & users"
+              icon={<Shield size={20} color={selectedRole === 'admin' ? TEAL : '#64748b'} />}
             />
           </div>
 
@@ -293,7 +301,7 @@ const Login = () => {
                 marginBottom: '1.4rem'
               }}
             >
-              {isLoading ? 'Signing in...' : `Sign in as ${selectedRole === 'caregiver' ? 'Caregiver' : 'Family Member'}`}
+              {isLoading ? 'Signing in...' : `Sign in as ${selectedRole === 'caregiver' ? 'Caregiver' : selectedRole === 'admin' ? 'Admin' : 'Family Member'}`}
             </button>
           </form>
 
