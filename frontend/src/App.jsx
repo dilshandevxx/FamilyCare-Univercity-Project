@@ -26,6 +26,17 @@ import CaregiverSettings     from './pages/caregiver/CaregiverSettings/caregiver
 import AddHealthLog          from './pages/caregiver/HealthLog/AddHealthLog';
 import CaregiverVisitHistory from './pages/caregiver/CaregiverVisitHistory/caregivervisithistor';
 
+// Admin pages
+import AdminDashboard    from './pages/admin/Dashboard/AdminDashboard';
+import UserManagement    from './pages/admin/UserManagement/UserManagement';
+import CaregiverApproval from './pages/admin/CaregiverApproval/CaregiverApproval';
+import ElderManagement   from './pages/admin/ElderManagement/ElderManagement';
+import AdminHealthLogs   from './pages/admin/HealthLogs/AdminHealthLogs';
+import AdminAlerts       from './pages/admin/Alerts/AdminAlerts';
+import AdminAnalytics    from './pages/admin/Analytics/AdminAnalytics';
+import SystemMonitoring  from './pages/admin/SystemMonitoring/SystemMonitoring';
+import AdminSettings     from './pages/admin/Settings/AdminSettings';
+
 /* Routes where the public Navbar should NOT appear */
 const DASHBOARD_PATHS = [
   '/dashboard', '/parents', '/alerts', '/health-feed', '/messages',
@@ -37,10 +48,19 @@ const PrivateRoute = ({ children }) => {
   return user ? children : <Navigate to="/login" />;
 };
 
+/* Admin-only route — user must be authenticated AND have role === 'admin' */
+const AdminRoute = ({ children }) => {
+  const { user } = useAuth();
+  if (!user) return <Navigate to="/login" />;
+  if (user.role !== 'admin') return <Navigate to="/" />;
+  return children;
+};
+
 const AppContent = () => {
   const location = useLocation();
   const hideNav = DASHBOARD_PATHS.some(p => location.pathname.startsWith(p))
     || location.pathname.startsWith('/caregiver/')
+    || location.pathname.startsWith('/admin/')
     || location.pathname === '/login'
     || location.pathname === '/register';
 
@@ -70,6 +90,17 @@ const AppContent = () => {
         <Route path="/caregiver/settings"     element={<PrivateRoute><CaregiverSettings /></PrivateRoute>} />
         <Route path="/caregiver/healthlog/add" element={<PrivateRoute><AddHealthLog /></PrivateRoute>} />
         <Route path="/caregiver/history"      element={<PrivateRoute><CaregiverVisitHistory /></PrivateRoute>} />
+
+        {/* Protected – Admin (role === 'admin' required) */}
+        <Route path="/admin/dashboard"          element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        <Route path="/admin/users"              element={<AdminRoute><UserManagement /></AdminRoute>} />
+        <Route path="/admin/caregiver-approval" element={<AdminRoute><CaregiverApproval /></AdminRoute>} />
+        <Route path="/admin/elders"             element={<AdminRoute><ElderManagement /></AdminRoute>} />
+        <Route path="/admin/health-logs"        element={<AdminRoute><AdminHealthLogs /></AdminRoute>} />
+        <Route path="/admin/alerts"             element={<AdminRoute><AdminAlerts /></AdminRoute>} />
+        <Route path="/admin/analytics"          element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
+        <Route path="/admin/monitoring"         element={<AdminRoute><SystemMonitoring /></AdminRoute>} />
+        <Route path="/admin/settings"           element={<AdminRoute><AdminSettings /></AdminRoute>} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" />} />
