@@ -12,8 +12,18 @@ CREATE TABLE IF NOT EXISTS users (
   name         VARCHAR(150)  NOT NULL,
   email        VARCHAR(150)  NOT NULL UNIQUE,
   password     VARCHAR(255)  NOT NULL,
+  phone        VARCHAR(20),
   role         ENUM('child', 'caregiver', 'admin') NOT NULL DEFAULT 'child',
   created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ── Family Member Profiles ────────────────────────────────────
+CREATE TABLE IF NOT EXISTS family_profiles (
+  id               INT AUTO_INCREMENT PRIMARY KEY,
+  user_id          INT NOT NULL UNIQUE,
+  relationship     VARCHAR(50),
+  created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- ── Parents (elderly person profiles) ────────────────────────
@@ -31,10 +41,12 @@ CREATE TABLE IF NOT EXISTS parents (
 -- ── Caregivers ────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS caregivers (
   id                 INT AUTO_INCREMENT PRIMARY KEY,
-  user_id            INT,                          -- links to users table if caregiver has an account
+  user_id            INT UNIQUE,
   name               VARCHAR(150) NOT NULL,
   specialization     VARCHAR(100),
-  experience_years   INT DEFAULT 0,
+  experience_years   VARCHAR(20),
+  certification      VARCHAR(50),
+  license_id         VARCHAR(100),
   hourly_rate        DECIMAL(8, 2) DEFAULT 0.00,
   bio                TEXT,
   is_available       BOOLEAN DEFAULT TRUE,
