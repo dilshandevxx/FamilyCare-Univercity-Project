@@ -28,6 +28,176 @@ const labelStyle = {
   color: '#374151',
 };
 
+const MODAL_CONTENT = {
+  terms: {
+    title: 'Terms of Service',
+    sections: [
+      {
+        heading: '1. Acceptance of Terms',
+        body: 'By creating an account and using FamilyCare, you agree to be bound by these Terms of Service. If you do not agree, please do not use our platform.',
+      },
+      {
+        heading: '2. Description of Service',
+        body: 'FamilyCare provides a platform that connects family members with professional caregivers to facilitate remote monitoring and coordination of care for elderly or dependent individuals.',
+      },
+      {
+        heading: '3. User Accounts',
+        body: 'You are responsible for maintaining the confidentiality of your account credentials. You agree to notify us immediately of any unauthorized access. You must provide accurate and complete information during registration.',
+      },
+      {
+        heading: '4. Caregiver Verification',
+        body: 'Caregiver accounts are subject to additional verification before activation. FamilyCare reserves the right to revoke caregiver access if provided credentials or certifications are found to be invalid.',
+      },
+      {
+        heading: '5. Prohibited Conduct',
+        body: 'You agree not to misuse the platform, share false information, attempt unauthorized access to other accounts, or use the service for any unlawful purpose.',
+      },
+      {
+        heading: '6. Limitation of Liability',
+        body: 'FamilyCare is a coordination platform and does not directly provide medical care. We are not liable for the actions of caregivers or the outcomes of care arrangements facilitated through our platform.',
+      },
+      {
+        heading: '7. Modifications',
+        body: 'We reserve the right to update these Terms at any time. Continued use of the platform after changes are posted constitutes your acceptance of the revised Terms.',
+      },
+      {
+        heading: '8. Governing Law',
+        body: 'These Terms shall be governed by applicable federal and state laws, including all relevant healthcare regulations.',
+      },
+    ],
+  },
+  privacy: {
+    title: 'Privacy Policy',
+    sections: [
+      {
+        heading: '1. Information We Collect',
+        body: 'We collect personal information you provide during registration (name, email, phone, role), usage data, and health-related information shared through the platform to facilitate care coordination.',
+      },
+      {
+        heading: '2. HIPAA Compliance',
+        body: 'FamilyCare handles Protected Health Information (PHI) in accordance with the Health Insurance Portability and Accountability Act (HIPAA). We implement administrative, physical, and technical safeguards to protect the privacy and security of health information.',
+      },
+      {
+        heading: '3. How We Use Your Information',
+        body: 'Your information is used to operate the platform, connect family members with caregivers, send notifications, improve our services, and comply with legal obligations. We do not sell your personal data.',
+      },
+      {
+        heading: '4. Information Sharing',
+        body: 'We share information only with the parties you authorize (e.g., caregivers you connect with), service providers who assist our operations under strict confidentiality agreements, and authorities when required by law.',
+      },
+      {
+        heading: '5. Data Security',
+        body: 'We use industry-standard encryption (TLS in transit, AES-256 at rest), access controls, and regular security audits to protect your data against unauthorized access or disclosure.',
+      },
+      {
+        heading: '6. Data Retention',
+        body: 'We retain your personal data for as long as your account is active or as needed to provide services. You may request deletion of your account and associated data at any time.',
+      },
+      {
+        heading: '7. Your Rights',
+        body: 'You have the right to access, correct, or delete your personal information. You may also opt out of non-essential communications. To exercise these rights, contact our Privacy Officer at privacy@familycare.com.',
+      },
+      {
+        heading: '8. Cookies',
+        body: 'We use essential cookies to keep you logged in and session cookies to improve your experience. We do not use third-party advertising cookies.',
+      },
+      {
+        heading: '9. Contact Us',
+        body: 'For privacy-related inquiries or to report a concern, contact us at privacy@familycare.com or write to: FamilyCare Privacy Officer, [Company Address].',
+      },
+    ],
+  },
+};
+
+const LegalModal = ({ type, onClose }) => {
+  const content = MODAL_CONTENT[type];
+  if (!content) return null;
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 1000,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '1rem',
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          backgroundColor: 'white', borderRadius: '16px',
+          width: '100%', maxWidth: '560px',
+          maxHeight: '80vh', display: 'flex', flexDirection: 'column',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.2)',
+        }}
+      >
+        {/* Header */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '1.25rem 1.5rem',
+          borderBottom: '1px solid #E2E8F0',
+          flexShrink: 0,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '32px', height: '32px', borderRadius: '8px',
+              backgroundColor: TEAL_LIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M9 12h6M9 16h6M7 8h10M5 4h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" stroke={TEAL} strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </div>
+            <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: '700', color: '#1a202c' }}>{content.title}</h3>
+          </div>
+          <button
+            onClick={onClose}
+            style={{
+              background: '#F3F4F6', border: 'none', borderRadius: '8px',
+              width: '32px', height: '32px', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: '1rem', color: '#6B7280',
+            }}
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Scrollable body */}
+        <div style={{ overflowY: 'auto', padding: '1.25rem 1.5rem', flex: 1 }}>
+          <p style={{ fontSize: '0.76rem', color: '#9CA3AF', marginTop: 0, marginBottom: '1rem' }}>
+            Last updated: January 1, 2026
+          </p>
+          {content.sections.map((s, i) => (
+            <div key={i} style={{ marginBottom: '1rem' }}>
+              <h4 style={{ fontSize: '0.83rem', fontWeight: '600', color: '#1a202c', margin: '0 0 4px 0' }}>{s.heading}</h4>
+              <p style={{ fontSize: '0.79rem', color: '#4A5568', lineHeight: 1.65, margin: 0 }}>{s.body}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          padding: '1rem 1.5rem',
+          borderTop: '1px solid #E2E8F0',
+          flexShrink: 0,
+          display: 'flex', justifyContent: 'flex-end',
+        }}>
+          <button
+            onClick={onClose}
+            style={{
+              backgroundColor: TEAL, color: 'white', border: 'none',
+              borderRadius: '8px', padding: '0.55rem 1.25rem',
+              fontSize: '0.82rem', fontWeight: '600', cursor: 'pointer',
+            }}
+          >
+            Got it
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const Register = () => {
   const [selectedRole, setSelectedRole] = useState('family');
   const [name, setName]               = useState('');
@@ -42,6 +212,7 @@ const Register = () => {
   const [agreed, setAgreed]           = useState(false);
   const [isLoading, setIsLoading]     = useState(false);
   const [error, setError]             = useState('');
+  const [openModal, setOpenModal]     = useState(null);
 
   const navigate = useNavigate();
   const { register } = useAuth();
@@ -182,8 +353,7 @@ const Register = () => {
 
       {/* ── Right panel ── */}
       <div className="register-form-panel" style={{
-        width: '500px',
-        flexShrink: 0,
+        flex: 1,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -383,9 +553,15 @@ const Register = () => {
               />
               <label htmlFor="agreed" style={{ fontSize: '0.76rem', color: '#4A5568', cursor: 'pointer', lineHeight: 1.5 }}>
                 I agree to the{' '}
-                <a href="#" style={{ color: TEAL, textDecoration: 'none', fontWeight: '500' }}>Terms of Service</a>
+                <a
+                  href="#" onClick={e => { e.preventDefault(); setOpenModal('terms'); }}
+                  style={{ color: TEAL, textDecoration: 'none', fontWeight: '500' }}
+                >Terms of Service</a>
                 {' '}and{' '}
-                <a href="#" style={{ color: TEAL, textDecoration: 'none', fontWeight: '500' }}>Privacy Policy</a>
+                <a
+                  href="#" onClick={e => { e.preventDefault(); setOpenModal('privacy'); }}
+                  style={{ color: TEAL, textDecoration: 'none', fontWeight: '500' }}
+                >Privacy Policy</a>
                 , including HIPAA compliance standards.
               </label>
             </div>
@@ -419,11 +595,13 @@ const Register = () => {
           </p>
 
           <p style={{ textAlign: 'center', fontSize: '0.72rem', color: '#9CA3AF', marginTop: '1.2rem' }}>
-            © 2024 FamilyCare. Your sanctuary for health.
+            © 2026 FamilyCare. Your sanctuary for health.
           </p>
         </div>
       </div>
     </div>
+
+    {openModal && <LegalModal type={openModal} onClose={() => setOpenModal(null)} />}
     </>
   );
 };

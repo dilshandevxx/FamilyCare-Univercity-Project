@@ -63,13 +63,242 @@
 
 .notification-dot {
   position: absolute;
-  top: 8px;
-  right: 10px;
-  width: 8px;
-  height: 8px;
+  top: 4px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
   background-color: #f97316;
+  border-radius: 999px;
+  border: 1.5px solid #ffffff;
+  font-size: 9px;
+  font-weight: 700;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  line-height: 1;
+}
+
+.icon-btn--active {
+  background-color: #f1f5f9;
+  color: #0d9488;
+}
+
+/* ── Popover wrapper ── */
+.hdr-popover-wrap {
+  position: relative;
+}
+
+.hdr-popover {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+  border: 1px solid #e2e8f0;
+  z-index: 100;
+  animation: popoverIn 0.15s ease;
+}
+
+@keyframes popoverIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.popover-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.popover-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.popover-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  font-size: 11px;
+  color: #0d9488;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.popover-close-btn {
+  background: #f1f5f9;
+  border: none;
+  border-radius: 6px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.popover-footer {
+  padding: 10px 16px;
+  border-top: 1px solid #f1f5f9;
+  text-align: center;
+}
+
+.popover-footer-btn {
+  background: none;
+  border: none;
+  font-size: 11px;
+  color: #0d9488;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* ── Notifications ── */
+.notif-popover {
+  width: 320px;
+}
+
+.notif-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.notif-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 16px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s;
+}
+
+.notif-item:hover {
+  background-color: #f8fafc;
+}
+
+.notif-item--unread {
+  background-color: #f0fdfa;
+}
+
+.notif-item--unread:hover {
+  background-color: #e6faf7;
+}
+
+.notif-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notif-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 2px;
+}
+
+.notif-msg {
+  font-size: 11px;
+  color: #64748b;
+  margin: 0 0 4px;
+  line-height: 1.5;
+}
+
+.notif-time {
+  font-size: 10px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin: 0;
+}
+
+.notif-unread-dot {
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  border: 1px solid #ffffff;
+  background-color: #0d9488;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+/* ── Help ── */
+.help-popover {
+  width: 270px;
+}
+
+.help-list {
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.help-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  background: none;
+  border: none;
+  border-radius: 10px;
+  padding: 9px 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.help-item:hover {
+  background-color: #f0fdfa;
+}
+
+.help-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background-color: #f0fdfa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.help-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 1px;
+}
+
+.help-desc {
+  font-size: 10px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.help-footer-note {
+  font-size: 10px;
+  color: #94a3b8;
+  margin: 0;
 }
 
 .header-divider {
