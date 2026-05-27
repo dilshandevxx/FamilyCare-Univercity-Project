@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import CaregiverLayout from '../../../layouts/CaregiverLayout';
 import {
   User, Calendar, Bell, Shield, LogOut, CheckCircle2,
-  ChevronRight, Edit3, Zap, Lock, Loader2
+  ChevronRight, Edit3, Zap, Lock, Loader2, ShieldCheck, ShieldOff, X, ScanLine
 } from 'lucide-react';
 import api from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
@@ -177,13 +177,25 @@ const CaregiverSettings = () => {
     currentPassword: '', newPassword: '', confirmPassword: '',
   });
 
+  // ── 2FA state ──────────────────────────────────────────────
+  const [tfaEnabled, setTfaEnabled]       = useState(false);
+  const [tfaModal, setTfaModal]           = useState(null); // null | 'setup' | 'disable'
+  const [tfaQrCode, setTfaQrCode]         = useState('');
+  const [tfaSecret, setTfaSecret]         = useState('');
+  const [tfaOtp, setTfaOtp]               = useState('');
+  const [tfaLoading, setTfaLoading]       = useState(false);
+  const [tfaStep, setTfaStep]             = useState(1); // 1=scan QR, 2=enter code
+
   const [saving, setSaving] = useState(''); // 'profile' | 'availability' | 'notifications' | 'password'
 
   // ── Load settings on mount ─────────────────────────────────
   useEffect(() => {
     const load = async () => {
       try {
-        const { data } = await api.get('/users/caregiver-settings');
+        const [{ data }, { data: tfaData }] = await Promise.all([
+          api.get('/users/caregiver-settings'),
+          api.get('/users/2fa/status'),
+        ]);
         setProfile({
           name:             data.name             || '',
           email:            data.email            || '',
@@ -208,6 +220,7 @@ const CaregiverSettings = () => {
           notif_health:   data.notif_health   !== undefined ? !!data.notif_health   : true,
           notif_visits:   data.notif_visits   !== undefined ? !!data.notif_visits   : false,
         });
+        setTfaEnabled(!!tfaData.tfa_enabled);
       } catch {
         showToast('error', 'Failed to load settings');
       } finally {
@@ -314,6 +327,68 @@ const CaregiverSettings = () => {
     await Promise.all([saveProfile(), saveAvailability(), saveNotifications()]);
   };
 
+  // ── 2FA handlers ───────────────────────────────────────────
+  const openEnableModal = async () => {
+    setTfaOtp('');
+    setTfaStep(1);
+    setTfaModal('setup');
+    setTfaLoading(true);
+    try {
+      const { data } = await api.post('/users/2fa/setup');
+      setTfaQrCode(data.qrCode);
+      setTfaSecret(data.secret);
+    } catch (err) {
+      showToast('error', err?.response?.data?.error || 'Failed to start 2FA setup');
+      setTfaModal(null);
+    } finally {
+      setTfaLoading(false);
+    }
+  };
+
+  const confirmEnable2FA = async () => {
+    if (tfaOtp.replace(/\s/g, '').length !== 6) {
+      showToast('error', 'Enter the 6-digit code from your authenticator app');
+      return;
+    }
+    setTfaLoading(true);
+    try {
+      await api.post('/users/2fa/verify', { token: tfaOtp });
+      setTfaEnabled(true);
+      setTfaModal(null);
+      showToast('success', '2FA enabled — your account is now more secure!');
+    } catch (err) {
+      showToast('error', err?.response?.data?.error || 'Invalid code — please try again');
+    } finally {
+      setTfaLoading(false);
+    }
+  };
+
+  const confirmDisable2FA = async () => {
+    if (tfaOtp.replace(/\s/g, '').length !== 6) {
+      showToast('error', 'Enter the 6-digit code from your authenticator app');
+      return;
+    }
+    setTfaLoading(true);
+    try {
+      await api.post('/users/2fa/disable', { token: tfaOtp });
+      setTfaEnabled(false);
+      setTfaModal(null);
+      showToast('success', '2FA has been disabled');
+    } catch (err) {
+      showToast('error', err?.response?.data?.error || 'Invalid code — please try again');
+    } finally {
+      setTfaLoading(false);
+    }
+  };
+
+  const closeTfaModal = () => {
+    setTfaModal(null);
+    setTfaOtp('');
+    setTfaQrCode('');
+    setTfaSecret('');
+    setTfaStep(1);
+  };
+
   const SpinBtn = ({ onClick, loading, label, className }) => (
     <button className={className} onClick={onClick} disabled={loading}>
       {loading ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : label}
@@ -389,7 +464,7 @@ const CaregiverSettings = () => {
               </div>
 
               <div className="profile-layout">
-                <div className="profile-avatar-container desktop-only">
+                <div className="profile-avatar-container">
                   <div
                     className="profile-avatar-box"
                     onClick={() => avatarInputRef.current?.click()}
@@ -634,20 +709,163 @@ const CaregiverSettings = () => {
                   label="Update Security"
                   className="btn-dark"
                 />
-                <button className="btn-link">Enable Two-Factor Auth</button>
+                {tfaEnabled ? (
+                  <button className="btn-link tfa-disable-link" onClick={() => { setTfaOtp(''); setTfaModal('disable'); }}>
+                    <ShieldOff size={15} /> Disable Two-Factor Auth
+                  </button>
+                ) : (
+                  <button className="btn-link" onClick={openEnableModal}>
+                    <ShieldCheck size={15} /> Enable Two-Factor Auth
+                  </button>
+                )}
               </div>
 
               <div className="security-mobile-list mobile-only">
-                <button className="security-mobile-btn">
+                <button className="security-mobile-btn" onClick={() => {}}>
                   <span>Change Password</span>
                   <ChevronRight size={18} className="icon-muted" />
                 </button>
-                <button className="security-mobile-btn">
+                <button
+                  className="security-mobile-btn"
+                  onClick={tfaEnabled
+                    ? () => { setTfaOtp(''); setTfaModal('disable'); }
+                    : openEnableModal
+                  }
+                >
                   <span>Two-Factor Authentication</span>
-                  <span className="badge-enabled">ENABLED</span>
+                  {tfaEnabled
+                    ? <span className="badge-enabled">ENABLED</span>
+                    : <span className="badge-disabled">DISABLED</span>
+                  }
                 </button>
               </div>
             </div>
+
+            {/* ── 2FA Modal ── */}
+            {tfaModal && (
+              <div className="tfa-overlay" onClick={closeTfaModal}>
+                <div className="tfa-modal" onClick={e => e.stopPropagation()}>
+
+                  {/* Header */}
+                  <div className="tfa-modal-header">
+                    <div className="tfa-modal-icon">
+                      {tfaModal === 'setup' ? <ShieldCheck size={22} /> : <ShieldOff size={22} />}
+                    </div>
+                    <div>
+                      <h3>{tfaModal === 'setup' ? 'Enable Two-Factor Authentication' : 'Disable Two-Factor Authentication'}</h3>
+                      <p>{tfaModal === 'setup'
+                        ? 'Add an extra layer of security to your account.'
+                        : 'Remove the extra security layer from your account.'
+                      }</p>
+                    </div>
+                    <button className="tfa-close-btn" onClick={closeTfaModal}><X size={18} /></button>
+                  </div>
+
+                  {tfaLoading && tfaModal === 'setup' && tfaStep === 1 ? (
+                    <div className="tfa-loading">
+                      <Loader2 size={32} style={{ animation: 'spin 1s linear infinite', color: '#0d9488' }} />
+                      <p>Generating your QR code…</p>
+                    </div>
+                  ) : tfaModal === 'setup' ? (
+                    <>
+                      {/* Step indicator */}
+                      <div className="tfa-steps">
+                        <div className={`tfa-step ${tfaStep >= 1 ? 'active' : ''}`}>
+                          <div className="tfa-step-num">1</div>
+                          <span>Scan QR</span>
+                        </div>
+                        <div className="tfa-step-line" />
+                        <div className={`tfa-step ${tfaStep >= 2 ? 'active' : ''}`}>
+                          <div className="tfa-step-num">2</div>
+                          <span>Verify Code</span>
+                        </div>
+                      </div>
+
+                      {tfaStep === 1 ? (
+                        <>
+                          <p className="tfa-instruction">
+                            Open <strong>Google Authenticator</strong>, <strong>Authy</strong>, or any TOTP app
+                            and scan the QR code below.
+                          </p>
+                          <div className="tfa-qr-wrapper">
+                            {tfaQrCode && <img src={tfaQrCode} alt="2FA QR Code" className="tfa-qr-img" />}
+                          </div>
+                          <details className="tfa-manual">
+                            <summary><ScanLine size={14} /> Can't scan? Enter key manually</summary>
+                            <code className="tfa-secret-code">{tfaSecret}</code>
+                          </details>
+                          <div className="tfa-modal-actions">
+                            <button className="btn-outline-gray" onClick={closeTfaModal}>Cancel</button>
+                            <button className="btn-primary-teal" onClick={() => setTfaStep(2)}>
+                              I've scanned it →
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <p className="tfa-instruction">
+                            Enter the <strong>6-digit code</strong> shown in your authenticator app to confirm setup.
+                          </p>
+                          <input
+                            className="tfa-otp-input"
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={7}
+                            placeholder="_ _ _ _ _ _"
+                            value={tfaOtp}
+                            onChange={e => setTfaOtp(e.target.value.replace(/[^0-9]/g, ''))}
+                            autoFocus
+                          />
+                          <div className="tfa-modal-actions">
+                            <button className="btn-outline-gray" onClick={() => setTfaStep(1)}>← Back</button>
+                            <button
+                              className="btn-primary-teal"
+                              onClick={confirmEnable2FA}
+                              disabled={tfaLoading}
+                            >
+                              {tfaLoading
+                                ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                                : 'Activate 2FA'
+                              }
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    /* ── Disable flow ── */
+                    <>
+                      <p className="tfa-instruction">
+                        Enter the <strong>6-digit code</strong> from your authenticator app to confirm disabling 2FA.
+                      </p>
+                      <input
+                        className="tfa-otp-input"
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={7}
+                        placeholder="_ _ _ _ _ _"
+                        value={tfaOtp}
+                        onChange={e => setTfaOtp(e.target.value.replace(/[^0-9]/g, ''))}
+                        autoFocus
+                      />
+                      <div className="tfa-modal-actions">
+                        <button className="btn-outline-gray" onClick={closeTfaModal}>Cancel</button>
+                        <button
+                          className="btn-danger"
+                          onClick={confirmDisable2FA}
+                          disabled={tfaLoading}
+                        >
+                          {tfaLoading
+                            ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                            : 'Disable 2FA'
+                          }
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Mobile action row */}
             <div className="mobile-actions mobile-only">
