@@ -24,8 +24,8 @@ const findOrCreateOAuthUser = async (profile, provider) => {
 
 passport.use(new GoogleStrategy(
   {
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    clientID: process.env.GOOGLE_CLIENT_ID || 'dummy-google-client-id',
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET || 'dummy-google-client-secret',
     callbackURL: `${process.env.SERVER_URL || 'http://localhost:5000'}/api/auth/google/callback`,
     scope: ['profile', 'email'],
   },
@@ -41,8 +41,8 @@ passport.use(new GoogleStrategy(
 
 passport.use(new GitHubStrategy(
   {
-    clientID: process.env.GITHUB_CLIENT_ID,
-    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    clientID: process.env.GITHUB_CLIENT_ID || 'dummy-github-client-id',
+    clientSecret: process.env.GITHUB_CLIENT_SECRET || 'dummy-github-client-secret',
     callbackURL: `${process.env.SERVER_URL || 'http://localhost:5000'}/api/auth/github/callback`,
     scope: ['user:email'],
   },
