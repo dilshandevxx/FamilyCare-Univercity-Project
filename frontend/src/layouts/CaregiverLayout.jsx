@@ -201,9 +201,6 @@ const CaregiverLayout = ({ children, title = "Dashboard" }) => {
                 <p className="profile-name">{user?.name || 'Caregiver'}</p>
                 <p className="profile-role">Caregiver</p>
               </div>
-              <div className="profile-avatar">
-                <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user?.name || 'Caregiver')}`} alt="Avatar" />
-              </div>
             </div>
           </div>
         </header>

@@ -534,6 +534,13 @@
   background: #0f766e;
 }
 
+.btn-submit:disabled {
+  background: #94a3b8;
+  box-shadow: none;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
 /* Sidebar Components */
 
 /* Profile Summary */

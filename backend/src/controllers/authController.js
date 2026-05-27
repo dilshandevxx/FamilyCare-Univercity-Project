@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const speakeasy = require('speakeasy');
 const pool = require('../config/db');
 
 // Maps frontend role names to DB ENUM values
@@ -18,6 +19,15 @@ const register = async (req, res) => {
       'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
       [name, email, hashed, dbRole]
     );
+
+    // Auto-create caregivers row so dashboard/residents APIs work immediately
+    if (dbRole === 'caregiver') {
+      await pool.query(
+        'INSERT IGNORE INTO caregivers (user_id, name) VALUES (?, ?)',
+        [result.insertId, name]
+      );
+    }
+
     const token = jwt.sign({ id: result.insertId, role: dbRole }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN || '7d',
     });
@@ -47,6 +57,25 @@ const login = async (req, res) => {
       }
     }
 
+    // ── 2FA gate ─────────────────────────────────────────────────
+    if (user.tfa_enabled) {
+      // Issue a short-lived partial token — no access to protected routes
+      const partialToken = jwt.sign(
+        { id: user.id, role: user.role, partial: true },
+        process.env.JWT_SECRET,
+        { expiresIn: '10m' }
+      );
+      return res.json({ tfa_required: true, partial_token: partialToken });
+    }
+
+    // Ensure caregivers row exists (handles accounts created before this fix)
+    if (user.role === 'caregiver') {
+      await pool.query(
+        'INSERT IGNORE INTO caregivers (user_id, name) VALUES (?, ?)',
+        [user.id, user.name]
+      );
+    }
+
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN || '7d',
     });
@@ -56,4 +85,49 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+// POST /api/auth/2fa/validate
+// Called after login when tfa_required is true
+const validate2FA = async (req, res) => {
+  const { partial_token, token: otpToken } = req.body;
+  if (!partial_token || !otpToken)
+    return res.status(400).json({ error: 'partial_token and token are required' });
+
+  let decoded;
+  try {
+    decoded = jwt.verify(partial_token, process.env.JWT_SECRET);
+  } catch {
+    return res.status(401).json({ error: 'Partial token is invalid or expired' });
+  }
+  if (!decoded.partial)
+    return res.status(401).json({ error: 'Invalid partial token' });
+
+  try {
+    const [rows] = await pool.query(
+      'SELECT tfa_secret, tfa_enabled, role FROM users WHERE id = ?',
+      [decoded.id]
+    );
+    if (rows.length === 0) return res.status(404).json({ error: 'User not found' });
+    const user = rows[0];
+    if (!user.tfa_enabled || !user.tfa_secret)
+      return res.status(400).json({ error: '2FA is not set up for this account' });
+
+    const valid = speakeasy.totp.verify({
+      secret: user.tfa_secret,
+      encoding: 'base32',
+      token: otpToken.replace(/\s/g, ''),
+      window: 1,
+    });
+    if (!valid) return res.status(400).json({ error: 'Invalid OTP — please try again' });
+
+    const fullToken = jwt.sign(
+      { id: decoded.id, role: decoded.role },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+    );
+    res.json({ message: 'Login successful', token: fullToken, role: decoded.role });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+module.exports = { register, login, validate2FA };
