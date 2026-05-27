@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { register, login } = require('../controllers/authController');
+const { register, login, validate2FA } = require('../controllers/authController');
 const { passport, generateToken } = require('../config/passport');
 
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
 
 router.post('/register', register);
 router.post('/login', login);
+router.post('/2fa/validate', validate2FA);
 
 // ── Google OAuth ──────────────────────────────────────────────
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));

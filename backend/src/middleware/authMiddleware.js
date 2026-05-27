@@ -16,4 +16,12 @@ const protect = (req, res, next) => {
   }
 };
 
-module.exports = { protect };
+// Must be used AFTER protect — checks the user is an admin
+const adminOnly = (req, res, next) => {
+  if (req.user?.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin access required' });
+  }
+  next();
+};
+
+module.exports = { protect, adminOnly };
