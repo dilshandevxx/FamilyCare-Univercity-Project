@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { 
   Search, Video, Phone, MoreVertical, Paperclip, Smile, Send,
   PhoneCall, User, Calendar, Heart, ShieldAlert, Plus, Sparkles, AlertCircle
