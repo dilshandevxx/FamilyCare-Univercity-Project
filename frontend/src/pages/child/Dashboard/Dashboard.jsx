@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Users, UserPlus, Bell, ThumbsUp,
@@ -7,6 +7,7 @@ import {
   Plus, Heart
 } from 'lucide-react';
 import ChildLayout from '../../../layouts/ChildLayout';
+import api from '../../../services/api';
 import './Dashboard.css';
 
 /* ─── mock data ─── */
@@ -30,6 +31,22 @@ const barDays    = ['M','T','W','T','F','S','S'];
 
 const Dashboard = () => {
   const [pulse] = useState('Stable');
+  const [dbParents, setDbParents] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchParents = async () => {
+      try {
+        const { data } = await api.get('/parents');
+        setDbParents(data || []);
+      } catch (err) {
+        console.error('Error fetching parents for dashboard:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchParents();
+  }, []);
 
   return (
     <ChildLayout title="Dashboard">
@@ -40,7 +57,9 @@ const Dashboard = () => {
           <div className="cd-stat-card">
             <div>
               <p className="cd-stat-label">TOTAL PARENTS</p>
-              <h2 className="cd-stat-val">02</h2>
+              <h2 className="cd-stat-val">
+                {String(dbParents.length).padStart(2, '0')}
+              </h2>
             </div>
             <div className="cd-stat-icon teal"><Users size={22}/></div>
           </div>
@@ -110,29 +129,47 @@ const Dashboard = () => {
                 <Link to="/parents" className="cd-view-all">View All</Link>
               </div>
 
-              {parents.map(p => (
-                <div key={p.id} className="cd-parent-row">
-                  <div className="cd-parent-avatar">
-                    <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${p.img}`} alt={p.name} />
-                  </div>
-                  <div className="cd-parent-info">
-                    <p className="cd-parent-name">{p.name}</p>
-                    <p className="cd-parent-meta">{p.location} • {p.age} yrs old</p>
-                    <div className="cd-vitality-row">
-                      <span className="cd-vitality-label">Vitality</span>
-                      <div className="cd-vitality-bar">
-                        <div className="cd-vitality-fill" style={{width:`${p.vitality}%`}} />
-                      </div>
-                      <span className="cd-vitality-pct">{p.vitality}%</span>
-                    </div>
-                    <div className="cd-parent-actions">
-                      <span className="cd-pill">Mut</span>
-                      <span className="cd-pill">Cl</span>
-                      <Link to="/parents" className="cd-details-btn">Details</Link>
-                    </div>
-                  </div>
+              {loading ? (
+                <div style={{ textAlign: 'center', padding: '1rem 0', color: '#64748b', fontSize: '0.82rem' }}>
+                  Loading parents...
                 </div>
-              ))}
+              ) : dbParents.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '1.5rem 0', color: '#64748b' }}>
+                  <p style={{ fontSize: '0.85rem', marginBottom: '0.8rem' }}>No parents registered yet.</p>
+                  <Link to="/add-parent" className="pm-add-btn" style={{ display: 'inline-flex', textDecoration: 'none', margin: '0 auto', padding: '0.5rem 1rem' }}>
+                    <Plus size={14} /> Add Parent
+                  </Link>
+                </div>
+              ) : (
+                dbParents.map(p => {
+                  const seed = p.name || 'Parent';
+                  const location = p.address || 'At Home';
+                  const age = p.age || 'N/A';
+                  return (
+                    <div key={p.id} className="cd-parent-row">
+                      <div className="cd-parent-avatar">
+                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}`} alt={p.name} />
+                      </div>
+                      <div className="cd-parent-info">
+                        <p className="cd-parent-name">{p.name}</p>
+                        <p className="cd-parent-meta">{location} • {age} yrs old</p>
+                        <div className="cd-vitality-row">
+                          <span className="cd-vitality-label">Vitality</span>
+                          <div className="cd-vitality-bar">
+                            <div className="cd-vitality-fill" style={{width: `94%`}} />
+                          </div>
+                          <span className="cd-vitality-pct">94%</span>
+                        </div>
+                        <div className="cd-parent-actions">
+                          {p.relationship && <span className="cd-pill">{p.relationship}</span>}
+                          {p.gender && <span className="cd-pill">{p.gender}</span>}
+                          <Link to="/parents" className="cd-details-btn">Details</Link>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
 
               {/* Family Overview */}
               <div style={{marginTop:'20px'}}>

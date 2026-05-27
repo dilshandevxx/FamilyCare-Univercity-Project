@@ -26,18 +26,6 @@ CREATE TABLE IF NOT EXISTS family_profiles (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- ── Parents (elderly person profiles) ────────────────────────
-CREATE TABLE IF NOT EXISTS parents (
-  id           INT AUTO_INCREMENT PRIMARY KEY,
-  child_id     INT NOT NULL,
-  name         VARCHAR(150) NOT NULL,
-  age          INT,
-  medical_conditions TEXT,
-  address      VARCHAR(255),
-  created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (child_id) REFERENCES users(id) ON DELETE CASCADE
-);
-
 -- ── Caregivers ────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS caregivers (
   id                 INT AUTO_INCREMENT PRIMARY KEY,
@@ -52,6 +40,27 @@ CREATE TABLE IF NOT EXISTS caregivers (
   is_available       BOOLEAN DEFAULT TRUE,
   created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- ── Parents (elderly person profiles) ────────────────────────
+CREATE TABLE IF NOT EXISTS parents (
+  id                      INT AUTO_INCREMENT PRIMARY KEY,
+  child_id                INT NOT NULL,
+  name                    VARCHAR(150) NOT NULL,
+  age                     INT,
+  gender                  VARCHAR(10),
+  relationship            VARCHAR(50),
+  phone                   VARCHAR(20),
+  address                 VARCHAR(255),
+  emergency_contact_name  VARCHAR(150),
+  emergency_contact_phone VARCHAR(20),
+  medical_conditions      TEXT,
+  allergies               TEXT,
+  current_medications     TEXT,
+  assigned_caregiver_id   INT,
+  created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (child_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (assigned_caregiver_id) REFERENCES caregivers(id) ON DELETE SET NULL
 );
 
 -- ── Appointments ──────────────────────────────────────────────
@@ -93,4 +102,15 @@ CREATE TABLE IF NOT EXISTS activity_logs (
   logged_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (parent_id) REFERENCES parents(id)  ON DELETE CASCADE,
   FOREIGN KEY (logged_by) REFERENCES users(id)    ON DELETE SET NULL
+);
+
+-- ── Messages (chat logs) ──────────────────────────────────────
+CREATE TABLE IF NOT EXISTS messages (
+  id           INT AUTO_INCREMENT PRIMARY KEY,
+  sender_id    INT NOT NULL,
+  receiver_id  INT NOT NULL,
+  message      TEXT NOT NULL,
+  created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
 );

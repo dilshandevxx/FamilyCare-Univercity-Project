@@ -35,6 +35,7 @@ const upload = multer({
 });
 
 // ── Routes ────────────────────────────────────────────────────────
+const { getLogs, addLog, getHealthFeed } = require('../controllers/healthController');
 
 // General log list for a resident  (query: ?parent_id=X)
 router.get('/', protect, getLogs);
@@ -50,5 +51,7 @@ router.get('/resident/:id/logs', protect, getResidentLogs);
 
 // Single log entry
 router.get('/:logId', protect, getLogById);
+router.post('/', protect, addLog);
+router.get('/feed', protect, getHealthFeed);
 
 module.exports = router;

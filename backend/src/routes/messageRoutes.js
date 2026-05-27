@@ -1,0 +1,10 @@
+const express = require('express');
+const router = express.Router();
+const { protect } = require('../middleware/authMiddleware');
+const { sendMessage, getMessages } = require('../controllers/messageController');
+
+// All chat routes are protected with JWT auth
+router.post('/', protect, sendMessage);
+router.get('/:otherUserId', protect, getMessages);
+
+module.exports = router;
