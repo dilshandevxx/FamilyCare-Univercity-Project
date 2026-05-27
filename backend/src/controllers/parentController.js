@@ -80,7 +80,24 @@ const getParents = async (req, res) => {
   }
 };
 
+// PUT /api/parents/:id/assign
+const assignCaregiver = async (req, res) => {
+  const { id } = req.params;
+  const { assigned_caregiver_id } = req.body;
+  try {
+    await pool.query(
+      'UPDATE parents SET assigned_caregiver_id = ? WHERE id = ? AND child_id = ?',
+      [assigned_caregiver_id || null, id, req.user.id]
+    );
+    res.json({ message: 'Caregiver assigned successfully' });
+  } catch (err) {
+    console.error('Error assigning caregiver:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   createParent,
-  getParents
+  getParents,
+  assignCaregiver
 };
