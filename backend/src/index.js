@@ -9,6 +9,7 @@ const caregiverRoutes = require('./routes/caregiverRoutes');
 const healthRoutes = require('./routes/healthRoutes');
 const appointmentRoutes = require('./routes/appointmentRoutes');
 const parentRoutes = require('./routes/parentRoutes');
+const messageRoutes = require('./routes/messageRoutes');
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use('/api/caregivers', caregiverRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/parents', parentRoutes);
+app.use('/api/messages', messageRoutes);
 
 // ── Health check ──────────────────────────────────────────────
 app.get('/', (req, res) => {
