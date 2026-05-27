@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
+const { passport } = require('./config/passport');
 
 // Route imports
 const authRoutes = require('./routes/authRoutes');
@@ -17,6 +19,8 @@ const app = express();
 // ── Middleware ────────────────────────────────────────────────
 app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }));
 app.use(express.json());
+app.use(passport.initialize());
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // ── Routes ────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);

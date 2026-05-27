@@ -9,7 +9,8 @@ import FeaturesPage from './pages/public/Features/Features';
 import Caregivers from './pages/public/Caregivers/Caregivers';
 import About      from './pages/public/About/About';
 import Login      from './pages/public/Login/Login';
-import Register   from './pages/public/Register/Register';
+import Register      from './pages/public/Register/Register';
+import OAuthCallback from './pages/public/OAuthCallback/OAuthCallback';
 
 // Child pages
 import Dashboard  from './pages/child/Dashboard/Dashboard';
@@ -76,7 +77,8 @@ const AppContent = () => {
         <Route path="/caregivers" element={<Caregivers />} />
         <Route path="/about"     element={<About />} />
         <Route path="/login"     element={<Login />} />
-        <Route path="/register"  element={<Register />} />
+        <Route path="/register"       element={<Register />} />
+        <Route path="/oauth/callback" element={<OAuthCallback />} />
 
         {/* Protected – Child */}
         <Route path="/dashboard"  element={<PrivateRoute><Dashboard /></PrivateRoute>} />

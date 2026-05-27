@@ -40,13 +40,20 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
+  const refreshUser = async () => {
+    try {
+      const { data } = await api.get('/users/profile');
+      setUser(data);
+    } catch {}
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading, refreshUser }}>
       {!loading && children}
     </AuthContext.Provider>
   );
