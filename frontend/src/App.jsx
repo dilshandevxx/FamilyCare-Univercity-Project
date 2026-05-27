@@ -19,6 +19,7 @@ import Alerts     from './pages/child/Alerts/Alerts';
 import HealthFeed from './pages/child/HealthFeed/HealthFeed';
 import Messages   from './pages/child/Messages/Messages';
 import AddParent  from './pages/child/AddParent/AddParent';
+import Settings   from './pages/child/Settings/Settings';
 
 // Caregiver pages
 import CaregiverDashboard    from './pages/caregiver/Dashboard/CaregiverDashboard';
@@ -86,6 +87,7 @@ const AppContent = () => {
         <Route path="/health-feed" element={<PrivateRoute><HealthFeed /></PrivateRoute>} />
         <Route path="/messages"   element={<PrivateRoute><Messages /></PrivateRoute>} />
         <Route path="/add-parent" element={<PrivateRoute><AddParent /></PrivateRoute>} />
+        <Route path="/settings"   element={<PrivateRoute><Settings /></PrivateRoute>} />
 
         {/* Protected – Caregiver */}
         <Route path="/caregiver/dashboard"    element={<PrivateRoute><CaregiverDashboard /></PrivateRoute>} />
