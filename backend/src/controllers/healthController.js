@@ -221,7 +221,7 @@ const getLogById = async (req, res) => {
   }
 };
 
-module.exports = { getLogs, addLog, getResidentSummary, getResidentLogs, getLogById };
+
 // GET /api/health/feed
 const getHealthFeed = async (req, res) => {
   const { parent_id } = req.query;
@@ -319,4 +319,11 @@ const getHealthFeed = async (req, res) => {
   }
 };
 
-module.exports = { getLogs, addLog, getHealthFeed };
+module.exports = {
+  getLogs,
+  addLog,
+  getResidentSummary,
+  getResidentLogs,
+  getLogById,
+  getHealthFeed
+};

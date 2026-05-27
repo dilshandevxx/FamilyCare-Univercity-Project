@@ -22,9 +22,10 @@ async function addColumnIfMissing(columnName, columnDef) {
 
 (async () => {
   try {
-    console.log('Running 2FA migration…');
+    console.log('Running 2FA & Avatar migration…');
     await addColumnIfMissing('tfa_secret',  'VARCHAR(255) DEFAULT NULL');
     await addColumnIfMissing('tfa_enabled', 'TINYINT(1)  DEFAULT 0');
+    await addColumnIfMissing('avatar_url',  'VARCHAR(500) DEFAULT NULL');
     console.log('Migration complete.');
   } catch (err) {
     console.error('Migration failed:', err.message);

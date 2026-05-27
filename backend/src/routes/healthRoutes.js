@@ -11,6 +11,7 @@ const {
   getResidentSummary,
   getResidentLogs,
   getLogById,
+  getHealthFeed,
 } = require('../controllers/healthController');
 
 // ── File upload for health-log attachments ────────────────────────
@@ -35,7 +36,6 @@ const upload = multer({
 });
 
 // ── Routes ────────────────────────────────────────────────────────
-const { getLogs, addLog, getHealthFeed } = require('../controllers/healthController');
 
 // General log list for a resident  (query: ?parent_id=X)
 router.get('/', protect, getLogs);
