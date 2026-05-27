@@ -114,3 +114,15 @@ CREATE TABLE IF NOT EXISTS messages (
   FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+-- ── Alerts (health / activity system logs) ────────────────────
+CREATE TABLE IF NOT EXISTS alerts (
+  id           INT AUTO_INCREMENT PRIMARY KEY,
+  parent_id    INT NOT NULL,
+  title        VARCHAR(255) NOT NULL,
+  description  TEXT NOT NULL,
+  type         ENUM('critical', 'warning', 'info') DEFAULT 'info',
+  is_resolved  BOOLEAN DEFAULT FALSE,
+  created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (parent_id) REFERENCES parents(id) ON DELETE CASCADE
+);
