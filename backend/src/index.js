@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { passport } = require('./config/passport');
+const pool = require('./config/db');
 
 // Route imports
 const authRoutes = require('./routes/authRoutes');
@@ -46,8 +47,31 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal Server Error' });
 });
 
-// ── Start server ──────────────────────────────────────────────
+// ── DB migrations then start ──────────────────────────────────
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+
+async function runMigrations() {
+  try {
+    const [cols] = await pool.query(
+      `SELECT COUNT(*) AS cnt
+       FROM INFORMATION_SCHEMA.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE()
+         AND TABLE_NAME   = 'messages'
+         AND COLUMN_NAME  = 'is_read'`
+    );
+    if (cols[0].cnt === 0) {
+      await pool.query(
+        'ALTER TABLE messages ADD COLUMN is_read BOOLEAN DEFAULT FALSE'
+      );
+      console.log('✅ Migration: added is_read column to messages');
+    }
+  } catch (err) {
+    console.warn('⚠️  Migration skipped:', err.message);
+  }
+}
+
+runMigrations().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+  });
 });
