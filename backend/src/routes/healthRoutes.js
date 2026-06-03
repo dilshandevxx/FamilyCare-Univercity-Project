@@ -12,6 +12,9 @@ const {
   getResidentLogs,
   getLogById,
   getHealthFeed,
+  getVisitHistory,
+  getVisitTrends,
+  getEldersList,
 } = require('../controllers/healthController');
 
 // ── File upload for health-log attachments ────────────────────────
@@ -36,6 +39,15 @@ const upload = multer({
 });
 
 // ── Routes ────────────────────────────────────────────────────────
+
+// Visit history for the logged-in caregiver (paginated, filterable)
+router.get('/visit-history', protect, getVisitHistory);
+
+// Monthly visit trends + MoM change for the logged-in caregiver
+router.get('/visit-trends', protect, getVisitTrends);
+
+// Distinct elders the caregiver has visited
+router.get('/elders-list', protect, getEldersList);
 
 // General log list for a resident  (query: ?parent_id=X)
 router.get('/', protect, getLogs);
