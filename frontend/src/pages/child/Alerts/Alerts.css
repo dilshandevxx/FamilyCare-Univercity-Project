@@ -2,6 +2,7 @@
 
 .al-container {
   max-width: 1200px;
+  ;
   margin: 0 auto;
   padding: 1.5rem;
   font-family: 'Inter', sans-serif;
@@ -179,7 +180,8 @@
   align-items: start;
 }
 
-.al-feed-column, .al-sidebar-column {
+.al-feed-column,
+.al-sidebar-column {
   display: flex;
   flex-direction: column;
   gap: 1.4rem;
@@ -234,9 +236,17 @@
   flex-shrink: 0;
 }
 
-.icon-critical { color: #ef4444; }
-.icon-warning { color: #f97316; }
-.icon-info { color: #00A896; }
+.icon-critical {
+  color: #ef4444;
+}
+
+.icon-warning {
+  color: #f97316;
+}
+
+.icon-info {
+  color: #00A896;
+}
 
 .al-card-content {
   flex-grow: 1;
@@ -378,8 +388,13 @@
 }
 
 @keyframes al-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .al-empty-state {
@@ -427,8 +442,13 @@
   margin-bottom: 0.6rem;
 }
 
-.al-widget-lbl.white-text { color: rgba(255, 255, 255, 0.8); }
-.al-widget-lbl.opacity-light { color: rgba(255, 255, 255, 0.6); }
+.al-widget-lbl.white-text {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.al-widget-lbl.opacity-light {
+  color: rgba(255, 255, 255, 0.6);
+}
 
 .al-stat-row {
   display: flex;
@@ -443,7 +463,9 @@
   margin: 0;
 }
 
-.al-stat-row h2.white-text { color: white; }
+.al-stat-row h2.white-text {
+  color: white;
+}
 
 .al-stat-trend {
   font-size: 0.75rem;
@@ -482,7 +504,9 @@
   line-height: 1.4;
 }
 
-.al-widget-desc.white-text { color: #7f1d1d; }
+.al-widget-desc.white-text {
+  color: #7f1d1d;
+}
 
 /* Caregiver Widget (Black/dark card) */
 .al-widget.black-bg {
@@ -572,8 +596,15 @@
 }
 
 @keyframes al-bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
 .al-map-labels {
@@ -637,17 +668,17 @@
   .al-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .al-header-row {
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
   }
-  
+
   .al-header-search {
     justify-content: space-between;
   }
-  
+
   .al-header-search input {
     width: 100%;
   }
