@@ -27,37 +27,6 @@ const CaregiverSidebar = () => {
         <h1 className="sidebar-logo">FamilyCare</h1>
         <p className="sidebar-subtitle">Caregiver Portal</p>
 
-        {/* User profile chip */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: '10px',
-          marginTop: '16px', padding: '10px 12px',
-          backgroundColor: 'rgba(255,255,255,0.08)',
-          borderRadius: '10px',
-        }}>
-          {user?.avatar_url ? (
-            <img
-              src={API_BASE + user.avatar_url}
-              alt="avatar"
-              style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
-            />
-          ) : (
-            <div style={{
-              width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0,
-              backgroundColor: '#0d9488', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '0.95rem', fontWeight: '700', color: 'white',
-            }}>
-              {user?.name ? user.name.charAt(0).toUpperCase() : 'C'}
-            </div>
-          )}
-          <div style={{ overflow: 'hidden' }}>
-            <p style={{ margin: 0, fontSize: '0.82rem', fontWeight: '600', color: 'white', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {user?.name || 'Caregiver'}
-            </p>
-            <p style={{ margin: 0, fontSize: '0.7rem', color: 'rgba(255,255,255,0.55)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {user?.email || ''}
-            </p>
-          </div>
-        </div>
       </div>
 
       <nav className="sidebar-nav">
