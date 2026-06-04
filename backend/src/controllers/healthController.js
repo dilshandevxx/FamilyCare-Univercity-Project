@@ -384,6 +384,131 @@ const getAnalytics = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+// ── GET /api/health/visit-history ────────────────────────────────
+// Paginated visit history for the logged-in caregiver
+const getVisitHistory = async (req, res) => {
+  const {
+    page      = '1',
+    limit     = '3',
+    dateRange = 'all',
+    elderId   = 'all',
+    condition = 'all',
+    search    = '',
+  } = req.query;
+
+  const pageNum  = Math.max(1, parseInt(page, 10));
+  const limitNum = Math.min(50, Math.max(1, parseInt(limit, 10)));
+  const offset   = (pageNum - 1) * limitNum;
+
+  const wheres = ['hl.logged_by = ?'];
+  const params = [req.user.id];
+
+  if (dateRange === 'last7') {
+    wheres.push('hl.logged_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)');
+  } else if (dateRange === 'last30') {
+    wheres.push('hl.logged_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)');
+  } else if (dateRange === 'last90') {
+    wheres.push('hl.logged_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)');
+  }
+
+  if (elderId !== 'all') {
+    wheres.push('hl.parent_id = ?');
+    params.push(parseInt(elderId, 10));
+  }
+
+  if (search.trim()) {
+    wheres.push('p.name LIKE ?');
+    params.push(`%${search.trim()}%`);
+  }
+
+  if (condition === 'stable') {
+    wheres.push("COALESCE(hl.overall_condition, 'STABLE') = 'STABLE'");
+  } else if (condition === 'needs_attention') {
+    wheres.push("COALESCE(hl.overall_condition, 'STABLE') != 'STABLE'");
+  }
+
+  const whereSQL = wheres.join(' AND ');
+
+  try {
+    const [rows] = await pool.query(
+      `SELECT hl.*,
+              p.id   AS parent_id,
+              p.name AS elder_name,
+              p.care_status
+       FROM health_logs hl
+       JOIN parents p ON p.id = hl.parent_id
+       WHERE ${whereSQL}
+       ORDER BY hl.logged_at DESC
+       LIMIT ? OFFSET ?`,
+      [...params, limitNum, offset]
+    );
+
+    const [[{ total }]] = await pool.query(
+      `SELECT COUNT(*) AS total
+       FROM health_logs hl
+       JOIN parents p ON p.id = hl.parent_id
+       WHERE ${whereSQL}`,
+      params
+    );
+
+    res.json({ visits: rows, total, page: pageNum, limit: limitNum });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// ── GET /api/health/visit-trends ─────────────────────────────────
+// Monthly visit counts for the last 6 months + MoM change
+const getVisitTrends = async (req, res) => {
+  try {
+    const [trends] = await pool.query(
+      `SELECT
+         DATE_FORMAT(logged_at, '%b')    AS month,
+         DATE_FORMAT(logged_at, '%Y-%m') AS month_key,
+         COUNT(*)                        AS visits
+       FROM health_logs
+       WHERE logged_by = ?
+         AND logged_at >= DATE_SUB(NOW(), INTERVAL 6 MONTH)
+       GROUP BY DATE_FORMAT(logged_at, '%Y-%m'), DATE_FORMAT(logged_at, '%b')
+       ORDER BY DATE_FORMAT(logged_at, '%Y-%m') ASC`,
+      [req.user.id]
+    );
+
+    const now           = new Date();
+    const currMonthKey  = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const prevDate      = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const prevMonthKey  = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`;
+
+    const currCount = trends.find(t => t.month_key === currMonthKey)?.visits  || 0;
+    const prevCount = trends.find(t => t.month_key === prevMonthKey)?.visits  || 0;
+    const changePercent = prevCount > 0
+      ? Math.round(((currCount - prevCount) / prevCount) * 100)
+      : (currCount > 0 ? 100 : 0);
+
+    res.json({ trends, changePercent, currMonth: currCount, prevMonth: prevCount });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// ── GET /api/health/elders-list ───────────────────────────────────
+// Distinct elders this caregiver has logged health data for
+const getEldersList = async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT DISTINCT p.id, p.name
+       FROM health_logs hl
+       JOIN parents p ON p.id = hl.parent_id
+       WHERE hl.logged_by = ?
+       ORDER BY p.name`,
+      [req.user.id]
+    );
+    res.json(rows);
+  } catch (err) {
+>>>>>>> origin/main
+    res.status(500).json({ error: err.message });
+  }
+};
 
 module.exports = {
   getLogs,
@@ -392,5 +517,9 @@ module.exports = {
   getResidentLogs,
   getLogById,
   getHealthFeed,
-  getAnalytics
+  getAnalytics,
+  getVisitHistory,
+  getVisitTrends,
+  getEldersList
+
 };
