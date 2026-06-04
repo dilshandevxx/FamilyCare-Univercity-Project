@@ -51,7 +51,46 @@ const getMessages = async (req, res) => {
   }
 };
 
+// GET /api/messages/contacts
+// Retrieve unique contacts (caregivers for child, or parents for caregiver)
+const getContacts = async (req, res) => {
+  const userId = req.user.id;
+  const role = req.user.role; // Assuming role is available on req.user
+
+  try {
+    let query = '';
+    let params = [userId];
+
+    if (role === 'child') {
+      // Child's contacts are the caregivers assigned to their parents
+      query = `
+        SELECT DISTINCT c.id AS user_id, c.name, c.avatar_url, c.specialization AS subtitle
+        FROM caregivers c
+        JOIN parents p ON p.assigned_caregiver_id = c.id
+        WHERE p.child_id = ?
+      `;
+    } else if (role === 'caregiver') {
+      // Caregiver's contacts are the children (family members) of the parents they care for
+      query = `
+        SELECT DISTINCT u.id AS user_id, u.name, u.avatar_url, 'Family Member' AS subtitle
+        FROM users u
+        JOIN parents p ON p.child_id = u.id
+        WHERE p.assigned_caregiver_id = ?
+      `;
+    } else {
+      return res.status(403).json({ error: 'Invalid role for contacts' });
+    }
+
+    const [rows] = await pool.query(query, params);
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching contacts:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   sendMessage,
-  getMessages
+  getMessages,
+  getContacts
 };
