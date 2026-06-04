@@ -225,12 +225,22 @@ const getLogById = async (req, res) => {
 // GET /api/health/feed
 const getHealthFeed = async (req, res) => {
   const { parent_id } = req.query;
+  const user_id = req.user.id;
+  const role = req.user.role;
 
   if (!parent_id) {
     return res.status(400).json({ error: 'parent_id query parameter is required' });
   }
 
   try {
+    // 0. Verify Ownership/Access
+    if (role === 'child') {
+      const [[parent]] = await pool.query('SELECT id FROM parents WHERE id = ? AND child_id = ?', [parent_id, user_id]);
+      if (!parent) return res.status(403).json({ error: 'Access denied to this parent feed' });
+    } else if (role === 'caregiver') {
+      const [[parent]] = await pool.query('SELECT id FROM parents WHERE id = ? AND assigned_caregiver_id = ?', [parent_id, user_id]);
+      if (!parent) return res.status(403).json({ error: 'Access denied to this parent feed' });
+    }
     // 1. Fetch vitals logs
     const [vitals] = await pool.query(
       `SELECT 
@@ -319,11 +329,68 @@ const getHealthFeed = async (req, res) => {
   }
 };
 
+// GET /api/health/analytics
+// Analytics data for the Analytics child page
+const getAnalytics = async (req, res) => {
+  const { parent_id, range } = req.query;
+  const user_id = req.user.id;
+
+  if (!parent_id) {
+    return res.status(400).json({ error: 'parent_id query parameter is required' });
+  }
+
+  try {
+    // Verify Access
+    const [[parent]] = await pool.query('SELECT id FROM parents WHERE id = ? AND child_id = ?', [parent_id, user_id]);
+    if (!parent) return res.status(403).json({ error: 'Access denied to this parent analytics' });
+
+    // Fetch vitals stats
+    const [[stats]] = await pool.query(
+      `SELECT 
+         COUNT(*) as totalLogs,
+         AVG(temperature) as avgTemp,
+         AVG(SUBSTRING_INDEX(blood_pressure, '/', 1)) as avgSys,
+         AVG(SUBSTRING_INDEX(blood_pressure, '/', -1)) as avgDia
+       FROM health_logs 
+       WHERE parent_id = ? AND logged_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)`,
+      [parent_id]
+    );
+
+    // Fetch critical alerts
+    const [[alerts]] = await pool.query(
+      `SELECT COUNT(*) as criticalAlerts 
+       FROM alerts 
+       WHERE parent_id = ? AND type = 'critical' AND created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)`,
+      [parent_id]
+    );
+
+    let avgBp = '120/80';
+    if (stats.avgSys && stats.avgDia) {
+      avgBp = `${Math.round(stats.avgSys)}/${Math.round(stats.avgDia)}`;
+    }
+
+    const avgTemp = stats.avgTemp ? stats.avgTemp.toFixed(1) : '98.6';
+    const totalLogs = stats.totalLogs || 0;
+    const criticalAlerts = alerts.criticalAlerts || 0;
+
+    res.json({
+      avgBp,
+      avgTemp,
+      totalLogs,
+      criticalAlerts
+    });
+  } catch (err) {
+    console.error('Error fetching analytics:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   getLogs,
   addLog,
   getResidentSummary,
   getResidentLogs,
   getLogById,
-  getHealthFeed
+  getHealthFeed,
+  getAnalytics
 };

@@ -12,6 +12,7 @@ const {
   getResidentLogs,
   getLogById,
   getHealthFeed,
+  getAnalytics
 } = require('../controllers/healthController');
 
 // ── File upload for health-log attachments ────────────────────────
@@ -53,5 +54,6 @@ router.get('/resident/:id/logs', protect, getResidentLogs);
 router.get('/:logId', protect, getLogById);
 router.post('/', protect, addLog);
 router.get('/feed', protect, getHealthFeed);
+router.get('/analytics', protect, getAnalytics);
 
 module.exports = router;
