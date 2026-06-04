@@ -18,6 +18,10 @@ const {
   disable2FA,
   getMyResidents,
   getDashboardStats,
+  updateNotificationPrefs,
+  getNotificationPrefs,
+  deleteAccount,
+  getChildDashboardStats,
 } = require('../controllers/userController');
 
 const storage = multer.diskStorage({
@@ -53,5 +57,15 @@ router.post('/2fa/disable',protect, disable2FA);
 // Dashboard data
 router.get('/my-residents',    protect, getMyResidents);
 router.get('/dashboard-stats', protect, getDashboardStats);
+
+// Child dashboard stats
+router.get('/child-stats',     protect, getChildDashboardStats);
+
+// Notification preferences (child)
+router.get('/notification-prefs',  protect, getNotificationPrefs);
+router.put('/notification-prefs',  protect, updateNotificationPrefs);
+
+// Account deletion
+router.delete('/account', protect, deleteAccount);
 
 module.exports = router;
