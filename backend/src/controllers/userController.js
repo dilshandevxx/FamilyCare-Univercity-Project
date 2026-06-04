@@ -7,7 +7,7 @@ const QRCode = require('qrcode');
 const getProfile = async (req, res) => {
   try {
     const [rows] = await pool.query(
-      'SELECT id, name, email, role, avatar_url, created_at FROM users WHERE id = ?',
+      'SELECT id, name, email, phone, role, avatar_url, created_at FROM users WHERE id = ?',
       [req.user.id]
     );
     if (rows.length === 0) return res.status(404).json({ error: 'User not found' });
@@ -19,7 +19,7 @@ const getProfile = async (req, res) => {
 
 // PUT /api/users/profile
 const updateProfile = async (req, res) => {
-  const { name, email, currentPassword, newPassword } = req.body;
+  const { name, email, phone, currentPassword, newPassword } = req.body;
 
   try {
     // 1. Fetch current user from database
@@ -48,18 +48,19 @@ const updateProfile = async (req, res) => {
     }
 
     // 4. Update fields
-    const updatedName = name || user.name;
+    const updatedName  = name  || user.name;
     const updatedEmail = email || user.email;
+    const updatedPhone = phone !== undefined ? phone : user.phone;
 
     if (hashedPassword) {
       await pool.query(
-        'UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?',
-        [updatedName, updatedEmail, hashedPassword, req.user.id]
+        'UPDATE users SET name = ?, email = ?, phone = ?, password = ? WHERE id = ?',
+        [updatedName, updatedEmail, updatedPhone, hashedPassword, req.user.id]
       );
     } else {
       await pool.query(
-        'UPDATE users SET name = ?, email = ? WHERE id = ?',
-        [updatedName, updatedEmail, req.user.id]
+        'UPDATE users SET name = ?, email = ?, phone = ? WHERE id = ?',
+        [updatedName, updatedEmail, updatedPhone, req.user.id]
       );
     }
 
@@ -442,6 +443,149 @@ const getDashboardStats = async (req, res) => {
   }
 };
 
+// PUT /api/users/notification-prefs
+// Save child notification preferences
+const updateNotificationPrefs = async (req, res) => {
+  const { health_alerts, caregiver_updates, daily_reports, sms_alerts } = req.body;
+  try {
+    // Store as JSON in users table (notification_prefs column)
+    // Gracefully skip if column doesn't exist yet
+    const prefs = JSON.stringify({
+      health_alerts:     health_alerts     !== undefined ? !!health_alerts     : true,
+      caregiver_updates: caregiver_updates !== undefined ? !!caregiver_updates : true,
+      daily_reports:     daily_reports     !== undefined ? !!daily_reports     : false,
+      sms_alerts:        sms_alerts        !== undefined ? !!sms_alerts        : true,
+    });
+    try {
+      await pool.query(
+        'UPDATE users SET notification_prefs = ? WHERE id = ?',
+        [prefs, req.user.id]
+      );
+    } catch (_) {
+      // notification_prefs column not yet added — ignore silently
+    }
+    res.json({ message: 'Notification preferences saved', prefs: JSON.parse(prefs) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// GET /api/users/notification-prefs
+const getNotificationPrefs = async (req, res) => {
+  try {
+    let prefs = { health_alerts: true, caregiver_updates: true, daily_reports: false, sms_alerts: true };
+    try {
+      const [[row]] = await pool.query(
+        'SELECT notification_prefs FROM users WHERE id = ?',
+        [req.user.id]
+      );
+      if (row && row.notification_prefs) {
+        prefs = JSON.parse(row.notification_prefs);
+      }
+    } catch (_) {}
+    res.json(prefs);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// DELETE /api/users/account
+// Permanently delete the authenticated user's account
+const deleteAccount = async (req, res) => {
+  try {
+    await pool.query('DELETE FROM users WHERE id = ?', [req.user.id]);
+    res.json({ message: 'Account deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting account:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// GET /api/child/stats
+// Child-specific dashboard stats
+const getChildDashboardStats = async (req, res) => {
+  const child_id = req.user.id;
+  try {
+    // Total parents
+    const [[{ total_parents }]] = await pool.query(
+      'SELECT COUNT(*) AS total_parents FROM parents WHERE child_id = ?',
+      [child_id]
+    );
+
+    // Alerts today (scoped to child's parents)
+    const [[{ alerts_today }]] = await pool.query(
+      `SELECT COUNT(*) AS alerts_today
+       FROM alerts a
+       JOIN parents p ON a.parent_id = p.id
+       WHERE p.child_id = ? AND DATE(a.created_at) = CURDATE() AND a.is_resolved = 0`,
+      [child_id]
+    );
+
+    // Active caregivers (distinct caregivers assigned to child's parents)
+    const [[{ active_caregivers }]] = await pool.query(
+      `SELECT COUNT(DISTINCT assigned_caregiver_id) AS active_caregivers
+       FROM parents
+       WHERE child_id = ? AND assigned_caregiver_id IS NOT NULL`,
+      [child_id]
+    );
+
+    // Overall health status — derived from latest log condition across all parents
+    const [latestLogs] = await pool.query(
+      `SELECT hl.overall_condition
+       FROM health_logs hl
+       JOIN parents p ON hl.parent_id = p.id
+       WHERE p.child_id = ?
+       ORDER BY hl.logged_at DESC
+       LIMIT 5`,
+      [child_id]
+    );
+
+    let health_status = 'Stable';
+    if (latestLogs.some(l => l.overall_condition === 'CRITICAL')) health_status = 'Critical';
+    else if (latestLogs.some(l => l.overall_condition === 'NEEDS ATTENTION')) health_status = 'Needs Attention';
+    else if (latestLogs.length === 0) health_status = 'No Data';
+
+    // Recent activity feed (last 5 events across all child's parents)
+    const [recentActivity] = await pool.query(
+      `(SELECT
+          'vitals' AS type,
+          CONCAT('Vitals logged for ', p.name) AS title,
+          hl.notes AS description,
+          hl.logged_at AS timestamp
+        FROM health_logs hl
+        JOIN parents p ON hl.parent_id = p.id
+        WHERE p.child_id = ?
+        ORDER BY hl.logged_at DESC
+        LIMIT 3)
+       UNION ALL
+       (SELECT
+          'alert' AS type,
+          a.title,
+          a.description,
+          a.created_at AS timestamp
+        FROM alerts a
+        JOIN parents p ON a.parent_id = p.id
+        WHERE p.child_id = ? AND a.is_resolved = 0
+        ORDER BY a.created_at DESC
+        LIMIT 2)
+       ORDER BY timestamp DESC
+       LIMIT 5`,
+      [child_id, child_id]
+    );
+
+    res.json({
+      total_parents,
+      active_caregivers,
+      alerts_today,
+      health_status,
+      recent_activity: recentActivity
+    });
+  } catch (err) {
+    console.error('Error fetching child dashboard stats:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   getProfile,
   updateProfile,
@@ -457,4 +601,8 @@ module.exports = {
   disable2FA,
   getMyResidents,
   getDashboardStats,
+  updateNotificationPrefs,
+  getNotificationPrefs,
+  deleteAccount,
+  getChildDashboardStats,
 };
