@@ -74,7 +74,7 @@ const Navbar = () => {
           <div className="navbar__auth">
             {user ? (
               <>
-                <Link to={user.role === 'caregiver' ? '/caregiver/dashboard' : '/dashboard'} className="nav-link">Dashboard</Link>
+                <Link to={user.role === 'admin' ? '/admin-v2/dashboard' : user.role === 'caregiver' ? '/caregiver/dashboard' : '/dashboard'} className="nav-link">Dashboard</Link>
                 <button onClick={handleLogout} className="btn btn-secondary navbar__cta">Logout</button>
               </>
             ) : (
@@ -141,7 +141,7 @@ const Navbar = () => {
           {user ? (
             <>
               <Link
-                to={user.role === 'caregiver' ? '/caregiver/dashboard' : '/dashboard'}
+                to={user.role === 'admin' ? '/admin-v2/dashboard' : user.role === 'caregiver' ? '/caregiver/dashboard' : '/dashboard'}
                 className="mobile-nav-link"
                 onClick={() => setMenuOpen(false)}
               >

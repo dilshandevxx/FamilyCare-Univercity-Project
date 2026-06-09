@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Activity, Heart, Thermometer, User, Clock, ChevronRight, CheckCircle, FileText, Info } from 'lucide-react';
+import { Search, Activity, Heart, Thermometer, User, Clock, ChevronRight, CheckCircle, FileText, Info, X } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
 import './AdminHealthLogsV2.css';
 
