@@ -24,28 +24,27 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const login = async (email, password) => {
-    // Mock successful login for any credentials
-    const dummyUser = { 
-      name: 'Demo User', 
-      email: email, 
-      role: email.includes('caregiver') ? 'caregiver' : 'parent' 
-    };
-    setUser(dummyUser);
-    localStorage.setItem('token', 'dummy-token');
-    return { token: 'dummy-token', user: dummyUser };
+  const login = async (email, password, role) => {
+    const { data } = await api.post('/auth/login', { email, password, role });
+    localStorage.setItem('token', data.token);
+    // Fetch full profile so user object has id, name, email, role
+    const { data: profile } = await api.get('/users/profile');
+    setUser(profile);
+    return data;
   };
 
   const register = async (userData) => {
-    // Mock registration for any credentials
-    const dummyUser = {
-      name: userData.name || 'New User',
-      email: userData.email,
-      role: userData.role || 'child'
-    };
-    setUser(dummyUser);
-    localStorage.setItem('token', 'dummy-token');
-    return { token: 'dummy-token', user: dummyUser };
+    const { data } = await api.post('/auth/register', userData);
+    setUser(data.user);
+    localStorage.setItem('token', data.token);
+    return data;
+  };
+
+  const refreshUser = async () => {
+    try {
+      const { data } = await api.get('/users/profile');
+      setUser(data);
+    } catch {}
   };
 
   const logout = () => {
@@ -54,7 +53,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, register, logout, loading, refreshUser }}>
       {!loading && children}
     </AuthContext.Provider>
   );

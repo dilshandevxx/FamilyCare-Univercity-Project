@@ -307,6 +307,15 @@
 }
 .status-stable .status-dot { background-color: #0d9488; }
 
+.status-moderate {
+  background-color: #fef9c3;
+  color: #ca8a04;
+}
+.status-moderate .status-dot { background-color: #ca8a04; }
+
+/* Mobile border — moderate care */
+.elder-card.status-border-moderate { border-left-color: #ca8a04; }
+
 /* Metrics Desktop */
 .elder-metrics-desktop {
   display: grid;

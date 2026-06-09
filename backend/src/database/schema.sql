@@ -12,34 +12,55 @@ CREATE TABLE IF NOT EXISTS users (
   name         VARCHAR(150)  NOT NULL,
   email        VARCHAR(150)  NOT NULL UNIQUE,
   password     VARCHAR(255)  NOT NULL,
+  phone        VARCHAR(20),
   role         ENUM('child', 'caregiver', 'admin') NOT NULL DEFAULT 'child',
   created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- ── Parents (elderly person profiles) ────────────────────────
-CREATE TABLE IF NOT EXISTS parents (
-  id           INT AUTO_INCREMENT PRIMARY KEY,
-  child_id     INT NOT NULL,
-  name         VARCHAR(150) NOT NULL,
-  age          INT,
-  medical_conditions TEXT,
-  address      VARCHAR(255),
-  created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (child_id) REFERENCES users(id) ON DELETE CASCADE
+-- ── Family Member Profiles ────────────────────────────────────
+CREATE TABLE IF NOT EXISTS family_profiles (
+  id               INT AUTO_INCREMENT PRIMARY KEY,
+  user_id          INT NOT NULL UNIQUE,
+  relationship     VARCHAR(50),
+  created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 -- ── Caregivers ────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS caregivers (
   id                 INT AUTO_INCREMENT PRIMARY KEY,
-  user_id            INT,                          -- links to users table if caregiver has an account
+  user_id            INT UNIQUE,
   name               VARCHAR(150) NOT NULL,
   specialization     VARCHAR(100),
-  experience_years   INT DEFAULT 0,
+  experience_years   VARCHAR(20),
+  certification      VARCHAR(50),
+  license_id         VARCHAR(100),
   hourly_rate        DECIMAL(8, 2) DEFAULT 0.00,
   bio                TEXT,
   is_available       BOOLEAN DEFAULT TRUE,
   created_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- ── Parents (elderly person profiles) ────────────────────────
+CREATE TABLE IF NOT EXISTS parents (
+  id                      INT AUTO_INCREMENT PRIMARY KEY,
+  child_id                INT NOT NULL,
+  name                    VARCHAR(150) NOT NULL,
+  age                     INT,
+  gender                  VARCHAR(10),
+  relationship            VARCHAR(50),
+  phone                   VARCHAR(20),
+  address                 VARCHAR(255),
+  emergency_contact_name  VARCHAR(150),
+  emergency_contact_phone VARCHAR(20),
+  medical_conditions      TEXT,
+  allergies               TEXT,
+  current_medications     TEXT,
+  assigned_caregiver_id   INT,
+  created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (child_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (assigned_caregiver_id) REFERENCES caregivers(id) ON DELETE SET NULL
 );
 
 -- ── Appointments ──────────────────────────────────────────────
@@ -81,4 +102,28 @@ CREATE TABLE IF NOT EXISTS activity_logs (
   logged_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (parent_id) REFERENCES parents(id)  ON DELETE CASCADE,
   FOREIGN KEY (logged_by) REFERENCES users(id)    ON DELETE SET NULL
+);
+
+-- ── Messages (chat logs) ──────────────────────────────────────
+CREATE TABLE IF NOT EXISTS messages (
+  id           INT AUTO_INCREMENT PRIMARY KEY,
+  sender_id    INT NOT NULL,
+  receiver_id  INT NOT NULL,
+  message      TEXT NOT NULL,
+  is_read      BOOLEAN DEFAULT FALSE,
+  created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- ── Alerts (health / activity system logs) ────────────────────
+CREATE TABLE IF NOT EXISTS alerts (
+  id           INT AUTO_INCREMENT PRIMARY KEY,
+  parent_id    INT NOT NULL,
+  title        VARCHAR(255) NOT NULL,
+  description  TEXT NOT NULL,
+  type         ENUM('critical', 'warning', 'info') DEFAULT 'info',
+  is_resolved  BOOLEAN DEFAULT FALSE,
+  created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (parent_id) REFERENCES parents(id) ON DELETE CASCADE
 );

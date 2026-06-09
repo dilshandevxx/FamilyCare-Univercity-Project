@@ -271,27 +271,37 @@
 /* Profile Specific */
 .profile-layout {
   display: flex;
-  flex-direction: column;
-  gap: 32px;
+  flex-direction: row;   /* avatar + fields side-by-side on ALL sizes */
+  align-items: flex-start;
+  gap: 20px;
 }
 
 @media (min-width: 768px) {
   .profile-layout {
-    flex-direction: row;
+    gap: 32px;
   }
 }
 
 .profile-avatar-container {
   position: relative;
   flex-shrink: 0;
+  align-self: flex-start;
 }
 
 .profile-avatar-box {
-  width: 96px;
-  height: 96px;
+  width: 72px;
+  height: 72px;
   background-color: #e2e8f0;
-  border-radius: 24px;
+  border-radius: 16px;
   overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .profile-avatar-box {
+    width: 96px;
+    height: 96px;
+    border-radius: 24px;
+  }
 }
 
 .edit-avatar-btn {
@@ -714,4 +724,280 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+/* ── Two-Factor Authentication modal ──────────────────────── */
+
+.tfa-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 16px;
+}
+
+.tfa-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.18);
+  width: 100%;
+  max-width: 440px;
+  padding: 28px;
+  animation: tfa-slide-in 0.22s ease;
+}
+
+@keyframes tfa-slide-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1);    }
+}
+
+/* Header row */
+.tfa-modal-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.tfa-modal-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: #f0fdfa;
+  color: #0d9488;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tfa-modal-header h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 4px;
+}
+
+.tfa-modal-header p {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.tfa-close-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.tfa-close-btn:hover {
+  color: #475569;
+  background: #f1f5f9;
+}
+
+/* Step indicator */
+.tfa-steps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.tfa-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.tfa-step.active {
+  color: #0d9488;
+}
+
+.tfa-step-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.tfa-step.active .tfa-step-num {
+  background: #0d9488;
+  border-color: #0d9488;
+  color: #fff;
+}
+
+.tfa-step-line {
+  flex: 1;
+  height: 2px;
+  background: #e2e8f0;
+  border-radius: 2px;
+}
+
+/* Body copy */
+.tfa-instruction {
+  font-size: 0.85rem;
+  color: #475569;
+  margin: 0 0 18px;
+  line-height: 1.55;
+}
+
+/* QR code */
+.tfa-qr-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.tfa-qr-img {
+  width: 180px;
+  height: 180px;
+  border-radius: 10px;
+  border: 2px solid #e2e8f0;
+  padding: 6px;
+  background: #fff;
+}
+
+/* Manual key entry */
+.tfa-manual {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.tfa-manual summary {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  list-style: none;
+  font-weight: 600;
+  color: #0d9488;
+  margin-bottom: 8px;
+}
+
+.tfa-secret-code {
+  display: block;
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.82rem;
+  word-break: break-all;
+  letter-spacing: 0.05em;
+  color: #334155;
+}
+
+/* OTP input */
+.tfa-otp-input {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: 2px solid #e2e8f0;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.55em;
+  text-align: center;
+  outline: none;
+  box-sizing: border-box;
+  color: #1e293b;
+  margin-bottom: 20px;
+  transition: border-color 0.2s;
+}
+
+.tfa-otp-input:focus {
+  border-color: #0d9488;
+}
+
+/* Loading state */
+.tfa-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px 0 16px;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+/* Action row */
+.tfa-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+/* Utility buttons */
+.btn-outline-gray {
+  padding: 9px 18px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  background: #fff;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-outline-gray:hover { background: #f8fafc; }
+
+.btn-danger {
+  padding: 9px 18px;
+  border-radius: 8px;
+  border: none;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s;
+}
+
+.btn-danger:hover:not(:disabled) { background: #dc2626; }
+.btn-danger:disabled { opacity: 0.65; cursor: not-allowed; }
+
+/* Security action link variant */
+.tfa-disable-link {
+  color: #ef4444 !important;
+}
+
+/* Badge for disabled state in mobile list */
+.badge-disabled {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+
+/* btn-link with icon */
+.btn-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }

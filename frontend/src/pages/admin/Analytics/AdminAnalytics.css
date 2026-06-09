@@ -1,0 +1,109 @@
+.an-page { display: flex; flex-direction: column; gap: 24px; }
+
+.an-header { margin-bottom: 4px; }
+.an-title   { font-size: 22px; font-weight: 800; color: #0f172a; margin: 0 0 4px; }
+.an-subtitle { font-size: 13px; color: #64748b; margin: 0; }
+
+.an-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.an-kpi-card {
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.an-kpi-icon {
+  width: 46px; height: 46px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.an-kpi-label { font-size: 12px; color: #64748b; font-weight: 600; margin: 0 0 4px; }
+.an-kpi-value { font-size: 26px; font-weight: 800; color: #0f172a; margin: 0; }
+
+.an-charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.an-chart-card {
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.an-chart-title { font-size: 14px; font-weight: 700; color: #0f172a; margin: 0 0 20px; }
+
+/* Vertical bars */
+.an-bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  height: 180px;
+}
+
+.an-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  gap: 6px;
+}
+
+.an-bar-val { font-size: 10px; color: #94a3b8; font-weight: 600; }
+
+.an-bar-wrap {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+}
+
+.an-bar {
+  width: 100%;
+  background: linear-gradient(180deg, #14b8a6 0%, #0d9488 100%);
+  border-radius: 6px 6px 0 0;
+  min-height: 4px;
+}
+
+.an-bar-label { font-size: 11px; color: #94a3b8; font-weight: 500; }
+
+/* Horizontal bars */
+.an-hbar-list { display: flex; flex-direction: column; gap: 14px; }
+
+.an-hbar-row { display: flex; align-items: center; gap: 12px; }
+
+.an-hbar-type { font-size: 12.5px; color: #475569; font-weight: 600; width: 130px; flex-shrink: 0; }
+
+.an-hbar-track {
+  flex: 1;
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.an-hbar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #14b8a6, #0d9488);
+  border-radius: 999px;
+}
+
+.an-hbar-count { font-size: 12px; font-weight: 700; color: #334155; width: 36px; text-align: right; }
+
+@media (max-width: 900px) {
+  .an-charts-row { grid-template-columns: 1fr; }
+}
