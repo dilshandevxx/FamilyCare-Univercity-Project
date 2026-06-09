@@ -1,6 +1,240 @@
 import React, { useState } from 'react';
 import './Caregivers.css';
 
+/* ── Talk to a Specialist modal ─────────────────────────────── */
+const TalkModal = ({ onClose }) => {
+  const [form, setForm] = useState({ name: '', email: '', phone: '', time: '', message: '' });
+  const [sent, setSent] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const subject = encodeURIComponent(`Specialist Request from ${form.name}`);
+    const body = encodeURIComponent(
+      `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nPreferred Time: ${form.time}\n\nMessage:\n${form.message}`
+    );
+    window.location.href = `mailto:support@familycare.com?subject=${subject}&body=${body}`;
+    setSent(true);
+  };
+
+  const inputStyle = {
+    width: '100%', padding: '0.7rem 1rem', borderRadius: '10px',
+    border: '1.5px solid #e2e8f0', fontSize: '0.9rem', outline: 'none',
+    boxSizing: 'border-box', fontFamily: 'inherit', transition: 'border-color 0.2s',
+  };
+  const labelStyle = { display: 'block', fontSize: '0.82rem', fontWeight: '600', marginBottom: '0.4rem', color: '#4a5568' };
+  const focus = e => e.target.style.borderColor = 'var(--color-primary)';
+  const blur  = e => e.target.style.borderColor = '#e2e8f0';
+
+  return (
+    <div onClick={onClose} style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 1000, padding: '1rem',
+    }}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background: 'white', borderRadius: '20px', padding: '2.5rem',
+        width: '100%', maxWidth: '480px', position: 'relative',
+        boxShadow: '0 25px 60px rgba(0,0,0,0.2)', maxHeight: '90vh', overflowY: 'auto',
+      }}>
+        <button onClick={onClose} style={{
+          position: 'absolute', top: '1.2rem', right: '1.2rem', background: 'none',
+          border: 'none', fontSize: '1.4rem', cursor: 'pointer', color: '#718096',
+        }}>×</button>
+
+        {sent ? (
+          <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
+            <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🎉</div>
+            <h3 style={{ color: 'var(--color-primary)', marginBottom: '0.75rem' }}>Request Sent!</h3>
+            <p style={{ color: '#718096', fontSize: '0.9rem', lineHeight: 1.6 }}>
+              Your email client should open shortly. A Family Concierge specialist will reach out within 24 hours.
+            </p>
+            <button onClick={onClose} style={{
+              marginTop: '1.5rem', background: 'var(--color-primary)', color: 'white',
+              border: 'none', borderRadius: '12px', padding: '0.8rem 2rem',
+              fontWeight: '600', cursor: 'pointer', width: '100%', fontSize: '0.95rem',
+            }}>Done</button>
+          </div>
+        ) : (
+          <>
+            <div style={{ marginBottom: '1.75rem' }}>
+              <h3 style={{ fontSize: '1.45rem', color: '#1a202c', marginBottom: '0.4rem' }}>Talk to a Specialist</h3>
+              <p style={{ color: '#718096', fontSize: '0.88rem' }}>Our Family Concierge team will help you find the perfect caregiver match.</p>
+            </div>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <label style={labelStyle}>Full Name</label>
+                  <input type="text" required placeholder="Jane Smith" style={inputStyle}
+                    value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
+                    onFocus={focus} onBlur={blur} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Phone (optional)</label>
+                  <input type="tel" placeholder="+1 234 567 8900" style={inputStyle}
+                    value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })}
+                    onFocus={focus} onBlur={blur} />
+                </div>
+              </div>
+              <div>
+                <label style={labelStyle}>Email Address</label>
+                <input type="email" required placeholder="your@email.com" style={inputStyle}
+                  value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
+                  onFocus={focus} onBlur={blur} />
+              </div>
+              <div>
+                <label style={labelStyle}>Preferred Contact Time</label>
+                <select style={{ ...inputStyle, background: 'white', cursor: 'pointer' }}
+                  value={form.time} onChange={e => setForm({ ...form, time: e.target.value })}
+                  onFocus={focus} onBlur={blur}>
+                  <option value="">Select a time window…</option>
+                  <option>Morning (8am – 12pm)</option>
+                  <option>Afternoon (12pm – 5pm)</option>
+                  <option>Evening (5pm – 8pm)</option>
+                  <option>Any time</option>
+                </select>
+              </div>
+              <div>
+                <label style={labelStyle}>Tell us about your needs</label>
+                <textarea required rows={3} placeholder="E.g. looking for a nurse for my mother, 3 days a week…"
+                  style={{ ...inputStyle, resize: 'vertical' }}
+                  value={form.message} onChange={e => setForm({ ...form, message: e.target.value })}
+                  onFocus={focus} onBlur={blur} />
+              </div>
+              <button type="submit" style={{
+                background: 'var(--color-primary)', color: 'white', border: 'none',
+                borderRadius: '12px', padding: '0.85rem', fontWeight: '700',
+                cursor: 'pointer', fontSize: '0.95rem', marginTop: '0.25rem',
+                transition: 'opacity 0.2s',
+              }}
+                onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
+                onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
+                Send Request
+              </button>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/* ── How it Works modal ─────────────────────────────────────── */
+const HowItWorksModal = ({ onClose }) => {
+  const [active, setActive] = useState(0);
+  const steps = [
+    {
+      icon: '🔍',
+      title: 'Browse & Filter',
+      desc: 'Explore our pool of verified, background-checked caregivers. Use filters like specialty, experience, price, and rating to narrow down the best candidates for your loved one.',
+      detail: 'Every caregiver on FamilyCare is identity-verified, reference-checked, and holds valid certifications for their listed specialties.',
+    },
+    {
+      icon: '📋',
+      title: 'Review Profiles',
+      desc: 'Read detailed profiles including qualifications, patient reviews, specialties, and personal care philosophy — so you know exactly who you\'re trusting with your family.',
+      detail: 'Profiles include video introductions, verified credentials, response time, and availability calendars.',
+    },
+    {
+      icon: '🤝',
+      title: 'Schedule a Match Call',
+      desc: 'Not sure who to choose? Our Family Concierge team will schedule a free consultation to understand your needs and personally recommend the best matches.',
+      detail: 'Consultations are free, no-commitment, and typically last 20–30 minutes.',
+    },
+    {
+      icon: '💚',
+      title: 'Start Care',
+      desc: 'Once you\'ve chosen, we handle the contracts, scheduling, and ongoing check-ins. Your dedicated care manager monitors health logs and keeps you updated in real time.',
+      detail: 'Cancel or reschedule anytime. Our platform tracks health logs, visit history, and sends alerts directly to your phone.',
+    },
+  ];
+
+  return (
+    <div onClick={onClose} style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      zIndex: 1000, padding: '1rem',
+    }}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background: 'white', borderRadius: '24px', width: '100%', maxWidth: '580px',
+        boxShadow: '0 25px 60px rgba(0,0,0,0.22)', overflow: 'hidden', maxHeight: '90vh',
+      }}>
+        {/* Header */}
+        <div style={{
+          background: 'var(--color-primary)', padding: '2rem 2.5rem',
+          color: 'white', position: 'relative',
+        }}>
+          <button onClick={onClose} style={{
+            position: 'absolute', top: '1.2rem', right: '1.2rem', background: 'rgba(255,255,255,0.15)',
+            border: 'none', borderRadius: '50%', width: '32px', height: '32px',
+            fontSize: '1.1rem', cursor: 'pointer', color: 'white', lineHeight: '32px',
+          }}>×</button>
+          <h3 style={{ fontSize: '1.5rem', marginBottom: '0.4rem' }}>How FamilyCare Works</h3>
+          <p style={{ opacity: 0.85, fontSize: '0.9rem' }}>Four simple steps to the right care.</p>
+        </div>
+
+        {/* Step tabs */}
+        <div style={{ display: 'flex', borderBottom: '1px solid #edf2f7' }}>
+          {steps.map((s, i) => (
+            <button key={i} onClick={() => setActive(i)} style={{
+              flex: 1, padding: '0.85rem 0.5rem', border: 'none', background: 'none',
+              cursor: 'pointer', fontSize: '1.4rem',
+              borderBottom: active === i ? '3px solid var(--color-primary)' : '3px solid transparent',
+              transition: 'border-color 0.2s',
+            }} title={s.title}>{s.icon}</button>
+          ))}
+        </div>
+
+        {/* Step content */}
+        <div style={{ padding: '2rem 2.5rem', overflowY: 'auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+            <div style={{
+              width: '36px', height: '36px', borderRadius: '50%',
+              background: 'var(--color-primary)', color: 'white',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontWeight: '700', fontSize: '0.9rem', flexShrink: 0,
+            }}>{active + 1}</div>
+            <h4 style={{ fontSize: '1.15rem', color: '#1a202c', margin: 0 }}>{steps[active].title}</h4>
+          </div>
+          <p style={{ color: '#4a5568', lineHeight: 1.7, marginBottom: '1rem', fontSize: '0.95rem' }}>
+            {steps[active].desc}
+          </p>
+          <div style={{
+            background: '#f0faf8', borderLeft: '3px solid var(--color-primary)',
+            padding: '0.9rem 1.1rem', borderRadius: '0 10px 10px 0',
+            fontSize: '0.85rem', color: '#2d6a63', lineHeight: 1.6,
+          }}>
+            {steps[active].detail}
+          </div>
+
+          {/* Step navigation */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', alignItems: 'center' }}>
+            <button onClick={() => setActive(p => Math.max(0, p - 1))} disabled={active === 0}
+              style={{
+                padding: '0.6rem 1.2rem', borderRadius: '10px', border: '1.5px solid #e2e8f0',
+                background: 'none', cursor: active === 0 ? 'not-allowed' : 'pointer',
+                color: active === 0 ? '#cbd5e0' : '#4a5568', fontWeight: '600', fontSize: '0.88rem',
+              }}>← Previous</button>
+            <span style={{ color: '#a0aec0', fontSize: '0.82rem' }}>Step {active + 1} of {steps.length}</span>
+            {active < steps.length - 1 ? (
+              <button onClick={() => setActive(p => p + 1)} style={{
+                padding: '0.6rem 1.2rem', borderRadius: '10px', border: 'none',
+                background: 'var(--color-primary)', color: 'white',
+                cursor: 'pointer', fontWeight: '600', fontSize: '0.88rem',
+              }}>Next →</button>
+            ) : (
+              <button onClick={onClose} style={{
+                padding: '0.6rem 1.2rem', borderRadius: '10px', border: 'none',
+                background: 'var(--color-primary)', color: 'white',
+                cursor: 'pointer', fontWeight: '600', fontSize: '0.88rem',
+              }}>Get Started ✓</button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const caregiversData = [
   {
     id: 1,
@@ -50,9 +284,13 @@ const caregiversData = [
 
 const Caregivers = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [showTalkModal, setShowTalkModal] = useState(false);
+  const [showHowModal, setShowHowModal] = useState(false);
 
   return (
     <div className="caregivers-page">
+      {showTalkModal && <TalkModal onClose={() => setShowTalkModal(false)} />}
+      {showHowModal  && <HowItWorksModal onClose={() => setShowHowModal(false)} />}
       <div className="container">
         {/* Header Section */}
         <div className="caregivers-header">
@@ -172,8 +410,8 @@ const Caregivers = () => {
               <h2>Need help choosing the right fit?</h2>
               <p>Our Family Concierge team can help you navigate profiles, conduct interviews, and find the perfect specialist for your unique needs.</p>
               <div className="promo-buttons">
-                <button className="btn btn-primary btn-talk">Talk to a Specialist</button>
-                <button className="btn btn-outline-white">How it Works</button>
+                <button className="btn btn-primary btn-talk" onClick={() => setShowTalkModal(true)}>Talk to a Specialist</button>
+                <button className="btn btn-outline-white" onClick={() => setShowHowModal(true)}>How it Works</button>
               </div>
             </div>
             <div className="promo-graphic">
