@@ -63,10 +63,11 @@ router.get('/resident/:id/summary', protect, getResidentSummary);
 // Paginated log history for a resident  (query: ?page=1&limit=10)
 router.get('/resident/:id/logs', protect, getResidentLogs);
 
-// Single log entry
-router.get('/:logId', protect, getLogById);
-router.post('/', protect, addLog);
+// Health feed and analytics (must be before /:logId wildcard)
 router.get('/feed', protect, getHealthFeed);
 router.get('/analytics', protect, getAnalytics);
+
+// Single log entry (wildcard — keep last among GET routes)
+router.get('/:logId', protect, getLogById);
 
 module.exports = router;
