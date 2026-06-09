@@ -1,0 +1,223 @@
+.approval-v2-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.approval-v2-action-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.8rem 1.2rem;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  animation: banner-slide 0.3s ease-out;
+}
+
+.approval-v2-action-banner.banner-approved {
+  background-color: #E6F7F5;
+  color: #00A896;
+  border: 1px solid rgba(0, 168, 150, 0.3);
+}
+
+.approval-v2-action-banner.banner-rejected {
+  background-color: #FEF2F2;
+  color: #DC2626;
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+@keyframes banner-slide {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.approval-v2-empty-state {
+  background-color: white;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  text-align: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+}
+
+.approval-v2-empty-state h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 1rem 0 0.5rem 0;
+  color: #1A202C;
+}
+
+.approval-v2-empty-state p {
+  font-size: 0.85rem;
+  color: #718096;
+  margin: 0;
+}
+
+.approval-v2-applicants-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.approval-v2-card {
+  background-color: white;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 280px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.approval-v2-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+}
+
+.approval-v2-card.status-approved {
+  border-color: #00A896;
+  background-color: #FAFFFD;
+}
+
+.approval-v2-card.status-rejected {
+  border-color: #FCA5A5;
+  background-color: #FFFDFD;
+}
+
+.approval-v2-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.2rem;
+}
+
+.approval-v2-profile-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: #E6F7F5;
+  color: #00A896;
+  font-weight: 800;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.approval-v2-applicant-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1A202C;
+  margin: 0;
+}
+
+.approval-v2-applicant-email {
+  font-size: 0.78rem;
+  color: #718096;
+  margin: 0;
+}
+
+.approval-v2-credentials {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: #FAF8F5;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 1rem;
+  font-size: 0.82rem;
+}
+
+.credential-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.credential-row .label {
+  color: #718096;
+  font-weight: 500;
+}
+
+.credential-row .value {
+  color: #1A202C;
+  font-weight: 600;
+}
+
+.credential-row .value-badge {
+  background-color: #E6F7F5;
+  color: #00A896;
+  font-weight: 700;
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.approval-v2-bio {
+  font-size: 0.8rem;
+  color: #4A5568;
+  line-height: 1.45;
+  margin-bottom: 1.25rem;
+}
+
+.approval-v2-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.approval-v2-actions button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.6rem;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reject-btn {
+  background-color: white;
+  border: 1.5px solid #FCA5A5;
+  color: #DC2626;
+}
+
+.reject-btn:hover {
+  background-color: #FEF2F2;
+}
+
+.approve-btn {
+  background-color: #00A896;
+  border: none;
+  color: white;
+}
+
+.approve-btn:hover {
+  background-color: #008f80;
+}
+
+.approval-v2-decision-status {
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+  padding: 8px;
+  border-radius: 8px;
+  letter-spacing: 0.8px;
+}
+
+.approval-v2-decision-status.is-approved {
+  background-color: #D1FAE5;
+  color: #065F46;
+}
+
+.approval-v2-decision-status.is-rejected {
+  background-color: #FEE2E2;
+  color: #991B1B;
+}

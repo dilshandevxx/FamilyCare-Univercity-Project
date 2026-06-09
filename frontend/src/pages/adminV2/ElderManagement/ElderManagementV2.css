@@ -1,0 +1,320 @@
+.elder-v2-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.elder-v2-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.elder-v2-search-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  max-width: 600px;
+}
+
+.elder-v2-search-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: white;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 0.55rem 0.8rem;
+  flex: 1;
+}
+
+.elder-v2-search-input input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 0.85rem;
+  color: #1A202C;
+}
+
+.elder-v2-filter-select {
+  padding: 0.55rem 1rem;
+  border-radius: 10px;
+  border: 1.5px solid #E2E8F0;
+  background-color: white;
+  font-size: 0.85rem;
+  color: #4A5568;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Elders grid */
+.elder-v2-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.elder-v2-card {
+  background-color: white;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 280px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-left: 5px solid #CBD5E1;
+}
+
+.elder-v2-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
+}
+
+.elder-v2-card.status-stable { border-left-color: #00A896; }
+.elder-v2-card.status-needs-attention { border-left-color: #EA580C; }
+.elder-v2-card.status-critical { border-left-color: #DC2626; }
+
+.elder-v2-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.elder-v2-avatar-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.elder-v2-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #FAF8F5;
+  color: #718096;
+  border: 1.5px solid #E2E8F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.elder-v2-avatar-name h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1A202C;
+  margin: 0;
+}
+
+.elder-v2-meta {
+  font-size: 0.75rem;
+  color: #718096;
+  margin: 2px 0 0 0;
+}
+
+.elder-v2-status-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.elder-v2-status-pill.status-stable { background-color: #E6F7F5; color: #00A896; }
+.elder-v2-status-pill.status-needs-attention { background-color: #FFF7ED; color: #EA580C; }
+.elder-v2-status-pill.status-critical { background-color: #FEF2F2; color: #DC2626; }
+
+.elder-v2-medical-conditions {
+  font-size: 0.8rem;
+  color: #4A5568;
+  margin-bottom: 1rem;
+  background-color: #FAF8F5;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.elder-v2-medical-conditions h5 {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #718096;
+  text-transform: uppercase;
+  margin: 0 0 3px 0;
+}
+
+.elder-v2-medical-conditions p {
+  margin: 0;
+  font-weight: 500;
+  color: #1A202C;
+}
+
+.elder-v2-assignment-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px dashed #E2E8F0;
+}
+
+.elder-v2-assignment-row .label {
+  color: #718096;
+  font-weight: 500;
+}
+
+.caregiver-select {
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1.5px solid #E2E8F0;
+  background-color: white;
+  font-size: 0.78rem;
+  color: #1A202C;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+
+.caregiver-select:focus {
+  border-color: #00A896;
+}
+
+.caregiver-select.unassigned {
+  color: #DC2626;
+  border-color: #FCA5A5;
+  background-color: #FEF2F2;
+}
+
+.elder-v2-contact-section {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 1.2rem;
+}
+
+.contact-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: #64748B;
+}
+
+.contact-info a {
+  color: #00A896;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.contact-info a:hover {
+  text-decoration: underline;
+}
+
+.elder-v2-card-footer {
+  margin-top: auto;
+}
+
+.view-log-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 0.6rem;
+  background-color: #FAF8F5;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4A5568;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-log-btn:hover {
+  background-color: #E6F7F5;
+  border-color: #00A896;
+  color: #00A896;
+}
+
+.elder-v2-empty {
+  text-align: center;
+  padding: 3rem;
+  color: #94A3B8;
+  grid-column: 1 / -1;
+  background-color: white;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+}
+
+/* Modals Chart */
+.elder-v2-modal-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+  background-color: #FAF8F5;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 1.2rem;
+}
+
+.chart-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #E2E8F0;
+  padding-bottom: 8px;
+  font-size: 0.85rem;
+}
+
+.chart-stat:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.chart-stat .label {
+  color: #718096;
+  font-weight: 500;
+}
+
+.chart-stat .value {
+  color: #1A202C;
+  font-weight: 700;
+}
+
+.chart-stat .value.text-coral { color: #DC2626; }
+
+.chart-stat .value-pill {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.chart-stat .value-pill.status-stable { background-color: #D1FAE5; color: #065F46; }
+.chart-stat .value-pill.status-needs-attention { background-color: #FEF3C7; color: #92400E; }
+.chart-stat .value-pill.status-critical { background-color: #FEE2E2; color: #991B1B; }
+
+.elder-v2-modal-close-btn {
+  width: 100%;
+  padding: 0.65rem;
+  background-color: #00A896;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.elder-v2-modal-close-btn:hover {
+  background-color: #008f80;
+}

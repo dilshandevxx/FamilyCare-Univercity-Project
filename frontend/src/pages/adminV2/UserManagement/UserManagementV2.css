@@ -1,0 +1,344 @@
+.user-v2-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.user-v2-header-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.user-v2-search-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  max-width: 600px;
+}
+
+.user-v2-search-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: white;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 0.55rem 0.8rem;
+  flex: 1;
+}
+
+.user-v2-search-input input {
+  border: none;
+  outline: none;
+  width: 100%;
+  font-size: 0.85rem;
+  color: #1A202C;
+}
+
+.user-v2-filter-select {
+  padding: 0.55rem 1rem;
+  border-radius: 10px;
+  border: 1.5px solid #E2E8F0;
+  background-color: white;
+  font-size: 0.85rem;
+  color: #4A5568;
+  outline: none;
+  cursor: pointer;
+}
+
+.user-v2-add-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.65rem 1.25rem;
+  background-color: #00A896;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(0, 168, 150, 0.2);
+  transition: background-color 0.2s;
+}
+
+.user-v2-add-btn:hover {
+  background-color: #008f80;
+}
+
+/* Table styling */
+.user-v2-table-wrapper {
+  background-color: white;
+  border: 1px solid #E2E8F0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+}
+
+.user-v2-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.85rem;
+}
+
+.user-v2-table th {
+  background-color: #FAF8F5;
+  color: #4A5568;
+  font-weight: 700;
+  padding: 1rem 1.5rem;
+  border-bottom: 1.5px solid #E2E8F0;
+}
+
+.user-v2-table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #E2E8F0;
+  color: #2D3748;
+}
+
+.user-v2-table tbody tr:hover {
+  background-color: #F8FAF9;
+}
+
+.user-v2-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-v2-avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #E6F7F5;
+  color: #00A896;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.user-v2-name {
+  font-weight: 700;
+  color: #1A202C;
+  margin: 0;
+}
+
+.user-v2-email {
+  font-size: 0.78rem;
+  color: #718096;
+  margin: 0;
+}
+
+/* Pills */
+.user-v2-role-pill {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+.role-admin { background-color: #E6F7F5; color: #00A896; }
+.role-caregiver { background-color: #EEF2FF; color: #4F46E5; }
+.role-child { background-color: #FFF7ED; color: #EA580C; }
+
+.user-v2-status-pill {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+.status-active { background-color: #ECFDF5; color: #059669; }
+.status-suspended { background-color: #FEF2F2; color: #DC2626; }
+
+.actions-header {
+  text-align: right;
+}
+
+.user-v2-actions-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.toggle-btn:hover {
+  transform: scale(1.05);
+}
+
+.delete-btn {
+  color: #94A3B8;
+}
+
+.delete-btn:hover {
+  color: #EF4444;
+  background-color: #FEF2F2;
+}
+
+.no-records-cell {
+  text-align: center;
+  color: #94A3B8;
+  padding: 2rem !important;
+}
+
+/* Modals */
+.user-v2-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.user-v2-modal {
+  background-color: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 480px;
+  padding: 2rem;
+  position: relative;
+  border: 1px solid #E2E8F0;
+  animation: modal-enter 0.2s ease-out;
+}
+
+.user-v2-modal-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: none;
+  border: none;
+  color: #94A3B8;
+  cursor: pointer;
+}
+
+.user-v2-modal-header {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.user-v2-modal-icon {
+  background-color: #E6F7F5;
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-v2-modal-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0;
+  color: #1A202C;
+}
+
+.user-v2-modal-desc {
+  font-size: 0.78rem;
+  color: #718096;
+  margin: 4px 0 0 0;
+}
+
+.user-v2-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 1.25rem;
+}
+
+.user-v2-form-group label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #4A5568;
+}
+
+.user-v2-form-group input,
+.user-v2-form-group select {
+  padding: 0.65rem 0.8rem;
+  border-radius: 8px;
+  border: 1.5px solid #E2E8F0;
+  font-family: inherit;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.user-v2-form-group input:focus,
+.user-v2-form-group select:focus {
+  border-color: #00A896;
+}
+
+.input-with-icon {
+  position: relative;
+}
+
+.input-with-icon .input-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94A3B8;
+}
+
+.input-with-icon input {
+  padding-left: 2.2rem;
+  width: 100%;
+}
+
+.user-v2-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 1.5rem;
+}
+
+.user-v2-modal-cancel {
+  padding: 0.6rem 1.2rem;
+  background-color: white;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 8px;
+  color: #4A5568;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.user-v2-modal-submit {
+  padding: 0.6rem 1.4rem;
+  background-color: #00A896;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.user-v2-modal-submit:hover {
+  background-color: #008f80;
+}
