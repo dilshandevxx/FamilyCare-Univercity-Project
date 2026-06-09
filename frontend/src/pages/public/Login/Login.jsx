@@ -27,7 +27,7 @@ const Login = () => {
   const { login } = useAuth();
 
   const redirectByRole = (role) => {
-    if (role === 'admin') navigate('/admin/dashboard');
+    if (role === 'admin') navigate('/admin-v2/dashboard');
     else if (role === 'caregiver') navigate('/caregiver/dashboard');
     else navigate('/dashboard');
   };

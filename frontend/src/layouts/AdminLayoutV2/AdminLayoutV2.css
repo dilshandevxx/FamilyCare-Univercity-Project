@@ -1,7 +1,7 @@
 .admin-v2-layout-wrapper {
   display: flex;
   min-height: 100vh;
-  background-color: #F8FAF9;
+  background-color: #FAF8F5; /* Warm sand tint backdrop */
   font-family: 'Inter', sans-serif;
   overflow: hidden;
 }
@@ -13,7 +13,7 @@
   left: 0;
   bottom: 0;
   z-index: 900;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .admin-v2-layout-main {
@@ -26,10 +26,12 @@
   overflow-x: hidden;
 }
 
-/* Header */
+/* Glassmorphism Header */
 .admin-v2-layout-header {
   height: 70px;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid #E2E8F0;
   display: flex;
   align-items: center;
@@ -38,6 +40,7 @@
   position: sticky;
   top: 0;
   z-index: 100;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
 .admin-v2-header-left {
@@ -51,17 +54,18 @@
   display: none;
   background: none;
   border: none;
-  color: #4A5568;
+  color: #475569;
   cursor: pointer;
   padding: 6px;
   border-radius: 8px;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
 .admin-v2-mobile-menu-btn:hover {
   background-color: #F1F5F9;
+  color: #0F172A;
 }
 
 .admin-v2-search-bar {
@@ -74,13 +78,13 @@
   width: 100%;
   max-width: 380px;
   border: 1.5px solid transparent;
-  transition: all 0.2s;
+  transition: all 0.2s ease-in-out;
 }
 
 .admin-v2-search-bar:focus-within {
-  border-color: rgba(0, 168, 150, 0.4);
+  border-color: rgba(0, 168, 150, 0.5);
   background-color: white;
-  box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.1);
+  box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.12);
 }
 
 .admin-v2-search-bar input {
@@ -89,7 +93,7 @@
   outline: none;
   width: 100%;
   font-size: 0.85rem;
-  color: #1A202C;
+  color: #0F172A;
 }
 
 .admin-v2-search-bar input::placeholder {
@@ -108,10 +112,11 @@
   font-size: 0.82rem;
   font-weight: 600;
   color: #475569;
-  background-color: #FAF8F5;
+  background-color: #F8FAF9;
   padding: 6px 12px;
   border-radius: 30px;
   border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.01);
 }
 
 .admin-v2-status-dot {
@@ -123,14 +128,14 @@
 }
 
 .admin-v2-status-dot.animated {
-  box-shadow: 0 0 0 0 rgba(0, 168, 150, 0.4);
+  box-shadow: 0 0 0 0 rgba(0, 168, 150, 0.5);
   animation: pulse-dot 2s infinite;
 }
 
 @keyframes pulse-dot {
   0% {
     transform: scale(0.95);
-    box-shadow: 0 0 0 0 rgba(0, 168, 150, 0.7);
+    box-shadow: 0 0 0 0 rgba(0, 168, 150, 0.6);
   }
   70% {
     transform: scale(1);
@@ -158,13 +163,13 @@
 
 .admin-v2-icon-btn:hover {
   background-color: #F1F5F9;
-  color: #1A202C;
+  color: #0F172A;
 }
 
 .admin-v2-notif-dot {
   position: absolute;
-  top: 6px;
-  right: 6px;
+  top: 5px;
+  right: 5px;
   width: 8px;
   height: 8px;
   border-radius: 50%;
@@ -174,7 +179,7 @@
 
 .admin-v2-header-divider {
   width: 1px;
-  height: 28px;
+  height: 24px;
   background-color: #E2E8F0;
 }
 
@@ -191,7 +196,7 @@
 .admin-v2-profile-name {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #1A202C;
+  color: #0F172A;
   margin: 0;
 }
 
@@ -201,7 +206,7 @@
   font-size: 0.7rem;
   font-weight: 600;
   color: #00A896;
-  background-color: #E6F7F5;
+  background-color: rgba(0, 168, 150, 0.08);
   padding: 2px 8px;
   border-radius: 30px;
   margin-top: 2px;
@@ -213,7 +218,7 @@
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid #E2E8F0;
-  background-color: #E2E8F0;
+  background-color: #F1F5F9;
 }
 
 .admin-v2-profile-avatar img {
@@ -222,7 +227,7 @@
   object-fit: cover;
 }
 
-/* Notifications Drawer */
+/* Notifications Dropdown (Stripe style) */
 .admin-v2-notif-container {
   position: relative;
 }
@@ -238,24 +243,24 @@
   position: absolute;
   top: calc(100% + 12px);
   right: 0;
-  width: 320px;
+  width: 330px;
   background-color: white;
   border: 1px solid #E2E8F0;
   border-radius: 12px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
   z-index: 150;
-  animation: dropdown-enter 0.2s ease-out;
+  animation: dropdown-enter 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
 }
 
 @keyframes dropdown-enter {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px) scale(0.98);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -263,44 +268,45 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem;
+  padding: 1rem 1.25rem;
   border-bottom: 1px solid #E2E8F0;
+  background-color: #FCFBF9;
 }
 
 .admin-v2-notif-dropdown-header h3 {
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 700;
   margin: 0;
-  color: #1A202C;
+  color: #0F172A;
 }
 
 .admin-v2-badge-unread {
   font-size: 0.72rem;
   background-color: #FEE2E2;
   color: #EF4444;
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: 10px;
   font-weight: 700;
 }
 
 .admin-v2-notif-dropdown-body {
-  max-height: 280px;
+  max-height: 290px;
   overflow-y: auto;
 }
 
 .admin-v2-notif-item {
-  padding: 1rem;
+  padding: 1rem 1.25rem;
   border-bottom: 1px solid #F1F5F9;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease;
   cursor: pointer;
 }
 
 .admin-v2-notif-item:hover {
-  background-color: #F8FAF9;
+  background-color: #FBFBFA;
 }
 
 .admin-v2-notif-item.unread {
-  background-color: #F4FBF9;
+  background-color: rgba(0, 168, 150, 0.03);
 }
 
 .admin-v2-notif-item-top {
@@ -313,7 +319,7 @@
 .admin-v2-notif-title {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #1A202C;
+  color: #0F172A;
 }
 
 .admin-v2-notif-time {
@@ -323,16 +329,16 @@
 
 .admin-v2-notif-desc {
   font-size: 0.78rem;
-  color: #718096;
+  color: #64748B;
   margin: 0;
-  line-height: 1.4;
+  line-height: 1.45;
 }
 
 .admin-v2-notif-dropdown-footer {
   padding: 0.75rem;
   text-align: center;
   border-top: 1px solid #E2E8F0;
-  background-color: #FAF8F5;
+  background-color: #FCFBF9;
 }
 
 .admin-v2-notif-dropdown-footer button {
@@ -352,7 +358,7 @@
 /* Workspace content area */
 .admin-v2-layout-content {
   flex: 1;
-  padding: 1.8rem 2rem 3rem 2rem;
+  padding: 2rem 2.5rem 4rem 2.5rem;
   overflow-y: auto;
 }
 
@@ -361,14 +367,14 @@
 }
 
 .admin-v2-breadcrumb-bar h2 {
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   font-weight: 800;
-  color: #1A202C;
+  color: #0F172A;
   margin: 0;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.5px;
 }
 
-/* Responsive */
+/* Responsive side nav transitions */
 @media (max-width: 1024px) {
   .admin-v2-sidebar-wrapper {
     transform: translateX(-100%);
@@ -376,6 +382,7 @@
 
   .admin-v2-sidebar-wrapper.open {
     transform: translateX(0);
+    box-shadow: 10px 0 30px rgba(0, 0, 0, 0.15);
   }
 
   .admin-v2-layout-main {
@@ -389,15 +396,22 @@
   .admin-v2-sidebar-overlay {
     position: fixed;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(15, 23, 42, 0.4);
     z-index: 850;
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    animation: fade-in 0.2s ease-out;
   }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @media (max-width: 640px) {
   .admin-v2-layout-header {
-    padding: 0 1rem;
+    padding: 0 1.25rem;
   }
   
   .admin-v2-search-bar {

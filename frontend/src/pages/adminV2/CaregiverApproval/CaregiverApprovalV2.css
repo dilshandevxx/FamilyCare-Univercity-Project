@@ -2,32 +2,35 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  animation: fade-in-up 0.4s ease-out;
 }
 
 .approval-v2-action-banner {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0.8rem 1.2rem;
-  border-radius: 10px;
-  font-size: 0.84rem;
-  animation: banner-slide 0.3s ease-out;
+  padding: 0.9rem 1.25rem;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);
+  animation: banner-slide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .approval-v2-action-banner.banner-approved {
-  background-color: #E6F7F5;
-  color: #00A896;
-  border: 1px solid rgba(0, 168, 150, 0.3);
+  background-color: #ECFDF5;
+  color: #059669;
+  border: 1.5px solid rgba(5, 150, 105, 0.25);
 }
 
 .approval-v2-action-banner.banner-rejected {
   background-color: #FEF2F2;
   color: #DC2626;
-  border: 1px solid rgba(220, 38, 38, 0.3);
+  border: 1.5px solid rgba(220, 38, 38, 0.25);
 }
 
 @keyframes banner-slide {
-  from { opacity: 0; transform: translateY(-10px); }
+  from { opacity: 0; transform: translateY(-8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -35,27 +38,32 @@
   background-color: white;
   border: 1px solid #E2E8F0;
   border-radius: 16px;
-  padding: 3rem 2rem;
+  padding: 4rem 2rem;
   text-align: center;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .approval-v2-empty-state h3 {
-  font-size: 1.2rem;
-  font-weight: 700;
-  margin: 1rem 0 0.5rem 0;
-  color: #1A202C;
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 1.25rem 0 0.5rem 0;
+  color: #0F172A;
+  letter-spacing: -0.3px;
 }
 
 .approval-v2-empty-state p {
-  font-size: 0.85rem;
-  color: #718096;
+  font-size: 0.88rem;
+  color: #64748B;
   margin: 0;
 }
 
 .approval-v2-applicants-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 1.5rem;
 }
 
@@ -64,59 +72,51 @@
   border: 1px solid #E2E8F0;
   border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 280px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  min-height: 290px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .approval-v2-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
-}
-
-.approval-v2-card.status-approved {
-  border-color: #00A896;
-  background-color: #FAFFFD;
-}
-
-.approval-v2-card.status-rejected {
-  border-color: #FCA5A5;
-  background-color: #FFFDFD;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
 }
 
 .approval-v2-card-header {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 1.2rem;
+  margin-bottom: 1.25rem;
 }
 
 .approval-v2-profile-avatar {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
-  background-color: #E6F7F5;
+  background: linear-gradient(135deg, rgba(0, 168, 150, 0.15), rgba(79, 70, 229, 0.1));
   color: #00A896;
   font-weight: 800;
-  font-size: 1rem;
+  font-size: 1.05rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid rgba(0, 168, 150, 0.2);
 }
 
 .approval-v2-applicant-name {
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  color: #1A202C;
+  color: #0F172A;
   margin: 0;
+  letter-spacing: -0.3px;
 }
 
 .approval-v2-applicant-email {
-  font-size: 0.78rem;
-  color: #718096;
+  font-size: 0.8rem;
+  color: #64748B;
   margin: 0;
 }
 
@@ -124,12 +124,12 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background-color: #FAF8F5;
+  background-color: #FCFBF9;
   border: 1px solid #E2E8F0;
-  border-radius: 10px;
-  padding: 10px 12px;
-  margin-bottom: 1rem;
-  font-size: 0.82rem;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 1.1rem;
+  font-size: 0.84rem;
 }
 
 .credential-row {
@@ -139,34 +139,37 @@
 }
 
 .credential-row .label {
-  color: #718096;
+  color: #64748B;
   font-weight: 500;
 }
 
 .credential-row .value {
-  color: #1A202C;
+  color: #0F172A;
   font-weight: 600;
 }
 
 .credential-row .value-badge {
-  background-color: #E6F7F5;
+  background-color: rgba(0, 168, 150, 0.1);
   color: #00A896;
   font-weight: 700;
   font-size: 0.72rem;
-  padding: 2px 8px;
+  padding: 3px 9px;
   border-radius: 20px;
+  border: 1px solid rgba(0, 168, 150, 0.15);
 }
 
 .approval-v2-bio {
-  font-size: 0.8rem;
-  color: #4A5568;
-  line-height: 1.45;
+  font-size: 0.82rem;
+  color: #475569;
+  line-height: 1.5;
   margin-bottom: 1.25rem;
+  flex-grow: 1;
 }
 
 .approval-v2-actions {
   display: flex;
   gap: 12px;
+  margin-top: auto;
 }
 
 .approval-v2-actions button {
@@ -175,9 +178,9 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 0.6rem;
+  padding: 0.7rem;
   border-radius: 10px;
-  font-size: 0.84rem;
+  font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
@@ -191,33 +194,40 @@
 
 .reject-btn:hover {
   background-color: #FEF2F2;
+  border-color: #EF4444;
 }
 
 .approve-btn {
   background-color: #00A896;
   border: none;
   color: white;
+  box-shadow: 0 4px 10px rgba(0, 168, 150, 0.15);
 }
 
 .approve-btn:hover {
   background-color: #008f80;
+  box-shadow: 0 6px 14px rgba(0, 168, 150, 0.25);
 }
 
 .approval-v2-decision-status {
   text-align: center;
   font-size: 0.85rem;
   font-weight: 800;
-  padding: 8px;
-  border-radius: 8px;
-  letter-spacing: 0.8px;
+  padding: 10px;
+  border-radius: 10px;
+  letter-spacing: 1px;
+  margin-top: auto;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
 .approval-v2-decision-status.is-approved {
   background-color: #D1FAE5;
   color: #065F46;
+  border: 1px dashed rgba(6, 95, 70, 0.3);
 }
 
 .approval-v2-decision-status.is-rejected {
   background-color: #FEE2E2;
   color: #991B1B;
+  border: 1px dashed rgba(153, 27, 27, 0.3);
 }
