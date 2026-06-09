@@ -46,7 +46,8 @@
   align-items: start;
 }
 
-.ap-form-main, .ap-form-sidebar {
+.ap-form-main,
+.ap-form-sidebar {
   display: flex;
   flex-direction: column;
   gap: 1.8rem;
@@ -126,8 +127,8 @@
   letter-spacing: 0.5px;
 }
 
-.ap-input-group input, 
-.ap-input-group select, 
+.ap-input-group input,
+.ap-input-group select,
 .ap-input-group textarea {
   padding: 0.75rem 0.85rem;
   font-size: 0.88rem;
@@ -145,8 +146,8 @@
   color: #94a3b8;
 }
 
-.ap-input-group input:focus, 
-.ap-input-group select:focus, 
+.ap-input-group input:focus,
+.ap-input-group select:focus,
 .ap-input-group textarea:focus {
   border-color: #00A896;
   box-shadow: 0 0 0 3px rgba(0, 168, 150, 0.1);
@@ -205,7 +206,7 @@
   align-items: center;
   justify-content: center;
   border: 2px solid white;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .ap-avatar-controls {
@@ -342,7 +343,8 @@
   box-shadow: 0 4px 6px rgba(0, 168, 150, 0.2);
 }
 
-.ap-btn-submit:disabled, .ap-btn-cancel:disabled {
+.ap-btn-submit:disabled,
+.ap-btn-cancel:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -378,28 +380,29 @@
   .ap-container {
     padding: 1rem;
   }
-  
+
   .ap-grid-layout {
     grid-template-columns: 1fr;
     gap: 1.2rem;
   }
-  
+
   .ap-form-footer {
     flex-direction: column;
     gap: 1.2rem;
     align-items: stretch;
     text-align: center;
   }
-  
+
   .ap-compliance-text {
     justify-content: center;
   }
-  
+
   .ap-action-btns {
     flex-direction: column-reverse;
   }
-  
-  .ap-btn-submit, .ap-btn-cancel {
+
+  .ap-btn-submit,
+  .ap-btn-cancel {
     width: 100%;
   }
 }
