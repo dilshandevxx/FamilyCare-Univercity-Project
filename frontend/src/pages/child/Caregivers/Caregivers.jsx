@@ -10,7 +10,7 @@ import './Caregivers.css';
 
 const CaregiversList = () => {
   // Tabs: 'browse' or 'assigned'
-  const [activeTab, setActiveTab] = useState('browse');
+  const [activeTab, setActiveTab] = useState('assigned');
   
   // States for caregivers and parents
   const [caregivers, setCaregivers] = useState([]);
