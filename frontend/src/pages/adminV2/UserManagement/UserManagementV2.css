@@ -260,9 +260,9 @@
 }
 
 .role-child {
-  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 100%);
   color: white;
-  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+  box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
 }
 
 .user-v2-status-pill {
