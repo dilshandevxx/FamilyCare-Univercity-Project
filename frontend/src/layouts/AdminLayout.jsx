@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { Bell, Search, Menu } from 'lucide-react';
 import AdminSidebar from '../components/admin/AdminSidebar';
-import { useAuth } from '../context/AuthContext';
 import './AdminLayout.css';
 
 const AdminLayout = ({ children, title = 'Dashboard' }) => {
-  const { user } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
@@ -45,12 +43,12 @@ const AdminLayout = ({ children, title = 'Dashboard' }) => {
 
             <div className="admin-profile-group">
               <div className="admin-profile-info">
-                <p className="admin-profile-name">{user?.name || 'FamilyCare Admin'}</p>
+                <p className="admin-profile-name">FamilyCare Admin</p>
                 <p className="admin-profile-role">Super Admin</p>
               </div>
               <div className="admin-profile-avatar">
                 <img
-                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user?.name || 'Admin')}`}
+                  src="https://api.dicebear.com/7.x/avataaars/svg?seed=Admin"
                   alt="Admin Avatar"
                 />
               </div>
