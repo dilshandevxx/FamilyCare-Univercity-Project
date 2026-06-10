@@ -56,10 +56,15 @@ const Dashboard = () => {
     <ChildLayout title="Dashboard">
       <div className="cd-root">
         
-        {/* ── Greeting Header ── */}
-        <div className="cd-greeting-header">
-          <h1 className="cd-greeting-title">{getGreeting()}, Alex.</h1>
-          <p className="cd-greeting-subtitle">Here is your family's care summary for today.</p>
+        {/* ── Hero Banner ── */}
+        <div className="cd-hero-banner">
+          <div className="cd-hero-content">
+            <h1 className="cd-hero-title">{getGreeting()}, Dilshan!</h1>
+            <p className="cd-hero-subtitle">Here's the latest update on your family's health and activity.</p>
+          </div>
+          <div className="cd-hero-decoration">
+            <Heart size={80} color="rgba(255, 255, 255, 0.2)" />
+          </div>
         </div>
 
         {/* ── Top stats ── */}
