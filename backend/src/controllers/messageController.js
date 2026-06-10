@@ -1,5 +1,48 @@
 const pool = require('../config/db');
 
+// ── Auto-reply (for testing the chat without a second account) ──
+// Set AUTO_REPLY_ENABLED=false in .env to turn this off.
+const AUTO_REPLY_ENABLED  = process.env.AUTO_REPLY_ENABLED !== 'false';
+const AUTO_REPLY_DELAY_MS = 1500; // fires this long after the sender goes quiet
+
+const AUTO_REPLIES = [
+  "Thanks for the update, I'll take a look!",
+  "Got it — appreciate you letting me know.",
+  "Okay, sounds good.",
+  "Noted, thank you!",
+  "I'll get back to you on this shortly.",
+];
+
+// Per-conversation state, keyed by `${senderId}->${receiverId}`
+const pendingReplyTimers = new Map(); // debounce: a new message resets the timer
+const lastReplyText      = new Map(); // avoid sending the same line twice in a row
+
+const pickReply = (key) => {
+  const last = lastReplyText.get(key);
+  const choices = AUTO_REPLIES.length > 1 ? AUTO_REPLIES.filter((r) => r !== last) : AUTO_REPLIES;
+  const reply = choices[Math.floor(Math.random() * choices.length)];
+  lastReplyText.set(key, reply);
+  return reply;
+};
+
+// Debounced so a quick burst of messages gets a single reply, not one per message
+const scheduleAutoReply = (senderId, receiverId) => {
+  const key = `${senderId}->${receiverId}`;
+
+  clearTimeout(pendingReplyTimers.get(key));
+  pendingReplyTimers.set(key, setTimeout(async () => {
+    pendingReplyTimers.delete(key);
+    try {
+      await pool.query(
+        'INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)',
+        [receiverId, senderId, pickReply(key)]
+      );
+    } catch (err) {
+      console.error('auto-reply error:', err);
+    }
+  }, AUTO_REPLY_DELAY_MS));
+};
+
 // GET /api/messages/contacts
 // Returns users this caregiver/child can message, enriched with last-message + unread count
 const getContacts = async (req, res) => {
@@ -133,6 +176,11 @@ const sendMessage = async (req, res) => {
       is_read:     false,
       created_at:  new Date().toISOString(),
     });
+
+    // Fire a placeholder reply back from the contact so the chat feels alive
+    if (AUTO_REPLY_ENABLED) {
+      scheduleAutoReply(sender_id, receiver_id);
+    }
   } catch (err) {
     console.error('sendMessage error:', err);
     res.status(500).json({ error: err.message });
@@ -191,6 +239,29 @@ const markAsRead = async (req, res) => {
   }
 };
 
+// DELETE /api/messages/:id
+// Delete a message you sent
+const deleteMessage = async (req, res) => {
+  const userId = req.user.id;
+  const { id }  = req.params;
+
+  try {
+    const [result] = await pool.query(
+      'DELETE FROM messages WHERE id = ? AND sender_id = ?',
+      [id, userId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Message not found or not yours to delete' });
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error('deleteMessage error:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // GET /api/messages/all-users
 // Returns every user except the caller — used for the "New Message" composer
 const getAllUsers = async (req, res) => {
@@ -233,4 +304,4 @@ const getElderSidebar = async (req, res) => {
   }
 };
 
-module.exports = { getContacts, getAllUsers, sendMessage, getMessages, markAsRead, getElderSidebar };
+module.exports = { getContacts, getAllUsers, sendMessage, getMessages, markAsRead, getElderSidebar, deleteMessage };
