@@ -145,7 +145,6 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Family Overview */}
             <div className="cd-card">
               <div className="cd-section-hd">
                 <h3 className="cd-card-title" style={{margin:0}}>Family Overview</h3>
@@ -153,8 +152,9 @@ const Dashboard = () => {
               </div>
 
               {loading ? (
-                <div style={{ textAlign: 'center', padding: '1rem 0', color: '#64748b', fontSize: '0.82rem' }}>
-                  Loading parents...
+                <div className="cd-family-grid">
+                  <div className="cd-skeleton cd-skeleton-box" style={{ height: '120px' }}></div>
+                  <div className="cd-skeleton cd-skeleton-box" style={{ height: '120px' }}></div>
                 </div>
               ) : dbParents.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '1.5rem 0', color: '#64748b' }}>
@@ -169,8 +169,6 @@ const Dashboard = () => {
                     const seed = p.name || 'Parent';
                     const location = p.address || 'At Home';
                     const age = p.age || 'N/A';
-                    
-                    // Assign a color dynamically or randomly based on ID for top border
                     const topColorClass = (p.id % 2 === 0) ? 'amber-top' : 'teal-top';
                     const badgeClass = (p.id % 2 === 0) ? 'warning' : 'good';
                     const badgeText = (p.id % 2 === 0) ? 'WARNING' : 'GOOD';
@@ -206,7 +204,6 @@ const Dashboard = () => {
               )}
             </div>
 
-            {/* Active Alerts */}
             <div className="cd-card">
               <div className="cd-section-hd">
                 <h3 className="cd-card-title" style={{margin:0}}>Active Alerts</h3>
@@ -214,8 +211,9 @@ const Dashboard = () => {
               </div>
               
               {loading ? (
-                <div style={{ textAlign: 'center', padding: '1rem 0', color: '#64748b', fontSize: '0.82rem' }}>
-                  Loading alerts...
+                <div>
+                  <div className="cd-skeleton cd-skeleton-box" style={{ height: '60px', marginBottom: '10px' }}></div>
+                  <div className="cd-skeleton cd-skeleton-box" style={{ height: '60px' }}></div>
                 </div>
               ) : alerts.filter(a => !a.is_resolved).length === 0 ? (
                 <div className="cd-alert-box" style={{ background: '#f8fafc', borderColor: '#e2e8f0', alignItems: 'center' }}>
@@ -301,8 +299,10 @@ const Dashboard = () => {
             <div className="cd-card">
               <h3 className="cd-card-title">Recent Activity</h3>
               {loading ? (
-                <div style={{ textAlign: 'center', padding: '1rem 0', color: '#64748b', fontSize: '0.82rem' }}>
-                  Loading feed...
+                <div>
+                  <div className="cd-skeleton cd-skeleton-box" style={{ height: '60px' }}></div>
+                  <div className="cd-skeleton cd-skeleton-box" style={{ height: '60px' }}></div>
+                  <div className="cd-skeleton cd-skeleton-box" style={{ height: '60px' }}></div>
                 </div>
               ) : healthLogs.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '1rem 0', color: '#64748b', fontSize: '0.82rem' }}>
