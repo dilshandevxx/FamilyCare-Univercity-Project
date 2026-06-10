@@ -148,44 +148,60 @@
 
 .cd-left, .cd-right { display: flex; flex-direction: column; }
 
-/* ── Today's Pulse ── */
+/* ── Today's Pulse / Vitality Card ── */
 .cd-pulse-box {
   display: flex;
-  gap: 24px;
-  background: #f8fafc;
-  border-radius: 12px;
-  padding: 16px 20px;
+  gap: 32px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,1);
+  border-radius: 20px;
+  padding: 24px 32px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.03);
+  align-items: center;
 }
 
-.cd-pulse-left { flex: 1; }
+.cd-pulse-left { 
+  flex: 1; 
+  padding-right: 24px;
+  border-right: 1px solid rgba(0,0,0,0.05);
+}
 
 .cd-pulse-label {
-  font-size: 10px;
-  font-weight: 700;
-  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 800;
+  color: #64748b;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0 0 8px;
+  letter-spacing: 1px;
+  margin: 0 0 12px;
 }
 
 .cd-pulse-status {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .cd-pulse-text {
-  font-size: 28px;
-  font-weight: 800;
+  font-size: 36px;
+  font-weight: 900;
   color: #00a896;
+  letter-spacing: -1px;
 }
 
-.cd-pulse-check { color: #00a896; }
+.cd-pulse-check { 
+  color: #fff;
+  background: #00a896;
+  border-radius: 50%;
+  padding: 4px;
+  box-shadow: 0 4px 12px rgba(0, 168, 150, 0.4);
+}
 
 .cd-pulse-right {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   justify-content: center;
 }
 
