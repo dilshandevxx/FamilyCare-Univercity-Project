@@ -35,6 +35,7 @@ const Dashboard = () => {
   const [alerts, setAlerts] = useState([]);
   const [healthLogs, setHealthLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showEmergency, setShowEmergency] = useState(false);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -357,7 +358,7 @@ const Dashboard = () => {
                   <Calendar size={20} className="cd-qa-icon" />
                   <span>Schedule</span>
                 </button>
-                <button className="cd-qa-btn emergency">
+                <button className="cd-qa-btn emergency" onClick={() => setShowEmergency(true)}>
                   <AlertTriangle size={20} />
                   <span>Emergency</span>
                 </button>
@@ -370,6 +371,27 @@ const Dashboard = () => {
 
           </div>
         </div>
+
+        {/* Emergency Modal Overlay */}
+        {showEmergency && (
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+            <div style={{ background: '#fff', padding: '30px', borderRadius: '16px', maxWidth: '400px', width: '90%', textAlign: 'center', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}>
+              <div style={{ background: '#fef2f2', width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                <AlertTriangle size={32} color="#ef4444" />
+              </div>
+              <h2 style={{ margin: '0 0 10px', fontSize: '20px', color: '#0f172a' }}>Emergency Contacts</h2>
+              <p style={{ margin: '0 0 24px', color: '#64748b', fontSize: '14px', lineHeight: 1.5 }}>
+                Please select a service or primary caregiver to contact immediately.
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <button style={{ padding: '12px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Call 911</button>
+                <button style={{ padding: '12px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Call Primary Nurse</button>
+                <button onClick={() => setShowEmergency(false)} style={{ padding: '12px', background: 'transparent', color: '#64748b', border: '1px solid #e2e8f0', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px' }}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </ChildLayout>
   );
