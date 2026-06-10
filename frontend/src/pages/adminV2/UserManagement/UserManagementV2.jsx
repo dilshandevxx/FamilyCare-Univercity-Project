@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, UserPlus, Trash2, Shield, ToggleLeft, ToggleRight, X, Mail, ShieldCheck } from 'lucide-react';
+import { Search, UserPlus, Trash2, Shield, ToggleLeft, ToggleRight, X, Mail, ShieldCheck, Users } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
 import './UserManagementV2.css';
 
@@ -111,7 +111,15 @@ const UserManagementV2 = () => {
             <tbody>
               {filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="no-records-cell">No matching users found.</td>
+                  <td colSpan={5}>
+                    <div className="no-records-cell">
+                      <div className="no-records-icon-wrapper">
+                        <Users size={56} color="#94A3B8" />
+                      </div>
+                      <h3>No Users Found</h3>
+                      <p>Try adjusting your search or filter to find what you're looking for.</p>
+                    </div>
+                  </td>
                 </tr>
               ) : (
                 filteredUsers.map(u => (
