@@ -673,11 +673,11 @@
 
 /* ── Right column ── */
 
-/* Quick Actions */
+/* ── Quick Actions ── */
 .cd-qa-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 16px;
 }
 
 .cd-qa-btn {
@@ -685,30 +685,48 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 16px 10px;
-  background: #f8fafc;
-  border: 1px solid #e8edf2;
-  border-radius: 14px;
+  gap: 12px;
+  background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+  border: none;
+  border-radius: 16px;
+  padding: 24px 16px;
   color: #334155;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
   text-decoration: none;
-  transition: background 0.2s;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
 }
 
-.cd-qa-btn:hover { background: #f1f5f9; }
+.cd-qa-btn:hover { 
+  transform: translateY(-6px) scale(1.02); 
+  box-shadow: 0 16px 32px rgba(0, 168, 150, 0.1); 
+  background: #ffffff;
+}
+
+.cd-qa-icon { 
+  color: #00a896; 
+  background: #e6f7f5;
+  padding: 12px;
+  border-radius: 12px;
+}
 
 .cd-qa-btn.emergency {
-  background: #fef2f2;
+  background: linear-gradient(145deg, #fef2f2 0%, #fee2e2 100%);
   color: #ef4444;
-  border-color: #fee2e2;
 }
 
-.cd-qa-btn.emergency:hover { background: #fee2e2; }
+.cd-qa-btn.emergency .cd-qa-icon {
+  background: #fff;
+  color: #ef4444;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
 
-.cd-qa-icon { color: #00a896; }
+.cd-qa-btn.emergency:hover { 
+  background: linear-gradient(145deg, #fee2e2 0%, #fecaca 100%); 
+  box-shadow: 0 16px 32px rgba(239, 68, 68, 0.2); 
+}
 
 /* Right Alerts */
 .cd-alert-hd {
