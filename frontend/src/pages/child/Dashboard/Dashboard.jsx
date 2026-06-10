@@ -16,24 +16,23 @@ const barHeights = [30, 50, 38, 65, 85, 55, 70];
 const barDays    = ['M','T','W','T','F','S','S'];
 
 const Dashboard = () => {
-  const [pulse] = useState('Stable');
   const [dbParents, setDbParents] = useState([]);
   const [alerts, setAlerts] = useState([]);
-  const [healthLogs, setHealthLogs] = useState([]);
+  const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showEmergency, setShowEmergency] = useState(false);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [parentsRes, alertsRes, healthRes] = await Promise.all([
+        const [parentsRes, alertsRes, dashRes] = await Promise.all([
           api.get('/parents'),
           api.get('/alerts'),
-          api.get('/health')
+          api.get('/health/dashboard/child')
         ]);
         setDbParents(parentsRes.data || []);
         setAlerts(alertsRes.data || []);
-        setHealthLogs(healthRes.data || []);
+        setDashboardData(dashRes.data);
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
       } finally {
@@ -73,7 +72,7 @@ const Dashboard = () => {
             <div>
               <p className="cd-stat-label">TOTAL PARENTS</p>
               <h2 className="cd-stat-val">
-                {String(dbParents.length).padStart(2, '0')}
+                {String(dashboardData?.topStats?.totalParents || 0).padStart(2, '0')}
               </h2>
             </div>
             <div className="cd-stat-icon teal"><Users size={22}/></div>
@@ -81,7 +80,7 @@ const Dashboard = () => {
           <div className="cd-stat-card">
             <div>
               <p className="cd-stat-label">ACTIVE CAREGIVERS</p>
-              <h2 className="cd-stat-val">04</h2>
+              <h2 className="cd-stat-val">{String(dashboardData?.topStats?.activeCaregivers || 0).padStart(2, '0')}</h2>
             </div>
             <div className="cd-stat-icon teal"><UserPlus size={22}/></div>
           </div>
@@ -95,7 +94,7 @@ const Dashboard = () => {
           <div className="cd-stat-card">
             <div>
               <p className="cd-stat-label">HEALTH STATUS</p>
-              <h2 className="cd-stat-val teal-text">Stable</h2>
+              <h2 className="cd-stat-val teal-text">{dashboardData?.topStats?.healthStatus || 'Stable'}</h2>
             </div>
             <div className="cd-stat-icon teal"><ThumbsUp size={22}/></div>
           </div>
@@ -114,22 +113,26 @@ const Dashboard = () => {
                 <div className="cd-pulse-left">
                   <p className="cd-pulse-label">OVERALL STATUS</p>
                   <div className="cd-pulse-status">
-                    <span className="cd-pulse-text">{pulse}</span>
-                    <CheckCircle size={22} className="cd-pulse-check" />
+                    <span className="cd-pulse-text">{dashboardData?.topStats?.healthStatus || 'Stable'}</span>
+                    {dashboardData?.topStats?.healthStatus === 'Critical' ? (
+                      <AlertTriangle size={22} className="cd-pulse-check" style={{color: '#ef4444', background: '#fee2e2'}} />
+                    ) : (
+                      <CheckCircle size={22} className="cd-pulse-check" />
+                    )}
                   </div>
                 </div>
                 <div className="cd-pulse-right">
                   <div className="cd-metric">
                     <Heart size={14} className="cd-metric-icon orange" />
                     <div>
-                      <p className="cd-metric-val">4 / 6</p>
+                      <p className="cd-metric-val">{dashboardData?.pulse?.medsTaken || 0} / {dashboardData?.pulse?.totalMeds || 1}</p>
                       <p className="cd-metric-label">MEDS TAKEN</p>
                     </div>
                   </div>
                   <div className="cd-metric">
                     <Activity size={14} className="cd-metric-icon pink" />
                     <div>
-                      <p className="cd-metric-val">72 bpm</p>
+                      <p className="cd-metric-val">{dashboardData?.pulse?.avgHr || '--'} bpm</p>
                       <p className="cd-metric-label">AVG HEART RATE</p>
                     </div>
                   </div>
@@ -235,25 +238,28 @@ const Dashboard = () => {
               )}
             </div>
 
-            {/* Health Trends – Sleep Quality */}
+            {/* Health Trends – Activity Trend */}
             <div className="cd-card">
               <div className="cd-section-hd">
                 <h3 className="cd-card-title" style={{margin:0}}>Health Trends</h3>
               </div>
               <div className="cd-trend-hd">
-                <span className="cd-trend-label">Sleep Quality (Weekly)</span>
-                <span className="cd-trend-badge">+12% vs last week</span>
+                <span className="cd-trend-label">Systolic BP Trend (Weekly)</span>
               </div>
               <div className="cd-bar-chart">
-                {barHeights.map((h, i) => (
-                  <div key={i} className="cd-bar-col">
-                    <div
-                      className={`cd-bar${i === 4 ? ' highlight' : ''}`}
-                      style={{ height: `${h}%` }}
-                    />
-                    <span className="cd-bar-label">{barDays[i]}</span>
-                  </div>
-                ))}
+                {(dashboardData?.charts?.bpTrend || [0,0,0,0,0,0,0]).map((h, i) => {
+                  // scale bar height relative to max (say 180)
+                  const heightPercent = h > 0 ? Math.min((h / 180) * 100, 100) : 0;
+                  return (
+                    <div key={i} className="cd-bar-col">
+                      <div
+                        className={`cd-bar${i === new Date().getDay() ? ' highlight' : ''}`}
+                        style={{ height: `${heightPercent}%` }}
+                      />
+                      <span className="cd-bar-label">{barDays[i]}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -262,15 +268,11 @@ const Dashboard = () => {
               <div className="cd-card cd-chart-card">
                 <div className="cd-chart-hd">
                   <Activity size={16} className="cd-chart-icon" />
-                  <span>Blood Pressure Trend</span>
+                  <span>Avg Blood Pressure</span>
                 </div>
-                <div className="cd-bp-bars">
-                  {[40, 62, 50, 78, 70, 55, 60].map((h, i) => (
-                    <div key={i} className="cd-bar-col">
-                      <div className={`cd-bp-bar${i === 3 ? ' highlight' : ''}`} style={{ height: `${h}%` }} />
-                      <span className="cd-bar-label">{barDays[i]}</span>
-                    </div>
-                  ))}
+                <div className="cd-temp-avg-row" style={{ marginTop: '16px' }}>
+                  <span className="cd-temp-lbl">Today's Avg</span>
+                  <span className="cd-temp-val">{dashboardData?.pulse?.avgBp || '--'}</span>
                 </div>
               </div>
               <div className="cd-card cd-chart-card">
@@ -280,10 +282,10 @@ const Dashboard = () => {
                 </div>
                 <div className="cd-temp-avg-row">
                   <span className="cd-temp-lbl">Today's Avg</span>
-                  <span className="cd-temp-val">98.4°F</span>
+                  <span className="cd-temp-val">{dashboardData?.pulse?.avgTemp || '--'}°F</span>
                 </div>
                 <div className="cd-temp-bar"><div className="cd-temp-fill" /></div>
-                <p className="cd-temp-desc">Temperature has remained within the normal range (97.8°F – 99.1°F) for the past 72 hours.</p>
+                <p className="cd-temp-desc">Temperature tracked across recent logs for {dbParents.length} members.</p>
               </div>
             </div>
 
@@ -296,25 +298,22 @@ const Dashboard = () => {
                   <div className="cd-skeleton cd-skeleton-box" style={{ height: '60px' }}></div>
                   <div className="cd-skeleton cd-skeleton-box" style={{ height: '60px' }}></div>
                 </div>
-              ) : healthLogs.length === 0 ? (
+              ) : !dashboardData?.feed || dashboardData.feed.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '1rem 0', color: '#64748b', fontSize: '0.82rem' }}>
                   No recent health activity.
                 </div>
               ) : (
                 <div className="cd-feed">
-                  {healthLogs.slice(0, 5).map((log, i) => {
-                    const date = new Date(log.logged_at || log.created_at);
+                  {dashboardData.feed.map((log, i) => {
+                    const date = new Date(log.timestamp);
                     const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     return (
                       <div key={log.id || i} className="cd-feed-item">
                         <div className="cd-feed-dot" style={{ background: '#00a896' }} />
                         <div className="cd-feed-body">
                           <p className="cd-feed-time">{timeString} • {log.parent_name}</p>
-                          <p className="cd-feed-title">Health Check-in</p>
-                          <p className="cd-feed-desc">
-                            Vitals: BP {log.blood_pressure || 'N/A'}, HR {log.heart_rate || 'N/A'} bpm.
-                            {log.notes ? ` Notes: ${log.notes}` : ''}
-                          </p>
+                          <p className="cd-feed-title">{log.title || 'Health Check-in'}</p>
+                          <p className="cd-feed-desc">{log.description || `Vitals: BP ${log.blood_pressure || 'N/A'}, HR ${log.heart_rate || 'N/A'} bpm.`}</p>
                         </div>
                       </div>
                     );

@@ -15,8 +15,8 @@ const {
   getAnalytics,
   getVisitHistory,
   getVisitTrends,
-  getEldersList
-
+  getEldersList,
+  getChildDashboardStats
 } = require('../controllers/healthController');
 
 // ── File upload for health-log attachments ────────────────────────
@@ -41,6 +41,9 @@ const upload = multer({
 });
 
 // ── Routes ────────────────────────────────────────────────────────
+
+// Dashboard Stats for Child
+router.get('/dashboard/child', protect, getChildDashboardStats);
 
 // Visit history for the logged-in caregiver (paginated, filterable)
 router.get('/visit-history', protect, getVisitHistory);
