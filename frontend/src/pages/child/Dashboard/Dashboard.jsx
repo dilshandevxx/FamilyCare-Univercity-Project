@@ -33,17 +33,20 @@ const Dashboard = () => {
   const [pulse] = useState('Stable');
   const [dbParents, setDbParents] = useState([]);
   const [alerts, setAlerts] = useState([]);
+  const [healthLogs, setHealthLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [parentsRes, alertsRes] = await Promise.all([
+        const [parentsRes, alertsRes, healthRes] = await Promise.all([
           api.get('/parents'),
-          api.get('/alerts')
+          api.get('/alerts'),
+          api.get('/health')
         ]);
         setDbParents(parentsRes.data || []);
         setAlerts(alertsRes.data || []);
+        setHealthLogs(healthRes.data || []);
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
       } finally {
@@ -334,18 +337,35 @@ const Dashboard = () => {
             {/* Recent Activity */}
             <div className="cd-card">
               <h3 className="cd-card-title">Recent Activity</h3>
-              <div className="cd-feed">
-                {activityFeed.map((a, i) => (
-                  <div key={i} className="cd-feed-item">
-                    <div className="cd-feed-dot" style={{ background: a.dot }} />
-                    <div className="cd-feed-body">
-                      <p className="cd-feed-time">{a.time}</p>
-                      <p className="cd-feed-title">{a.title}</p>
-                      <p className="cd-feed-desc">{a.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              {loading ? (
+                <div style={{ textAlign: 'center', padding: '1rem 0', color: '#64748b', fontSize: '0.82rem' }}>
+                  Loading feed...
+                </div>
+              ) : healthLogs.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '1rem 0', color: '#64748b', fontSize: '0.82rem' }}>
+                  No recent health activity.
+                </div>
+              ) : (
+                <div className="cd-feed">
+                  {healthLogs.slice(0, 5).map((log, i) => {
+                    const date = new Date(log.logged_at || log.created_at);
+                    const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    return (
+                      <div key={log.id || i} className="cd-feed-item">
+                        <div className="cd-feed-dot" style={{ background: '#00a896' }} />
+                        <div className="cd-feed-body">
+                          <p className="cd-feed-time">{timeString} • {log.parent_name}</p>
+                          <p className="cd-feed-title">Health Check-in</p>
+                          <p className="cd-feed-desc">
+                            Vitals: BP {log.blood_pressure || 'N/A'}, HR {log.heart_rate || 'N/A'} bpm.
+                            {log.notes ? ` Notes: ${log.notes}` : ''}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Add New Member */}
