@@ -10,21 +10,7 @@ import ChildLayout from '../../../layouts/ChildLayout';
 import api from '../../../services/api';
 import './Dashboard.css';
 
-/* ─── mock data ─── */
-const parents = [
-  {
-    id: 1, name: 'Eleanor Johnson', age: 82,
-    location: 'At Home', vitality: 94,
-    meds: '4/6', heartRate: '72 bpm',
-    status: 'stable', img: 'Eleanor',
-  },
-];
-
-const activityFeed = [
-  { time: '2 HOURS AGO', title: 'Lunch Completed', desc: 'Eleanor had a full meal with Nurse Sarah. Mood was described as "cheerful".', dot: '#00a896' },
-  { time: '4 HOURS AGO', title: 'Physical Therapy', desc: 'Arthur completed his 30-minute mobility session at the rehab centre.', dot: '#94a3b8' },
-  { time: '6 HOURS AGO', title: 'Morning Vitals', desc: "Both parents' morning readings were within normal ranges.", dot: '#94a3b8' },
-];
+/* ─── Chart Data ─── */
 
 const barHeights = [30, 50, 38, 65, 85, 55, 70];
 const barDays    = ['M','T','W','T','F','S','S'];
