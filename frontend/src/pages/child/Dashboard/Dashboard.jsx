@@ -48,9 +48,22 @@ const Dashboard = () => {
     fetchParents();
   }, []);
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  };
+
   return (
     <ChildLayout title="Dashboard">
       <div className="cd-root">
+        
+        {/* ── Greeting Header ── */}
+        <div className="cd-greeting-header">
+          <h1 className="cd-greeting-title">{getGreeting()}, Alex.</h1>
+          <p className="cd-greeting-subtitle">Here is your family's care summary for today.</p>
+        </div>
 
         {/* ── Top stats ── */}
         <div className="cd-stats-row">

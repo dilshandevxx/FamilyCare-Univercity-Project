@@ -8,6 +8,24 @@
   gap: 28px;
 }
 
+/* ── Greeting Header ── */
+.cd-greeting-header {
+  margin-bottom: 4px;
+}
+
+.cd-greeting-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.cd-greeting-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+}
+
 /* ── Shared card ── */
 .cd-card {
   background: #fff;
