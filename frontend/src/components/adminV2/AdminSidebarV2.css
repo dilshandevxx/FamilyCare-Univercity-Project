@@ -4,7 +4,8 @@
   height: 100vh;
   background-color: #0B0F19;
   border-right: 1px solid #1E293B;
-  padding: 1.5rem 0 1.5rem 0; /* padding horizontal is managed per-item to avoid border clipping */
+  padding: 1.5rem 0 1.5rem 0;
+  /* padding horizontal is managed per-item to avoid border clipping */
   font-family: 'Inter', sans-serif;
   color: #94A3B8;
   box-sizing: border-box;
@@ -88,7 +89,8 @@
   background: linear-gradient(90deg, rgba(0, 168, 150, 0.15) 0%, rgba(0, 168, 150, 0.03) 100%);
   color: #00A896;
   font-weight: 600;
-  box-shadow: inset 3px 0 0 #00A896; /* Glowing indicator line */
+  box-shadow: inset 3px 0 0 #00A896;
+  /* Glowing indicator line */
 }
 
 .admin-v2-nav-icon {
