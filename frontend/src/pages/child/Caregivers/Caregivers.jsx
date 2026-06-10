@@ -173,8 +173,10 @@ const CaregiversList = () => {
   const filteredCaregivers = caregivers.filter(cg => {
     // 1. Search Query
     const query = searchQuery.toLowerCase();
-    const matchesSearch = cg.name.toLowerCase().includes(query) || 
-                          cg.specialization.toLowerCase().includes(query) ||
+    const safeName = cg.name || '';
+    const safeSpec = cg.specialization || '';
+    const matchesSearch = safeName.toLowerCase().includes(query) || 
+                          safeSpec.toLowerCase().includes(query) ||
                           (cg.bio && cg.bio.toLowerCase().includes(query));
 
     // 2. Experience Filter
