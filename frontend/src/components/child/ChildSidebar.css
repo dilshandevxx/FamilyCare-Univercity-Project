@@ -2,8 +2,9 @@
 .child-sidebar {
   width: 240px;
   min-height: 100vh;
-  background: #fff;
-  border-right: 1px solid #e8edf2;
+  background: #ffffff;
+  border: none;
+  box-shadow: 4px 0 24px rgba(0,0,0,0.02);
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -77,22 +78,26 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 11px 16px;
+  padding: 12px 18px;
   color: #64748b;
   text-decoration: none;
   font-size: 14px;
-  font-weight: 500;
-  border-radius: 10px;
-  transition: all 0.2s;
-  margin-bottom: 2px;
+  font-weight: 600;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  margin-bottom: 6px;
 }
 
-.cs-link:hover { background: #f8fafc; color: #0f172a; }
+.cs-link:hover { 
+  background: #f8fafc; 
+  color: #0f172a; 
+  transform: translateX(6px);
+}
 
 .cs-link.active {
-  background: #e6f7f5;
-  color: #00a896;
-  font-weight: 600;
+  background: linear-gradient(135deg, #00a896 0%, #028090 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 168, 150, 0.25);
 }
 
 .cs-footer {
@@ -106,19 +111,20 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 11px 16px;
-  background-color: transparent;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
+  padding: 14px 16px;
+  background: #fef2f2;
+  color: #ef4444;
+  border: none;
+  border-radius: 12px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .cs-btn-logout:hover {
-  background-color: #fef2f2;
+  background: #fee2e2;
   color: #dc2626;
-  border-color: #fca5a5;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.15);
 }
