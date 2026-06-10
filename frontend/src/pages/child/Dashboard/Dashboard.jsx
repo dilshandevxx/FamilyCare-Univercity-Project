@@ -340,56 +340,9 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Active Alerts Right */}
-            <div className="cd-card">
-              <div className="cd-alert-hd">
-                <AlertTriangle size={16} className="cd-alert-hd-icon" />
-                <h3 className="cd-card-title" style={{margin:0}}>Active Alerts</h3>
-              </div>
-              <div className="cd-alert-list">
-                <div className="cd-alert-item amber">
-                  <div className="cd-alert-item-icon">
-                    <AlertTriangle size={14} />
-                  </div>
-                  <div>
-                    <p className="cd-ali-title">Missed medication</p>
-                    <p className="cd-ali-desc">Martha • Metformin (500mg)</p>
-                    <p className="cd-ali-time amber-text">45 MINS OVERDUE</p>
-                  </div>
-                </div>
-                <div className="cd-alert-item white">
-                  <div className="cd-alert-item-icon grey">
-                    <Activity size={14} />
-                  </div>
-                  <div>
-                    <p className="cd-ali-title">Abnormal BP Reading</p>
-                    <p className="cd-ali-desc">Arthur • 142/95 mmHg</p>
-                    <p className="cd-ali-time grey-text">LOGGED AT 09:30 AM</p>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Recent Activity Feed Right */}
-            <div className="cd-card">
-              <h3 className="cd-card-title">Recent Activity Feed</h3>
-              <div className="cd-rfeed">
-                {[
-                  { title: 'BP checked & normal', desc: 'Arthur • 120/80 mmHg', time: '10:45 AM' },
-                  { title: 'Medicine taken', desc: 'Martha • Morning Vitamin Pack', time: '09:15 AM' },
-                  { title: 'Meal completed', desc: 'Arthur • Low-sodium breakfast', time: '08:30 AM' },
-                ].map((r, i) => (
-                  <div key={i} className="cd-rfeed-item">
-                    <div className="cd-rfeed-dot" />
-                    <div className="cd-rfeed-body">
-                      <p className="cd-rfeed-title">{r.title}</p>
-                      <p className="cd-rfeed-desc">{r.desc}</p>
-                      <span className="cd-rfeed-time">{r.time}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+
+
 
           </div>
         </div>
