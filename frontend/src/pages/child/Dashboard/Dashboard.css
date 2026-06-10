@@ -307,26 +307,33 @@
 /* ── Family overview grid ── */
 .cd-family-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
 }
 
 .cd-family-card {
-  border-radius: 14px;
-  border: 1px solid #e8edf2;
-  padding: 16px;
-  border-top-width: 4px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  background: #fff;
+  border-radius: 20px;
+  border: none;
+  padding: 24px;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+  background: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+  position: relative;
+  overflow: hidden;
 }
+
+.cd-family-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 6px;
+}
+.cd-family-card.teal-top::before  { background: #00a896; }
+.cd-family-card.amber-top::before { background: #f59e0b; }
 
 .cd-family-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.06);
 }
-
-.cd-family-card.teal-top  { border-top-color: #00a896; }
-.cd-family-card.amber-top { border-top-color: #f59e0b; }
 
 .cd-family-head {
   display: flex;
