@@ -188,7 +188,7 @@ const Dashboard = () => {
                         <div className="cd-family-meta">
                           <div className="cd-meta-row">
                             <span className="cd-ml">Primary Caregiver</span>
-                            <span className="cd-mv">Loading...</span>
+                            <span className="cd-mv">{p.caregiver_name || 'Unassigned'}</span>
                           </div>
                           <div className="cd-meta-row">
                             <span className="cd-ml">Relation</span>
