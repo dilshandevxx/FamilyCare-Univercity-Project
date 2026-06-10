@@ -497,35 +497,46 @@
 
 .cd-bar-chart {
   display: flex;
+  justify-content: space-between;
   align-items: flex-end;
-  gap: 8px;
   height: 120px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid #f1f5f9;
-  position: relative;
+  margin-top: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed rgba(0,0,0,0.05);
 }
 
 .cd-bar-col {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  height: 100%;
-  justify-content: flex-end;
+  gap: 8px;
+  flex: 1;
+  cursor: pointer;
 }
 
 .cd-bar {
-  width: 100%;
-  background: #e2e8f0;
-  border-radius: 4px 4px 0 0;
-  transition: height 0.4s ease;
+  width: 14px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
 }
 
-.cd-bar.highlight { background: #00a896; }
+.cd-bar-col:hover .cd-bar {
+  transform: scaleY(1.1) translateY(-4px);
+  background: linear-gradient(180deg, #94a3b8 0%, #cbd5e1 100%);
+}
+
+.cd-bar.highlight { 
+  background: linear-gradient(180deg, #00a896 0%, #028090 100%); 
+  box-shadow: 0 4px 12px rgba(0, 168, 150, 0.3);
+}
+
+.cd-bar-col:hover .cd-bar.highlight {
+  background: linear-gradient(180deg, #00d1b9 0%, #00a896 100%); 
+}
 
 .cd-bar-label {
-  font-size: 10px;
+  font-size: 11px;
   color: #94a3b8;
   font-weight: 600;
 }
@@ -551,22 +562,31 @@
 
 .cd-chart-icon { color: #00a896; }
 
+/* ── Blood pressure bars ── */
 .cd-bp-bars {
   display: flex;
+  justify-content: space-between;
   align-items: flex-end;
-  gap: 6px;
-  height: 90px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #f1f5f9;
+  height: 80px;
+  margin-top: 16px;
 }
 
 .cd-bp-bar {
-  flex: 1;
-  background: #e2e8f0;
-  border-radius: 3px 3px 0 0;
+  width: 14px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background 0.3s;
 }
 
-.cd-bp-bar.highlight { background: #00a896; }
+.cd-bar-col:hover .cd-bp-bar {
+  transform: scaleY(1.1) translateY(-4px);
+  background: linear-gradient(180deg, #cbd5e1 0%, #e2e8f0 100%);
+}
+
+.cd-bp-bar.highlight { 
+  background: linear-gradient(180deg, #f97316 0%, #ea580c 100%); 
+  box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+}
 
 .cd-temp-avg-row {
   display: flex;
