@@ -32,25 +32,45 @@ const barDays    = ['M','T','W','T','F','S','S'];
 const Dashboard = () => {
   const [pulse] = useState('Stable');
   const [dbParents, setDbParents] = useState([]);
+  const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchParents = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const { data } = await api.get('/parents');
-        setDbParents(data || []);
+        const [parentsRes, alertsRes] = await Promise.all([
+          api.get('/parents'),
+          api.get('/alerts')
+        ]);
+        setDbParents(parentsRes.data || []);
+        setAlerts(alertsRes.data || []);
       } catch (err) {
-        console.error('Error fetching parents for dashboard:', err);
+        console.error('Error fetching dashboard data:', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchParents();
+    fetchDashboardData();
   }, []);
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
+  };
+
+  const unreadAlertsCount = alerts.filter(a => !a.is_resolved).length;
 
   return (
     <ChildLayout title="Dashboard">
       <div className="cd-root">
+        
+        {/* ── Greeting Header ── */}
+        <div className="cd-greeting-header">
+          <h1 className="cd-greeting-title">{getGreeting()}, Alex.</h1>
+          <p className="cd-greeting-subtitle">Here is your family's care summary for today.</p>
+        </div>
 
         {/* ── Top stats ── */}
         <div className="cd-stats-row">
@@ -73,7 +93,7 @@ const Dashboard = () => {
           <div className="cd-stat-card">
             <div>
               <p className="cd-stat-label">ALERTS TODAY</p>
-              <h2 className="cd-stat-val">03</h2>
+              <h2 className="cd-stat-val">{String(unreadAlertsCount).padStart(2, '0')}</h2>
             </div>
             <div className="cd-stat-icon orange"><Bell size={22}/></div>
           </div>
@@ -222,20 +242,41 @@ const Dashboard = () => {
 
             {/* Active Alerts */}
             <div className="cd-card">
-              <h3 className="cd-card-title">Active Alerts</h3>
-              <div className="cd-alert-box">
-                <div className="cd-alert-icon-wrap">
-                  <AlertTriangle size={18} className="cd-alert-icon" />
-                </div>
-                <div className="cd-alert-body">
-                  <p className="cd-alert-title">Missed Medication: <strong>Arthur</strong></p>
-                  <p className="cd-alert-desc">The evening dosage for blood pressure was not marked as taken by 8:00 PM.</p>
-                  <div className="cd-alert-actions">
-                    <button className="cd-alert-btn-primary">CONTACT NURSE</button>
-                    <button className="cd-alert-btn-ghost">DISMISS</button>
-                  </div>
-                </div>
+              <div className="cd-section-hd">
+                <h3 className="cd-card-title" style={{margin:0}}>Active Alerts</h3>
+                <Link to="/alerts" className="cd-view-all">View All Alerts</Link>
               </div>
+              
+              {loading ? (
+                <div style={{ textAlign: 'center', padding: '1rem 0', color: '#64748b', fontSize: '0.82rem' }}>
+                  Loading alerts...
+                </div>
+              ) : alerts.filter(a => !a.is_resolved).length === 0 ? (
+                <div className="cd-alert-box" style={{ background: '#f8fafc', borderColor: '#e2e8f0', alignItems: 'center' }}>
+                  <CheckCircle size={20} color="#00a896" />
+                  <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>No active alerts. Everything is stable.</p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {alerts.filter(a => !a.is_resolved).slice(0, 3).map(alert => (
+                    <div key={alert.id} className={`cd-alert-box ${alert.type || 'info'}`}>
+                      <div className={`cd-alert-icon-wrap ${alert.type || 'info'}`}>
+                        {alert.type === 'critical' ? <AlertTriangle size={18} className="cd-alert-icon" style={{color: '#ef4444'}} /> :
+                         alert.type === 'warning' ? <AlertTriangle size={18} className="cd-alert-icon" style={{color: '#d97706'}} /> :
+                         <CheckCircle size={18} className="cd-alert-icon" style={{color: '#3b82f6'}} />}
+                      </div>
+                      <div className="cd-alert-body">
+                        <p className="cd-alert-title">{alert.title}</p>
+                        <p className="cd-alert-desc">{alert.description}</p>
+                        <div className="cd-alert-actions">
+                          <button className={`cd-alert-btn-primary ${alert.type || 'info'}`}>VIEW DETAILS</button>
+                          <button className="cd-alert-btn-ghost">DISMISS</button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Health Trends – Sleep Quality */}
@@ -340,56 +381,9 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Active Alerts Right */}
-            <div className="cd-card">
-              <div className="cd-alert-hd">
-                <AlertTriangle size={16} className="cd-alert-hd-icon" />
-                <h3 className="cd-card-title" style={{margin:0}}>Active Alerts</h3>
-              </div>
-              <div className="cd-alert-list">
-                <div className="cd-alert-item amber">
-                  <div className="cd-alert-item-icon">
-                    <AlertTriangle size={14} />
-                  </div>
-                  <div>
-                    <p className="cd-ali-title">Missed medication</p>
-                    <p className="cd-ali-desc">Martha • Metformin (500mg)</p>
-                    <p className="cd-ali-time amber-text">45 MINS OVERDUE</p>
-                  </div>
-                </div>
-                <div className="cd-alert-item white">
-                  <div className="cd-alert-item-icon grey">
-                    <Activity size={14} />
-                  </div>
-                  <div>
-                    <p className="cd-ali-title">Abnormal BP Reading</p>
-                    <p className="cd-ali-desc">Arthur • 142/95 mmHg</p>
-                    <p className="cd-ali-time grey-text">LOGGED AT 09:30 AM</p>
-                  </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Recent Activity Feed Right */}
-            <div className="cd-card">
-              <h3 className="cd-card-title">Recent Activity Feed</h3>
-              <div className="cd-rfeed">
-                {[
-                  { title: 'BP checked & normal', desc: 'Arthur • 120/80 mmHg', time: '10:45 AM' },
-                  { title: 'Medicine taken', desc: 'Martha • Morning Vitamin Pack', time: '09:15 AM' },
-                  { title: 'Meal completed', desc: 'Arthur • Low-sodium breakfast', time: '08:30 AM' },
-                ].map((r, i) => (
-                  <div key={i} className="cd-rfeed-item">
-                    <div className="cd-rfeed-dot" />
-                    <div className="cd-rfeed-body">
-                      <p className="cd-rfeed-title">{r.title}</p>
-                      <p className="cd-rfeed-desc">{r.desc}</p>
-                      <span className="cd-rfeed-time">{r.time}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+
+
 
           </div>
         </div>
