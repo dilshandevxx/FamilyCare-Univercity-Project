@@ -710,11 +710,11 @@
 @media (max-width: 1200px) {
   .cd-main-grid { grid-template-columns: 1fr; }
   .cd-right { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .cd-family-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
 }
 
 @media (max-width: 900px) {
   .cd-stats-row { grid-template-columns: 1fr 1fr; }
-  .cd-family-grid { grid-template-columns: 1fr; }
   .cd-charts-row { grid-template-columns: 1fr; }
 }
 
@@ -722,6 +722,9 @@
   .cd-stats-row { grid-template-columns: 1fr; }
   .cd-right { grid-template-columns: 1fr; }
   .cd-qa-grid { grid-template-columns: 1fr 1fr; }
+  .cd-family-grid { grid-template-columns: 1fr; }
+  .cd-pulse-box { flex-direction: column; gap: 16px; }
+  .cd-greeting-title { font-size: 22px; }
 }
 
 /* ── Skeletons ── */
