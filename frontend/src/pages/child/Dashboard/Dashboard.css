@@ -394,26 +394,43 @@
 
 .cd-fbtn:hover { background: #e6f7f5; }
 
-/* ── Active Alert (main card) ── */
+/* ── Alerts ── */
 .cd-alert-box {
   display: flex;
-  gap: 14px;
-  border-radius: 12px;
-  padding: 16px;
-  transition: transform 0.2s;
+  gap: 16px;
+  background: #ffffff;
+  border: none;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .cd-alert-box:hover {
-  transform: translateX(4px);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.05);
 }
 
-.cd-alert-box.critical { background: #fef2f2; border: 1px solid #fecaca; }
-.cd-alert-box.warning  { background: #fffbeb; border: 1px solid #fde68a; }
-.cd-alert-box.info     { background: #eff6ff; border: 1px solid #bfdbfe; }
+.cd-alert-box::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; bottom: 0; width: 4px;
+}
+
+.cd-alert-box.critical { background: linear-gradient(90deg, rgba(254,242,242,0.8) 0%, #fff 100%); }
+.cd-alert-box.critical::before { background: #ef4444; box-shadow: 2px 0 12px rgba(239,68,68,0.6); }
+
+.cd-alert-box.warning { background: linear-gradient(90deg, rgba(255,251,235,0.8) 0%, #fff 100%); }
+.cd-alert-box.warning::before { background: #f59e0b; box-shadow: 2px 0 12px rgba(245,158,11,0.6); }
+
+.cd-alert-box.info { background: linear-gradient(90deg, rgba(239,246,255,0.8) 0%, #fff 100%); }
+.cd-alert-box.info::before { background: #3b82f6; box-shadow: 2px 0 12px rgba(59,130,246,0.6); }
 
 .cd-alert-icon-wrap {
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   display: flex;
   align-items: center;
