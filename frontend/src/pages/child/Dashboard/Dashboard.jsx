@@ -57,7 +57,7 @@ const Dashboard = () => {
       <div className="cd-root">
         
         {/* ── Hero Banner ── */}
-        <div className="cd-hero-banner">
+        <div className="cd-hero-banner animate-fade-in">
           <div className="cd-hero-content">
             <h1 className="cd-hero-title">{getGreeting()}, Dilshan!</h1>
             <p className="cd-hero-subtitle">Here's the latest update on your family's health and activity.</p>
@@ -68,7 +68,7 @@ const Dashboard = () => {
         </div>
 
         {/* ── Top stats ── */}
-        <div className="cd-stats-row">
+        <div className="cd-stats-row animate-fade-in delay-1">
           <div className="cd-stat-card">
             <div>
               <p className="cd-stat-label">TOTAL PARENTS</p>
@@ -105,7 +105,7 @@ const Dashboard = () => {
         <div className="cd-main-grid">
 
           {/* ── Left column ── */}
-          <div className="cd-left">
+          <div className="cd-left animate-fade-in delay-2">
 
             {/* Today's Pulse */}
             <div className="cd-card">
@@ -331,7 +331,7 @@ const Dashboard = () => {
           </div>
 
           {/* ── Right column ── */}
-          <div className="cd-right">
+          <div className="cd-right animate-fade-in delay-3">
 
             {/* Quick Actions */}
             <div className="cd-card">
