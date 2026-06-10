@@ -20,10 +20,10 @@ const register = async (req, res) => {
       [name, email, hashed, dbRole]
     );
 
-    // Auto-create caregivers row so dashboard/residents APIs work immediately
+    // Auto-create caregivers row — new registrations start as 'pending' for admin approval
     if (dbRole === 'caregiver') {
       await pool.query(
-        'INSERT IGNORE INTO caregivers (user_id, name) VALUES (?, ?)',
+        "INSERT IGNORE INTO caregivers (user_id, name, status) VALUES (?, ?, 'pending')",
         [result.insertId, name]
       );
     }

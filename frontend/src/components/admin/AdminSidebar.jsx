@@ -1,28 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, Users, UserCheck, Heart, Activity,
   Bell, BarChart2, Monitor, Settings, LogOut, Radio, X, AlertTriangle,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import api from '../../services/api';
 import './AdminSidebar.css';
-
-const navItems = [
-  { to: '/admin/dashboard',   icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/admin/users',       icon: Users,            label: 'User Management' },
-  { to: '/admin/caregiver-approval', icon: UserCheck, label: 'Caregiver Approval', badge: 8 },
-  { to: '/admin/elders',      icon: Heart,            label: 'Elder Management' },
-  { to: '/admin/health-logs', icon: Activity,         label: 'Health Logs' },
-  { to: '/admin/alerts',      icon: Bell,             label: 'Alerts', badge: 12 },
-  { to: '/admin/analytics',   icon: BarChart2,        label: 'Analytics' },
-  { to: '/admin/monitoring',  icon: Monitor,          label: 'System Monitoring' },
-  { to: '/admin/settings',    icon: Settings,         label: 'Settings' },
-];
 
 const AdminSidebar = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [showBroadcast, setShowBroadcast] = useState(false);
+  const [pendingApprovals, setPendingApprovals] = useState(null);
+  const [activeAlerts, setActiveAlerts]         = useState(null);
+
+  useEffect(() => {
+    api.get('/admin/stats')
+      .then(({ data }) => {
+        setPendingApprovals(data.pending_approvals ?? null);
+        setActiveAlerts(data.active_alerts ?? null);
+      })
+      .catch(() => {});
+  }, []);
+
+  const navItems = [
+    { to: '/admin/dashboard',           icon: LayoutDashboard, label: 'Dashboard' },
+    { to: '/admin/users',               icon: Users,            label: 'User Management' },
+    { to: '/admin/caregiver-approval',  icon: UserCheck,        label: 'Caregiver Approval', badge: pendingApprovals },
+    { to: '/admin/elders',              icon: Heart,            label: 'Elder Management' },
+    { to: '/admin/health-logs',         icon: Activity,         label: 'Health Logs' },
+    { to: '/admin/alerts',              icon: Bell,             label: 'Alerts', badge: activeAlerts },
+    { to: '/admin/analytics',           icon: BarChart2,        label: 'Analytics' },
+    { to: '/admin/monitoring',          icon: Monitor,          label: 'System Monitoring' },
+    { to: '/admin/settings',            icon: Settings,         label: 'Settings' },
+  ];
 
   const handleLogout = () => {
     logout();
@@ -45,7 +57,9 @@ const AdminSidebar = () => {
           >
             <Icon size={18} />
             <span className="admin-nav-label">{label}</span>
-            {badge && <span className="admin-nav-badge">{badge}</span>}
+            {badge !== null && badge !== undefined && badge > 0 && (
+              <span className="admin-nav-badge">{badge}</span>
+            )}
           </NavLink>
         ))}
       </nav>

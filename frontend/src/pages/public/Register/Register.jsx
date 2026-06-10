@@ -308,7 +308,7 @@ const Register = () => {
         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(0,50,40,0.45), rgba(0,30,25,0.72))' }} />
 
         {/* Logo */}
-        <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <Link to="/" style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
           <div style={{
             width: '32px', height: '32px', borderRadius: '8px',
             backgroundColor: TEAL, display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -318,7 +318,7 @@ const Register = () => {
             </svg>
           </div>
           <span style={{ color: 'white', fontWeight: '700', fontSize: '1.2rem', letterSpacing: '-0.3px' }}>FamilyCare</span>
-        </div>
+        </Link>
 
         {/* Hero text */}
         <div style={{ position: 'relative', zIndex: 1 }}>
@@ -362,6 +362,18 @@ const Register = () => {
         overflowY: 'auto',
       }}>
         <div style={{ maxWidth: '400px', width: '100%', margin: '0 auto' }}>
+
+          {/* Back to home */}
+          <Link to="/" style={{
+            display: 'inline-flex', alignItems: 'center', gap: '6px',
+            color: '#6B7280', fontSize: '0.82rem', textDecoration: 'none',
+            marginBottom: '1.4rem', fontWeight: '500',
+          }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 5l-7 7 7 7"/>
+            </svg>
+            Back to home
+          </Link>
 
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1a202c', marginBottom: '0.25rem' }}>
             Create an Account
@@ -593,6 +605,15 @@ const Register = () => {
               Sign in
             </Link>
           </p>
+
+          {/* Quick nav links */}
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '1.2rem', paddingTop: '1.2rem', borderTop: '1px solid #F1F5F9' }}>
+            {[{ label: 'Home', to: '/' }, { label: 'Features', to: '/features' }, { label: 'About', to: '/about' }].map(({ label, to }) => (
+              <Link key={to} to={to} style={{ fontSize: '0.78rem', color: '#9CA3AF', textDecoration: 'none', fontWeight: '500' }}>
+                {label}
+              </Link>
+            ))}
+          </div>
 
           <p style={{ textAlign: 'center', fontSize: '0.72rem', color: '#9CA3AF', marginTop: '1.2rem' }}>
             © 2026 FamilyCare. Your sanctuary for health.

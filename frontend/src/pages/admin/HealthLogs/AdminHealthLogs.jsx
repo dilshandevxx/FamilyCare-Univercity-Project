@@ -1,33 +1,82 @@
-import React, { useState } from 'react';
-import { Activity, Search, Filter } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Activity, Search, Filter, RefreshCw, Loader2 } from 'lucide-react';
 import AdminLayout from '../../../layouts/AdminLayout';
+import api from '../../../services/api';
 import './AdminHealthLogs.css';
 
-const mockLogs = [
-  { id: 1, elder: 'Martha K.',  caregiver: 'Elena Rossi',    type: 'Blood Pressure', value: '158/95 mmHg', flag: 'Critical', date: 'Today, 09:15 AM' },
-  { id: 2, elder: 'George P.',  caregiver: 'David Kim',      type: 'Blood Glucose',  value: '126 mg/dL',   flag: 'Warning',  date: 'Today, 08:40 AM' },
-  { id: 3, elder: 'Alice W.',   caregiver: 'Amara Johnson',  type: 'Vitals Check',   value: 'Normal',      flag: 'Normal',   date: 'Today, 08:00 AM' },
-  { id: 4, elder: 'Robert H.',  caregiver: 'Luis Morales',   type: 'Heart Rate',     value: '98 bpm',      flag: 'Warning',  date: 'Yesterday, 7 PM' },
-  { id: 5, elder: 'Dorothy M.', caregiver: 'Priya Sharma',   type: 'Vitals Check',   value: 'Normal',      flag: 'Normal',   date: 'Yesterday, 4 PM' },
-  { id: 6, elder: 'Frank L.',   caregiver: 'Fatima Al-Saud', type: 'Oxygen Saturation', value: '91%',      flag: 'Critical', date: 'Yesterday, 2 PM' },
-];
-
-const flagColors = {
+const FLAG_COLORS = {
   Normal:   { bg: '#f0fdf4', color: '#16a34a' },
   Warning:  { bg: '#fef3c7', color: '#b45309' },
   Critical: { bg: '#fef2f2', color: '#dc2626' },
 };
 
-const AdminHealthLogs = () => {
-  const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState('All');
+const formatDate = (iso) => {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const now = new Date();
+  const diffD = Math.floor((now - d) / 86400000);
+  if (diffD === 0) return `Today, ${d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+  if (diffD === 1) return `Yesterday, ${d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+};
 
-  const filtered = mockLogs.filter(l => {
-    const matchSearch = l.elder.toLowerCase().includes(search.toLowerCase()) ||
-                        l.caregiver.toLowerCase().includes(search.toLowerCase());
-    const matchFilter = filter === 'All' || l.flag === filter;
-    return matchSearch && matchFilter;
-  });
+const deriveFlag = (log) => {
+  if (log.flag) return log.flag;
+  const cond = (log.overall_condition || '').toLowerCase();
+  if (cond.includes('critical') || cond.includes('poor')) return 'Critical';
+  if (cond.includes('fair') || cond.includes('concern')) return 'Warning';
+  return 'Normal';
+};
+
+const logSummary = (log) => {
+  const parts = [];
+  if (log.blood_pressure) parts.push(`BP: ${log.blood_pressure}`);
+  if (log.heart_rate)     parts.push(`HR: ${log.heart_rate} bpm`);
+  if (log.temperature)    parts.push(`Temp: ${log.temperature}°`);
+  if (!parts.length && log.overall_condition) parts.push(log.overall_condition);
+  if (!parts.length && log.notes) parts.push(log.notes.slice(0, 40));
+  return parts.join(' · ') || '—';
+};
+
+const AdminHealthLogs = () => {
+  const [logs, setLogs]       = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch]   = useState('');
+  const [filter, setFilter]   = useState('All');
+
+  const fetchLogs = useCallback(async (q = '', f = 'All') => {
+    setLoading(true);
+    try {
+      const { data } = await api.get('/admin/health-logs', {
+        params: { search: q, flag: f, limit: 150 },
+      });
+      setLogs(data);
+    } catch {
+      setLogs([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchLogs(); }, [fetchLogs]);
+
+  const handleSearch = (e) => {
+    const val = e.target.value;
+    setSearch(val);
+    clearTimeout(handleSearch._t);
+    handleSearch._t = setTimeout(() => fetchLogs(val, filter), 400);
+  };
+
+  const handleFilter = (f) => {
+    setFilter(f);
+    fetchLogs(search, f);
+  };
+
+  const todayCount = logs.filter(l => {
+    const d = new Date(l.logged_at);
+    const now = new Date();
+    return d.toDateString() === now.toDateString();
+  }).length;
 
   return (
     <AdminLayout title="Health Logs">
@@ -35,10 +84,25 @@ const AdminHealthLogs = () => {
         <div className="ahl-header">
           <div>
             <h1 className="ahl-title">Health Logs</h1>
-            <p className="ahl-subtitle">185 logs recorded today across all zones.</p>
+            <p className="ahl-subtitle">
+              {loading ? 'Loading…' : `${todayCount} log${todayCount !== 1 ? 's' : ''} recorded today across all residents.`}
+            </p>
           </div>
-          <div className="ahl-stat-pill">
-            <Activity size={14} /> 185 Today
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <button
+              onClick={() => fetchLogs(search, filter)}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 5,
+                padding: '7px 13px', borderRadius: 8,
+                border: '1px solid #e2e8f0', background: '#fff',
+                cursor: 'pointer', fontSize: '0.8rem', color: '#64748b', fontWeight: 600,
+              }}
+            >
+              <RefreshCw size={12} /> Refresh
+            </button>
+            <div className="ahl-stat-pill">
+              <Activity size={14} /> {loading ? '…' : todayCount} Today
+            </div>
           </div>
         </div>
 
@@ -48,7 +112,7 @@ const AdminHealthLogs = () => {
             <input
               placeholder="Search by elder or caregiver..."
               value={search}
-              onChange={e => setSearch(e.target.value)}
+              onChange={handleSearch}
             />
           </div>
           <div className="ahl-filters">
@@ -56,7 +120,7 @@ const AdminHealthLogs = () => {
               <button
                 key={f}
                 className={`ahl-filter-btn ${filter === f ? 'active' : ''}`}
-                onClick={() => setFilter(f)}
+                onClick={() => handleFilter(f)}
               >
                 <Filter size={11} /> {f}
               </button>
@@ -65,39 +129,53 @@ const AdminHealthLogs = () => {
         </div>
 
         <div className="ahl-table-wrap">
-          <table className="ahl-table">
-            <thead>
-              <tr>
-                <th>Elder</th>
-                <th>Caregiver</th>
-                <th>Log Type</th>
-                <th>Value</th>
-                <th>Status</th>
-                <th>Date & Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map(l => {
-                const f = flagColors[l.flag];
-                return (
-                  <tr key={l.id}>
-                    <td className="ahl-td-name">{l.elder}</td>
-                    <td className="ahl-td-sub">{l.caregiver}</td>
-                    <td className="ahl-td-sub">{l.type}</td>
-                    <td className="ahl-td-val">{l.value}</td>
-                    <td>
-                      <span className="ahl-flag" style={{ background: f.bg, color: f.color }}>
-                        {l.flag}
-                      </span>
-                    </td>
-                    <td className="ahl-td-sub">{l.date}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '60px 0' }}>
+              <Loader2 size={28} style={{ animation: 'ahl-spin 1s linear infinite', color: '#0d9488' }} />
+            </div>
+          ) : logs.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '60px 0', color: '#94a3b8', fontSize: '0.9rem' }}>
+              <Activity size={36} style={{ marginBottom: 12, opacity: 0.4 }} />
+              <p style={{ margin: 0 }}>No health logs found.</p>
+            </div>
+          ) : (
+            <table className="ahl-table">
+              <thead>
+                <tr>
+                  <th>Elder</th>
+                  <th>Caregiver</th>
+                  <th>Vitals / Summary</th>
+                  <th>Condition</th>
+                  <th>Status</th>
+                  <th>Date &amp; Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                {logs.map(l => {
+                  const flag = deriveFlag(l);
+                  const f    = FLAG_COLORS[flag] || FLAG_COLORS.Normal;
+                  return (
+                    <tr key={l.id}>
+                      <td className="ahl-td-name">{l.elder_name || '—'}</td>
+                      <td className="ahl-td-sub">{l.caregiver_name || '—'}</td>
+                      <td className="ahl-td-sub">{logSummary(l)}</td>
+                      <td className="ahl-td-sub">{l.overall_condition || '—'}</td>
+                      <td>
+                        <span className="ahl-flag" style={{ background: f.bg, color: f.color }}>
+                          {flag}
+                        </span>
+                      </td>
+                      <td className="ahl-td-sub">{formatDate(l.logged_at)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
+
+      <style>{`@keyframes ahl-spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}`}</style>
     </AdminLayout>
   );
 };

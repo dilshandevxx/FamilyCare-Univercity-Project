@@ -122,6 +122,31 @@ const addLog = async (req, res) => {
       } catch (_) {}
     }
 
+    // ── Step 4: Auto-create alert for critical/warning conditions ──
+    const condUpper = (overall_condition || '').toUpperCase();
+    if (condUpper === 'CRITICAL' || condUpper === 'NEEDS ATTENTION') {
+      try {
+        const [[elder]] = await pool.query('SELECT name FROM parents WHERE id = ?', [parent_id]);
+        const elderName = elder ? elder.name : 'Resident';
+        const alertType = condUpper === 'CRITICAL' ? 'critical' : 'warning';
+        const vitals = [
+          blood_pressure ? `BP: ${blood_pressure}` : null,
+          heart_rate     ? `HR: ${heart_rate} bpm`  : null,
+          temperature    ? `Temp: ${temperature}°`  : null,
+        ].filter(Boolean).join(' · ');
+
+        await pool.query(
+          'INSERT INTO alerts (parent_id, title, description, type) VALUES (?, ?, ?, ?)',
+          [
+            parent_id,
+            `${condUpper === 'CRITICAL' ? 'Critical' : 'Warning'} condition logged for ${elderName}`,
+            vitals || (clinical_notes || notes || 'Health log flagged this condition'),
+            alertType,
+          ]
+        );
+      } catch (_) {}
+    }
+
     res.status(201).json({
       id:      newId,
       message: 'Health log added successfully',
@@ -505,7 +530,6 @@ const getEldersList = async (req, res) => {
     );
     res.json(rows);
   } catch (err) {
->>>>>>> origin/main
     res.status(500).json({ error: err.message });
   }
 };

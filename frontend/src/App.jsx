@@ -42,6 +42,17 @@ import AdminAnalytics    from './pages/admin/Analytics/AdminAnalytics';
 import SystemMonitoring  from './pages/admin/SystemMonitoring/SystemMonitoring';
 import AdminSettings     from './pages/admin/Settings/AdminSettings';
 
+// Admin V2 pages
+import AdminDashboardV2    from './pages/adminV2/Dashboard/AdminDashboardV2';
+import UserManagementV2    from './pages/adminV2/UserManagement/UserManagementV2';
+import CaregiverApprovalV2 from './pages/adminV2/CaregiverApproval/CaregiverApprovalV2';
+import ElderManagementV2   from './pages/adminV2/ElderManagement/ElderManagementV2';
+import AdminHealthLogsV2   from './pages/adminV2/HealthLogs/AdminHealthLogsV2';
+import AdminAlertsV2       from './pages/adminV2/Alerts/AdminAlertsV2';
+import AdminAnalyticsV2    from './pages/adminV2/Analytics/AdminAnalyticsV2';
+import SystemMonitoringV2  from './pages/adminV2/SystemMonitoring/SystemMonitoringV2';
+import AdminSettingsV2     from './pages/adminV2/Settings/AdminSettingsV2';
+
 /* Routes where the public Navbar should NOT appear */
 const DASHBOARD_PATHS = [
   '/dashboard', '/parents', '/alerts', '/health-feed', '/messages',
@@ -66,6 +77,7 @@ const AppContent = () => {
   const hideNav = DASHBOARD_PATHS.some(p => location.pathname.startsWith(p))
     || location.pathname.startsWith('/caregiver/')
     || location.pathname.startsWith('/admin/')
+    || location.pathname.startsWith('/admin-v2/')
     || location.pathname === '/login'
     || location.pathname === '/register';
 
@@ -111,6 +123,17 @@ const AppContent = () => {
         <Route path="/admin/analytics"          element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
         <Route path="/admin/monitoring"         element={<AdminRoute><SystemMonitoring /></AdminRoute>} />
         <Route path="/admin/settings"           element={<AdminRoute><AdminSettings /></AdminRoute>} />
+
+        {/* Protected – Admin V2 (role === 'admin' required) */}
+        <Route path="/admin-v2/dashboard"          element={<AdminRoute><AdminDashboardV2 /></AdminRoute>} />
+        <Route path="/admin-v2/users"              element={<AdminRoute><UserManagementV2 /></AdminRoute>} />
+        <Route path="/admin-v2/caregiver-approval" element={<AdminRoute><CaregiverApprovalV2 /></AdminRoute>} />
+        <Route path="/admin-v2/elders"             element={<AdminRoute><ElderManagementV2 /></AdminRoute>} />
+        <Route path="/admin-v2/health-logs"        element={<AdminRoute><AdminHealthLogsV2 /></AdminRoute>} />
+        <Route path="/admin-v2/alerts"             element={<AdminRoute><AdminAlertsV2 /></AdminRoute>} />
+        <Route path="/admin-v2/analytics"          element={<AdminRoute><AdminAnalyticsV2 /></AdminRoute>} />
+        <Route path="/admin-v2/monitoring"         element={<AdminRoute><SystemMonitoringV2 /></AdminRoute>} />
+        <Route path="/admin-v2/settings"           element={<AdminRoute><AdminSettingsV2 /></AdminRoute>} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" />} />

@@ -1,0 +1,350 @@
+.admin-v2-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #FAF9F6;
+  border-right: 1px solid #E2E8F0;
+  padding: 1.5rem 1rem;
+  font-family: 'Inter', sans-serif;
+  color: #1A202C;
+}
+
+.admin-v2-sidebar-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.admin-v2-logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-v2-logo-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background-color: #00A896;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 168, 150, 0.2);
+}
+
+.admin-v2-logo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1A202C;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.admin-v2-logo-sub {
+  font-size: 0.72rem;
+  color: #00A896;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin: 0;
+  margin-top: 1px;
+}
+
+.admin-v2-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.admin-v2-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.75rem 0.85rem;
+  border-radius: 10px;
+  color: #4A5568;
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+.admin-v2-nav-link:hover {
+  background-color: #EDF2F7;
+  color: #1A202C;
+}
+
+.admin-v2-nav-link.active {
+  background-color: #E6F7F5;
+  color: #00A896;
+  font-weight: 600;
+}
+
+.admin-v2-nav-icon {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.admin-v2-nav-label {
+  flex: 1;
+}
+
+.admin-v2-nav-badge {
+  background-color: #00A896;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 99px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.admin-v2-nav-link.active .admin-v2-nav-badge {
+  background-color: #008f80;
+}
+
+.admin-v2-sidebar-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 1rem;
+  border-top: 1px solid #E2E8F0;
+}
+
+.admin-v2-btn-broadcast {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #FEF2F2;
+  color: #DC2626;
+  border: 1.5px solid #FCA5A5;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-v2-btn-broadcast:hover {
+  background-color: #FEE2E2;
+  border-color: #EF4444;
+}
+
+.admin-v2-btn-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 0.75rem;
+  background-color: transparent;
+  color: #718096;
+  border: 1.5px dashed #CBD5E1;
+  border-radius: 10px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-v2-btn-logout:hover {
+  background-color: #EDF2F7;
+  color: #1A202C;
+  border-style: solid;
+}
+
+/* Modals */
+.admin-v2-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.admin-v2-modal {
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  max-width: 480px;
+  padding: 1.8rem;
+  position: relative;
+  border: 1px solid #E2E8F0;
+  animation: modal-enter 0.25s ease-out;
+}
+
+@keyframes modal-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.admin-v2-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #94A3B8;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.admin-v2-modal-close:hover {
+  background-color: #F1F5F9;
+  color: #475569;
+}
+
+.admin-v2-modal-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 1.5rem;
+}
+
+.admin-v2-modal-icon {
+  background-color: #FEF2F2;
+  padding: 10px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-v2-modal-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1A202C;
+  margin: 0;
+}
+
+.admin-v2-modal-desc {
+  font-size: 0.78rem;
+  color: #718096;
+  margin: 4px 0 0 0;
+  line-height: 1.45;
+}
+
+.admin-v2-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.admin-v2-modal-textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 10px;
+  border: 1.5px solid #E2E8F0;
+  font-family: inherit;
+  font-size: 0.85rem;
+  outline: none;
+  resize: none;
+  transition: border-color 0.2s;
+}
+
+.admin-v2-modal-textarea:focus {
+  border-color: #00A896;
+}
+
+.admin-v2-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.admin-v2-modal-cancel {
+  padding: 0.65rem 1.25rem;
+  background-color: white;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 10px;
+  color: #4A5568;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.admin-v2-modal-cancel:hover {
+  background-color: #F8FAF9;
+}
+
+.admin-v2-modal-send {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.65rem 1.4rem;
+  background-color: #DC2626;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.admin-v2-modal-send:hover {
+  background-color: #B91C1C;
+}
+
+/* Success State */
+.admin-v2-broadcast-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.5rem 0;
+}
+
+.admin-v2-success-icon-wrapper {
+  background-color: #E6F7F5;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.admin-v2-broadcast-success h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #1A202C;
+  margin: 0 0 6px 0;
+}
+
+.admin-v2-broadcast-success p {
+  font-size: 0.8rem;
+  color: #718096;
+  margin: 0;
+  max-width: 280px;
+  line-height: 1.45;
+}
