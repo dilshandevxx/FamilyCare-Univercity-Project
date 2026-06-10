@@ -145,10 +145,10 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* My Parents */}
+            {/* Family Overview */}
             <div className="cd-card">
               <div className="cd-section-hd">
-                <h3 className="cd-card-title" style={{margin:0}}>My Parents</h3>
+                <h3 className="cd-card-title" style={{margin:0}}>Family Overview</h3>
                 <Link to="/parents" className="cd-view-all">View All</Link>
               </div>
 
@@ -164,83 +164,46 @@ const Dashboard = () => {
                   </Link>
                 </div>
               ) : (
-                dbParents.map(p => {
-                  const seed = p.name || 'Parent';
-                  const location = p.address || 'At Home';
-                  const age = p.age || 'N/A';
-                  return (
-                    <div key={p.id} className="cd-parent-row">
-                      <div className="cd-parent-avatar">
-                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}`} alt={p.name} />
-                      </div>
-                      <div className="cd-parent-info">
-                        <p className="cd-parent-name">{p.name}</p>
-                        <p className="cd-parent-meta">{location} • {age} yrs old</p>
-                        <div className="cd-vitality-row">
-                          <span className="cd-vitality-label">Vitality</span>
-                          <div className="cd-vitality-bar">
-                            <div className="cd-vitality-fill" style={{width: `94%`}} />
-                          </div>
-                          <span className="cd-vitality-pct">94%</span>
-                        </div>
-                        <div className="cd-parent-actions">
-                          {p.relationship && <span className="cd-pill">{p.relationship}</span>}
-                          {p.gender && <span className="cd-pill">{p.gender}</span>}
-                          <Link to="/parents" className="cd-details-btn">Details</Link>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-
-              {/* Family Overview */}
-              <div style={{marginTop:'20px'}}>
-                <div className="cd-section-hd" style={{marginBottom:'14px'}}>
-                  <span className="cd-card-title" style={{margin:0}}>Family Overview</span>
-                  <Link to="/parents" className="cd-view-all">View All Family</Link>
-                </div>
                 <div className="cd-family-grid">
-                  {/* Arthur */}
-                  <div className="cd-family-card teal-top">
-                    <div className="cd-family-head">
-                      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Arthur" alt="Arthur" className="cd-family-img"/>
-                      <div>
-                        <p className="cd-family-name">Arthur Miller</p>
-                        <p className="cd-family-detail">Age: 78 • Heart Condition</p>
+                  {dbParents.map(p => {
+                    const seed = p.name || 'Parent';
+                    const location = p.address || 'At Home';
+                    const age = p.age || 'N/A';
+                    
+                    // Assign a color dynamically or randomly based on ID for top border
+                    const topColorClass = (p.id % 2 === 0) ? 'amber-top' : 'teal-top';
+                    const badgeClass = (p.id % 2 === 0) ? 'warning' : 'good';
+                    const badgeText = (p.id % 2 === 0) ? 'WARNING' : 'GOOD';
+
+                    return (
+                      <div key={p.id} className={`cd-family-card ${topColorClass}`}>
+                        <div className="cd-family-head">
+                          <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}`} alt={p.name} className="cd-family-img"/>
+                          <div>
+                            <p className="cd-family-name">{p.name}</p>
+                            <p className="cd-family-detail">Age: {age} • {location}</p>
+                          </div>
+                          <span className={`cd-badge ${badgeClass}`}>{badgeText}</span>
+                        </div>
+                        <div className="cd-family-meta">
+                          <div className="cd-meta-row">
+                            <span className="cd-ml">Primary Caregiver</span>
+                            <span className="cd-mv">Loading...</span>
+                          </div>
+                          <div className="cd-meta-row">
+                            <span className="cd-ml">Relation</span>
+                            <span className="cd-mv">{p.relationship || 'N/A'}</span>
+                          </div>
+                        </div>
+                        <div className="cd-family-btns">
+                          <button className="cd-fbtn">Vitals</button>
+                          <Link to="/parents" className="cd-fbtn" style={{ textAlign: 'center', textDecoration: 'none' }}>Details</Link>
+                        </div>
                       </div>
-                      <span className="cd-badge good">GOOD</span>
-                    </div>
-                    <div className="cd-family-meta">
-                      <div className="cd-meta-row"><span className="cd-ml">Primary Caregiver</span><span className="cd-mv">Sarah Jenkins</span></div>
-                      <div className="cd-meta-row"><span className="cd-ml">Last Update</span><span className="cd-mv">15 mins ago</span></div>
-                    </div>
-                    <div className="cd-family-btns">
-                      <button className="cd-fbtn">Vitals</button>
-                      <button className="cd-fbtn">Call</button>
-                    </div>
-                  </div>
-                  {/* Martha */}
-                  <div className="cd-family-card amber-top">
-                    <div className="cd-family-head">
-                      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Martha" alt="Martha" className="cd-family-img"/>
-                      <div>
-                        <p className="cd-family-name">Martha Miller</p>
-                        <p className="cd-family-detail">Age: 75 • Type 2 Diabetes</p>
-                      </div>
-                      <span className="cd-badge warning">WARNING</span>
-                    </div>
-                    <div className="cd-family-meta">
-                      <div className="cd-meta-row"><span className="cd-ml">Primary Caregiver</span><span className="cd-mv">David Chan</span></div>
-                      <div className="cd-meta-row"><span className="cd-ml">Last Update</span><span className="cd-mv">2 hours ago</span></div>
-                    </div>
-                    <div className="cd-family-btns">
-                      <button className="cd-fbtn">Vitals</button>
-                      <button className="cd-fbtn">Call</button>
-                    </div>
-                  </div>
+                    );
+                  })}
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Active Alerts */}
