@@ -259,16 +259,17 @@ const Dashboard = () => {
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {alerts.filter(a => !a.is_resolved).slice(0, 3).map(alert => (
-                    <div key={alert.id} className="cd-alert-box">
-                      <div className="cd-alert-icon-wrap">
+                    <div key={alert.id} className={`cd-alert-box ${alert.type || 'info'}`}>
+                      <div className={`cd-alert-icon-wrap ${alert.type || 'info'}`}>
                         {alert.type === 'critical' ? <AlertTriangle size={18} className="cd-alert-icon" style={{color: '#ef4444'}} /> :
-                         <AlertTriangle size={18} className="cd-alert-icon" />}
+                         alert.type === 'warning' ? <AlertTriangle size={18} className="cd-alert-icon" style={{color: '#d97706'}} /> :
+                         <CheckCircle size={18} className="cd-alert-icon" style={{color: '#3b82f6'}} />}
                       </div>
                       <div className="cd-alert-body">
                         <p className="cd-alert-title">{alert.title}</p>
                         <p className="cd-alert-desc">{alert.description}</p>
                         <div className="cd-alert-actions">
-                          <button className="cd-alert-btn-primary">CONTACT NURSE</button>
+                          <button className={`cd-alert-btn-primary ${alert.type || 'info'}`}>VIEW DETAILS</button>
                           <button className="cd-alert-btn-ghost">DISMISS</button>
                         </div>
                       </div>
