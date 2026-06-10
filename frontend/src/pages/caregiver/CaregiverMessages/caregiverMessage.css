@@ -339,34 +339,59 @@
 
 .empty-messages p { font-size: 14px; margin: 0; }
 
-.message-bubble {
-  max-width: 68%;
-  padding: 14px 16px;
-  border-radius: 18px;
-  font-size: 14px;
-  line-height: 1.55;
-  word-break: break-word;
-  position: relative;
+/* ── Message rows (bubble + hover-revealed delete button) ── */
+.message-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  max-width: 70%;
   animation: fadeIn 0.2s ease;
 }
+
+.message-row.me   { align-self: flex-end; }
+.message-row.them { align-self: flex-start; }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
+.message-bubble {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.55;
+  word-break: break-word;
+  position: relative;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.message-row:hover .message-bubble {
+  transform: translateY(-1px);
+}
+
 .message-bubble.them {
-  align-self: flex-start;
   background-color: #e2e8f0;
   color: #334155;
   border-bottom-left-radius: 4px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
 .message-bubble.me {
-  align-self: flex-end;
   background-color: #0d9488;
   color: white;
   border-bottom-right-radius: 4px;
+  box-shadow: 0 2px 6px rgba(13, 148, 136, 0.18);
+}
+
+.message-row:hover .message-bubble.them {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.message-row:hover .message-bubble.me {
+  box-shadow: 0 4px 14px rgba(13, 148, 136, 0.3);
 }
 
 .message-time {
@@ -374,6 +399,38 @@
   margin-top: 6px;
   opacity: 0.65;
   text-align: right;
+}
+
+/* ── Delete message button ──────────────────────────────── */
+.msg-delete-btn {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 0.15s ease, transform 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.message-row:hover .msg-delete-btn {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.msg-delete-btn:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.msg-delete-btn:active {
+  transform: scale(0.9);
 }
 
 /* ── Send error banner ──────────────────────────────────── */
