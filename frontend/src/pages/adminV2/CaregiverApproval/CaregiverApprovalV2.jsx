@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, UserCheck, ShieldX, Check, AlertCircle, FileText, Award, Clock, Hash, MapPin, Users, Search } from 'lucide-react';
+import { ShieldCheck, UserCheck, ShieldX, Check, AlertCircle, Award, Clock, Hash, MapPin, Users, Search } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
 import './CaregiverApprovalV2.css';
 
@@ -32,42 +32,40 @@ const CaregiverApprovalV2 = () => {
 
   const filteredApplicants = applicants.filter(a => 
     a.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    a.certification.toLowerCase().includes(searchQuery.toLowerCase())
+    a.certification.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    a.license.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <AdminLayoutV2 title="Caregiver Verification">
       <div className="approval-v2-container">
         
-        {/* Header and Stats */}
+        {/* Header Section */}
         <div className="approval-v2-header">
-          <div className="approval-v2-header-content">
+          <div className="approval-v2-title">
             <h2>Caregiver Approvals</h2>
-            <p>Review and verify caregiver applications before they can join the platform.</p>
+            <p>Review and verify caregiver applications for platform access.</p>
           </div>
           
-          <div className="approval-v2-stats">
-            <div className="approval-v2-stat-card">
-              <div className="stat-icon pending">
-                <Users size={24} />
-              </div>
-              <div className="stat-info">
-                <h4>Pending</h4>
-                <p className="stat-value">{applicants.filter(a => a.status === 'pending').length}</p>
-              </div>
+          <div className="approval-v2-header-actions">
+            <div className="approval-v2-search">
+              <Search size={18} className="search-icon" />
+              <input 
+                type="text" 
+                placeholder="Search applicants by name, cert, or license..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-            <div className="approval-v2-stat-card">
-              <div className="stat-icon approved">
-                <ShieldCheck size={24} />
-              </div>
-              <div className="stat-info">
-                <h4>Verified</h4>
-                <p className="stat-value">124</p>
-              </div>
+            
+            <div className="approval-v2-stat-pill">
+              <Users size={18} />
+              <span>{applicants.filter(a => a.status === 'pending').length} Pending</span>
             </div>
           </div>
         </div>
 
+        {/* Success/Error Banner */}
         {recentAction && (
           <div className={`approval-v2-action-banner banner-${recentAction.decision}`}>
             {recentAction.decision === 'approved' ? <ShieldCheck size={20} /> : <AlertCircle size={20} />}
@@ -75,89 +73,86 @@ const CaregiverApprovalV2 = () => {
           </div>
         )}
 
+        {/* Main Content */}
         {applicants.length === 0 ? (
           <div className="approval-v2-empty-state">
             <div className="approval-v2-empty-icon">
-              <ShieldCheck size={48} />
+              <ShieldCheck size={64} />
             </div>
             <h3>All Caught Up!</h3>
             <p>There are no pending caregiver applications awaiting administrative review at this time.</p>
           </div>
         ) : (
-          <div className="approval-v2-applicants-grid">
-            {filteredApplicants.map(a => (
-              <div key={a.id} className={`approval-v2-card status-${a.status}`}>
-                <div className="approval-v2-card-header">
-                  <div className="approval-v2-profile-avatar">
+          <div className="approval-v2-list">
+            {filteredApplicants.length > 0 ? filteredApplicants.map(a => (
+              <div key={a.id} className={`approval-v2-list-item status-${a.status}`}>
+                
+                {/* 1. Profile Info */}
+                <div className="list-item-profile">
+                  <div className="list-item-avatar">
                     {a.name.split(' ').map(n => n[0]).join('')}
                   </div>
-                  <div className="approval-v2-applicant-info">
-                    <h3 className="approval-v2-applicant-name">{a.name}</h3>
-                    <p className="approval-v2-applicant-email">
-                      {a.email}
-                    </p>
-                    <p className="approval-v2-applicant-location">
+                  <div className="list-item-details">
+                    <h3>{a.name}</h3>
+                    <p className="list-item-email">{a.email}</p>
+                    <p className="list-item-location">
                       <MapPin size={12} /> {a.location}
                     </p>
                   </div>
                 </div>
 
-                <div className="approval-v2-credentials">
-                  <div className="credential-item">
-                    <div className="credential-icon"><Award size={16} /></div>
-                    <div className="credential-details">
-                      <span className="label">Certification</span>
-                      <span className="value">{a.certification}</span>
-                    </div>
+                {/* 2. Credentials */}
+                <div className="list-item-credentials">
+                  <div className="cred-badge primary">
+                    <Award size={14} /> <span>{a.certification}</span>
                   </div>
-                  <div className="credential-item">
-                    <div className="credential-icon"><Clock size={16} /></div>
-                    <div className="credential-details">
-                      <span className="label">Experience</span>
-                      <span className="value">{a.experience}</span>
-                    </div>
+                  <div className="cred-badge">
+                    <Clock size={14} /> <span>{a.experience}</span>
                   </div>
-                  <div className="credential-item full-width">
-                    <div className="credential-icon"><Hash size={16} /></div>
-                    <div className="credential-details">
-                      <span className="label">License Number</span>
-                      <span className="value font-mono">{a.license}</span>
-                    </div>
+                  <div className="cred-badge mono">
+                    <Hash size={14} /> <span>{a.license}</span>
                   </div>
                 </div>
 
-                <div className="approval-v2-bio">
+                {/* 3. Bio Snippet */}
+                <div className="list-item-bio">
                   <p>"{a.bio}"</p>
                 </div>
 
-                {a.status === 'pending' ? (
-                  <div className="approval-v2-actions">
-                    <button 
-                      className="reject-btn"
-                      onClick={() => handleDecision(a.id, a.name, 'rejected')}
-                    >
-                      <ShieldX size={18} />
-                      Reject
-                    </button>
-                    <button 
-                      className="approve-btn"
-                      onClick={() => handleDecision(a.id, a.name, 'approved')}
-                    >
-                      <UserCheck size={18} />
-                      Approve & Verify
-                    </button>
-                  </div>
-                ) : (
-                  <div className={`approval-v2-decision-status is-${a.status}`}>
-                    {a.status === 'approved' ? (
-                      <><Check size={18} /> APPROVED</>
-                    ) : (
-                      <><ShieldX size={18} /> REJECTED</>
-                    )}
-                  </div>
-                )}
+                {/* 4. Actions */}
+                <div className="list-item-actions">
+                  {a.status === 'pending' ? (
+                    <>
+                      <button 
+                        className="btn-reject"
+                        onClick={() => handleDecision(a.id, a.name, 'rejected')}
+                        title="Reject Applicant"
+                      >
+                        <ShieldX size={18} />
+                      </button>
+                      <button 
+                        className="btn-approve"
+                        onClick={() => handleDecision(a.id, a.name, 'approved')}
+                      >
+                        <UserCheck size={16} /> Approve
+                      </button>
+                    </>
+                  ) : (
+                    <div className={`decision-badge is-${a.status}`}>
+                      {a.status === 'approved' ? (
+                        <><Check size={16} /> Approved</>
+                      ) : (
+                        <><ShieldX size={16} /> Rejected</>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
-            ))}
+            )) : (
+              <div className="approval-v2-empty-state">
+                <p>No applicants match your search criteria.</p>
+              </div>
+            )}
           </div>
         )}
 
