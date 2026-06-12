@@ -196,6 +196,7 @@
   background-color: #E2E8F0;
   outline: none;
   -webkit-appearance: none;
+  appearance: none;
 }
 
 .v2-range-slider::-webkit-slider-runnable-track {
@@ -206,6 +207,7 @@
 
 .v2-range-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
+  appearance: none;
   height: 18px;
   width: 18px;
   border-radius: 50%;
