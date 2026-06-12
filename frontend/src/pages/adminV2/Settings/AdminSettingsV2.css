@@ -201,6 +201,28 @@
 .v2-range-slider::-webkit-slider-runnable-track {
   height: 6px;
   border-radius: 4px;
+  background-color: #E2E8F0;
+}
+
+.v2-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #00A896;
+  cursor: pointer;
+  margin-top: -6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+
+.v2-range-slider::-moz-range-thumb {
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #00A896;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
 
 /* Save settings footer bar */
