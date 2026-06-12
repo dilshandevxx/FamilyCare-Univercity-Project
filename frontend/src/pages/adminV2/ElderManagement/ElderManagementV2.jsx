@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Heart, User, ShieldAlert, Phone, Eye, Clipboard, X } from 'lucide-react';
+import { Search, Heart, User, Phone, Eye, ClipboardList, X, Activity, Thermometer, Info } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
 import './ElderManagementV2.css';
 
@@ -38,24 +38,30 @@ const ElderManagementV2 = () => {
     <AdminLayoutV2 title="Elder Management">
       <div className="elder-v2-container">
         
-        {/* Actions Bar */}
-        <div className="elder-v2-header-actions">
-          <div className="elder-v2-search-group">
-            <div className="elder-v2-search-input">
-              <Search size={18} color="#94A3B8" />
+        {/* Header Section */}
+        <div className="elder-v2-header">
+          <div className="elder-v2-title">
+            <h2>Elder Resident Directory</h2>
+            <p>Manage resident assignments, monitor real-time health statuses, and review medical charts.</p>
+          </div>
+          
+          <div className="elder-v2-header-actions">
+            <div className="elder-v2-search">
+              <Search size={18} className="search-icon" />
               <input 
                 type="text" 
-                placeholder="Search elder by name or medical conditions..." 
+                placeholder="Search by name or condition..." 
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
             </div>
+            
             <select 
               className="elder-v2-filter-select"
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value)}
             >
-              <option value="all">All Conditions</option>
+              <option value="all">All Statuses</option>
               <option value="stable">Stable</option>
               <option value="needs-attention">Needs Attention</option>
               <option value="critical">Critical</option>
@@ -66,10 +72,15 @@ const ElderManagementV2 = () => {
         {/* Elders Grid Layout */}
         <div className="elder-v2-grid">
           {filteredElders.length === 0 ? (
-            <div className="elder-v2-empty">No elder profiles found.</div>
+            <div className="elder-v2-empty">
+              <Info size={48} />
+              <p>No elder profiles match your search criteria.</p>
+            </div>
           ) : (
             filteredElders.map(e => (
               <div key={e.id} className={`elder-v2-card status-${e.status}`}>
+                <div className="elder-v2-card-glow"></div>
+                
                 <div className="elder-v2-card-header">
                   <div className="elder-v2-avatar-name">
                     <div className="elder-v2-avatar">
@@ -77,46 +88,51 @@ const ElderManagementV2 = () => {
                     </div>
                     <div>
                       <h4>{e.name}</h4>
-                      <p className="elder-v2-meta">Age: {e.age} &nbsp;·&nbsp; Room {e.room}</p>
+                      <p className="elder-v2-meta">Age: {e.age} <span className="dot">•</span> Room {e.room}</p>
                     </div>
                   </div>
                   <span className={`elder-v2-status-pill status-${e.status}`}>
-                    {e.status.replace('-', ' ')}
+                    {e.status === 'needs-attention' ? 'Attention' : e.status}
                   </span>
                 </div>
 
                 <div className="elder-v2-medical-conditions">
-                  <h5>Medical Conditions:</h5>
+                  <div className="conditions-header">
+                    <Activity size={14} /> 
+                    <h5>Diagnosed Conditions</h5>
+                  </div>
                   <p>{e.conditions}</p>
                 </div>
 
                 <div className="elder-v2-assignment-row">
-                  <span className="label">Assigned Caregiver:</span>
-                  <select 
-                    value={e.caregiver} 
-                    onChange={eOpt => handleAssignCaregiver(e.id, eOpt.target.value)}
-                    className={`caregiver-select ${e.caregiver === 'Unassigned' ? 'unassigned' : ''}`}
-                  >
-                    {caregiversList.map(cg => (
-                      <option key={cg} value={cg}>{cg}</option>
-                    ))}
-                  </select>
+                  <span className="label">Assigned Caregiver</span>
+                  <div className="select-wrapper">
+                    <select 
+                      value={e.caregiver} 
+                      onChange={eOpt => handleAssignCaregiver(e.id, eOpt.target.value)}
+                      className={`caregiver-select ${e.caregiver === 'Unassigned' ? 'unassigned' : ''}`}
+                    >
+                      {caregiversList.map(cg => (
+                        <option key={cg} value={cg}>{cg}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div className="elder-v2-contact-section">
                   <div className="contact-info">
-                    <User size={13} />
+                    <User size={14} />
                     <span>{e.contact}</span>
                   </div>
                   <div className="contact-info">
-                    <Phone size={13} />
+                    <Phone size={14} />
                     <a href={`tel:${e.phone}`}>{e.phone}</a>
                   </div>
                 </div>
 
                 <div className="elder-v2-card-footer">
                   <button className="view-log-btn" onClick={() => setSelectedElder(e)}>
-                    <Clipboard size={14} />
+                    <ClipboardList size={16} />
                     View Health Record
                   </button>
                 </div>
@@ -130,31 +146,31 @@ const ElderManagementV2 = () => {
           <div className="elder-v2-modal-overlay" onClick={() => setSelectedElder(null)}>
             <div className="elder-v2-modal" onClick={e => e.stopPropagation()}>
               <button className="elder-v2-modal-close" onClick={() => setSelectedElder(null)}>
-                <X size={18} />
+                <X size={20} />
               </button>
 
               <div className="elder-v2-modal-header">
                 <div className="elder-v2-modal-icon">
-                  <Heart size={24} color="#00A896" />
+                  <Heart size={28} color="white" />
                 </div>
                 <div>
-                  <h2 className="elder-v2-modal-title">{selectedElder.name} &mdash; Medical Chart</h2>
-                  <p className="elder-v2-modal-desc">Age: {selectedElder.age} &nbsp;·&nbsp; Room {selectedElder.room}</p>
+                  <h2 className="elder-v2-modal-title">{selectedElder.name}</h2>
+                  <p className="elder-v2-modal-desc">Medical Chart &nbsp;•&nbsp; Room {selectedElder.room}</p>
                 </div>
               </div>
 
-              <div className="elder-v2-modal-chart">
+              <div className="elder-v2-modal-body">
                 <div className="chart-stat">
                   <span className="label">Care Severity</span>
                   <span className={`value-pill status-${selectedElder.status}`}>{selectedElder.status.toUpperCase()}</span>
                 </div>
                 <div className="chart-stat">
                   <span className="label">Assigned Caregiver</span>
-                  <span className="value">{selectedElder.caregiver}</span>
+                  <span className="value font-bold text-teal">{selectedElder.caregiver}</span>
                 </div>
                 <div className="chart-stat">
                   <span className="label">Diagnosed Conditions</span>
-                  <span className="value text-dark font-medium">{selectedElder.conditions}</span>
+                  <span className="value">{selectedElder.conditions}</span>
                 </div>
                 <div className="chart-stat">
                   <span className="label">Allergies</span>
@@ -162,7 +178,10 @@ const ElderManagementV2 = () => {
                 </div>
                 <div className="chart-stat">
                   <span className="label">Emergency Contact</span>
-                  <span className="value">{selectedElder.contact} ({selectedElder.phone})</span>
+                  <div className="value-contact">
+                    <span>{selectedElder.contact}</span>
+                    <span className="font-mono">{selectedElder.phone}</span>
+                  </div>
                 </div>
               </div>
 
