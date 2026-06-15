@@ -16,15 +16,15 @@ const AdminSidebarV2 = () => {
 
   // V2 Navigation routes
   const navItems = [
-    { to: '/admin-v2/dashboard',           icon: LayoutDashboard, label: 'Dashboard' },
-    { to: '/admin-v2/users',               icon: Users,            label: 'User Management' },
-    { to: '/admin-v2/caregiver-approval',  icon: UserCheck,        label: 'Caregiver Approval', badge: 3 },
-    { to: '/admin-v2/elders',              icon: Heart,            label: 'Elder Management' },
-    { to: '/admin-v2/health-logs',         icon: Activity,         label: 'Health Logs' },
-    { to: '/admin-v2/alerts',              icon: Bell,             label: 'Alerts', badge: 2 },
-    { to: '/admin-v2/analytics',           icon: BarChart2,        label: 'Analytics' },
-    { to: '/admin-v2/monitoring',          icon: Monitor,          label: 'System Monitor' },
-    { to: '/admin-v2/settings',            icon: Settings,         label: 'Settings' },
+    { to: '/admin/dashboard',           icon: LayoutDashboard, label: 'Dashboard' },
+    { to: '/admin/users',               icon: Users,            label: 'User Management' },
+    { to: '/admin/caregiver-approval',  icon: UserCheck,        label: 'Caregiver Approval', badge: 3 },
+    { to: '/admin/elders',              icon: Heart,            label: 'Elder Management' },
+    { to: '/admin/health-logs',         icon: Activity,         label: 'Health Logs' },
+    { to: '/admin/alerts',              icon: Bell,             label: 'Alerts', badge: 2 },
+    { to: '/admin/analytics',           icon: BarChart2,        label: 'Analytics' },
+    { to: '/admin/monitoring',          icon: Monitor,          label: 'System Monitor' },
+    { to: '/admin/settings',            icon: Settings,         label: 'Settings' },
   ];
 
   const handleLogout = () => {
