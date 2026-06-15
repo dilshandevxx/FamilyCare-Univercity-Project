@@ -1,22 +1,69 @@
-import React, { useState } from 'react';
-import { Settings, Shield, Mail, Heart, Save, CheckCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Settings, Shield, Mail, Heart, Save, CheckCircle, Loader2 } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
+import api from '../../../services/api';
 import './AdminSettingsV2.css';
+
+const toBool = (v) => v === true || v === 'true';
 
 const AdminSettingsV2 = () => {
   const [showToast, setShowToast] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
   const [tfaRequired, setTfaRequired] = useState(true);
   const [sessionTimeout, setSessionTimeout] = useState('30');
   const [hrThreshold, setHrThreshold] = useState(100);
   const [tempThreshold, setTempThreshold] = useState(100.4);
 
-  const handleSave = (e) => {
+  useEffect(() => {
+    const fetchSettings = async () => {
+      setLoading(true);
+      try {
+        const { data } = await api.get('/admin/settings');
+        if (data.twoFactor !== undefined) setTfaRequired(toBool(data.twoFactor));
+        if (data.sessionTimeout !== undefined) setSessionTimeout(data.sessionTimeout);
+        if (data.hrThreshold !== undefined) setHrThreshold(Number(data.hrThreshold));
+        if (data.tempThreshold !== undefined) setTempThreshold(Number(data.tempThreshold));
+      } catch (error) {
+        console.log('Failed to fetch settings, using defaults');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const handleSave = async (e) => {
     e.preventDefault();
-    setShowToast(true);
-    setTimeout(() => {
-      setShowToast(false);
-    }, 2000);
+    setSaving(true);
+    try {
+      await api.put('/admin/settings', {
+        twoFactor: String(tfaRequired),
+        sessionTimeout: String(sessionTimeout),
+        hrThreshold: String(hrThreshold),
+        tempThreshold: String(tempThreshold)
+      });
+      setShowToast(true);
+      setTimeout(() => {
+        setShowToast(false);
+      }, 2500);
+    } catch (error) {
+      alert('Failed to save settings');
+    } finally {
+      setSaving(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <AdminLayoutV2 title="System Settings Console">
+        <div className="settings-v2-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+          <Loader2 className="animate-spin" size={40} color="#00A896" />
+        </div>
+      </AdminLayoutV2>
+    );
+  }
 
   return (
     <AdminLayoutV2 title="System Settings Console">
@@ -112,9 +159,9 @@ const AdminSettingsV2 = () => {
 
           {/* Save Button */}
           <div className="settings-v2-footer">
-            <button type="submit" className="settings-v2-save-btn">
-              <Save size={16} />
-              Save Config Settings
+            <button type="submit" className="settings-v2-save-btn" disabled={saving}>
+              {saving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
+              {saving ? 'Saving...' : 'Save Config Settings'}
             </button>
           </div>
 
