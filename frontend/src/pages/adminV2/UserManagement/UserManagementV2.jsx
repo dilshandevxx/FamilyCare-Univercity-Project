@@ -329,50 +329,52 @@ const UserManagementV2 = () => {
                   </div>
                 </div>
 
-                <div className="user-v2-form-group">
-                  <label>Full Name</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g. John Doe"
-                    value={newName}
-                    onChange={e => setNewName(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="user-v2-form-group">
-                  <label>Email Address</label>
-                  <div className="input-with-icon">
-                    <Mail size={16} className="input-icon" />
+                <div className="user-v2-modal-body">
+                  <div className="user-v2-form-group">
+                    <label>Full Name</label>
                     <input 
-                      type="email" 
-                      placeholder="e.g. john@example.com"
-                      value={newEmail}
-                      onChange={e => setNewEmail(e.target.value)}
+                      type="text" 
+                      placeholder="e.g. John Doe"
+                      value={newName}
+                      onChange={e => setNewName(e.target.value)}
                       required
                     />
                   </div>
-                </div>
 
-                <div className="user-v2-form-group">
-                  <label>Account Role</label>
-                  <select 
-                    value={newRole}
-                    onChange={e => setNewRole(e.target.value)}
-                  >
-                    <option value="child">Family Member (Child)</option>
-                    <option value="caregiver">Professional Caregiver</option>
-                    <option value="admin">System Administrator</option>
-                  </select>
-                </div>
+                  <div className="user-v2-form-group">
+                    <label>Email Address</label>
+                    <div className="input-with-icon">
+                      <Mail size={16} className="input-icon" />
+                      <input 
+                        type="email" 
+                        placeholder="e.g. john@example.com"
+                        value={newEmail}
+                        onChange={e => setNewEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
 
-                <div className="user-v2-modal-actions">
-                  <button type="button" className="user-v2-modal-cancel" onClick={() => setShowAddModal(false)}>
-                    Cancel
-                  </button>
-                  <button type="submit" className="user-v2-modal-submit">
-                    Create User
-                  </button>
+                  <div className="user-v2-form-group">
+                    <label>Account Role</label>
+                    <select 
+                      value={newRole}
+                      onChange={e => setNewRole(e.target.value)}
+                    >
+                      <option value="child">Family Member (Child)</option>
+                      <option value="caregiver">Professional Caregiver</option>
+                      <option value="admin">System Administrator</option>
+                    </select>
+                  </div>
+
+                  <div className="user-v2-modal-actions">
+                    <button type="button" className="user-v2-modal-cancel" onClick={() => setShowAddModal(false)}>
+                      Cancel
+                    </button>
+                    <button type="submit" className="user-v2-modal-submit">
+                      Create User
+                    </button>
+                  </div>
                 </div>
               </form>
             </div>
