@@ -1,31 +1,63 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Users, UserCheck, Heart, Activity, Bell, AlertTriangle,
   TrendingUp, Download, ArrowUpRight, UserPlus, Eye, ShieldAlert,
-  HeartHandshake, ChevronRight, ActivitySquare, Server, AlertCircle
+  HeartHandshake, ChevronRight, ActivitySquare, Server, AlertCircle, Loader2
 } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
+import api from '../../../services/api';
 import './AdminDashboardV2.css';
+
+const formatActivityTime = (ts) => {
+  if (!ts) return '';
+  const diffMs  = Date.now() - new Date(ts);
+  const diffM   = Math.floor(diffMs / 60000);
+  const diffH   = Math.floor(diffMs / 3600000);
+  const diffD   = Math.floor(diffMs / 86400000);
+  if (diffM < 1)  return 'Just now';
+  if (diffM < 60) return `${diffM}m ago`;
+  if (diffH < 24) return `${diffH}h ago`;
+  if (diffD === 1) return '1d ago';
+  return `${diffD}d ago`;
+};
 
 const AdminDashboardV2 = () => {
   const navigate = useNavigate();
 
-  const mockStats = {
-    totalUsers: 1248,
-    activeCaregivers: 38,
-    monitoredSeniors: 82,
-    healthLogsToday: 156,
-    activeAlerts: 4,
-    pendingApprovals: 3
-  };
+  const [stats, setStats] = useState({
+    total_users: '—', total_caregivers: '—', total_elders: '—',
+    logs_today: '—', active_alerts: '—', critical_alerts: '—', pending_approvals: '—',
+  });
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [loadingActivity, setLoadingActivity] = useState(true);
 
-  const recentActivity = [
-    { text: 'New Caregiver Registered', desc: 'Ravi Kumar completed certification verification', type: 'approval', time: '5m ago' },
-    { text: 'Critical Alert Resolved', desc: 'Robert Sterling (Room 215) heart rate stabilized', type: 'alert', time: '18m ago' },
-    { text: 'New Senior Profile Created', desc: 'Eleanor Vance assigned to caregiver Ravi Kumar', type: 'parent', time: '1h ago' },
-    { text: 'Daily Health Log Added', desc: 'Vitals logged for Arthur Jenkins (BP: 145/95)', type: 'log', time: '2h ago' }
-  ];
+  const fetchStats = useCallback(async () => {
+    try {
+      const { data } = await api.get('/admin/stats');
+      setStats(data);
+    } catch (error) {
+      console.error('Failed to fetch stats:', error);
+    }
+  }, []);
+
+  const fetchActivity = useCallback(async () => {
+    setLoadingActivity(true);
+    try {
+      const { data } = await api.get('/admin/activity');
+      setRecentActivity(data);
+    } catch (error) {
+      console.error('Failed to fetch activity:', error);
+      setRecentActivity([]);
+    } finally {
+      setLoadingActivity(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchStats();
+    fetchActivity();
+  }, [fetchStats, fetchActivity]);
 
   return (
     <AdminLayoutV2 title="Overview Dashboard">
@@ -37,17 +69,17 @@ const AdminDashboardV2 = () => {
             <h3>System Status Operational</h3>
             <h2>FamilyCare Infrastructure Console</h2>
             <p>
-              Your central platform administration center. Currently monitoring <strong>{mockStats.monitoredSeniors} active senior residents</strong> and <strong>{mockStats.activeCaregivers} verified caregivers</strong> in real-time.
+              Your central platform administration center. Currently monitoring <strong>{stats.total_elders !== '—' ? stats.total_elders : 0} active senior residents</strong> and <strong>{stats.total_caregivers !== '—' ? stats.total_caregivers : 0} verified caregivers</strong> in real-time.
             </p>
           </div>
           <div className="v2-hero-stats">
-            <div className="v2-hero-stat-pill">
-              <span className="dot active" />
-              <span>4 Critical Alerts</span>
+            <div className="v2-hero-stat-pill" onClick={() => navigate('/admin-v2/alerts')} style={{ cursor: 'pointer' }}>
+              <span className={`dot ${stats.critical_alerts > 0 ? 'active' : ''}`} style={stats.critical_alerts === 0 ? {background: '#94A3B8', boxShadow: 'none'} : {}} />
+              <span>{stats.critical_alerts !== '—' ? stats.critical_alerts : 0} Critical Alerts</span>
             </div>
-            <div className="v2-hero-stat-pill">
-              <span className="dot pending" />
-              <span>3 Pending Audits</span>
+            <div className="v2-hero-stat-pill" onClick={() => navigate('/admin-v2/caregiver-approval')} style={{ cursor: 'pointer' }}>
+              <span className={`dot ${stats.pending_approvals > 0 ? 'pending' : ''}`} style={stats.pending_approvals === 0 ? {background: '#94A3B8', boxShadow: 'none'} : {}} />
+              <span>{stats.pending_approvals !== '—' ? stats.pending_approvals : 0} Pending Audits</span>
             </div>
           </div>
         </div>
@@ -59,9 +91,9 @@ const AdminDashboardV2 = () => {
             <div className="v2-stat-glass-overlay" />
             <div className="v2-stat-info">
               <span className="label">System User Base</span>
-              <h3 className="value">{mockStats.totalUsers}</h3>
+              <h3 className="value">{stats.total_users}</h3>
               <p className="detail positive">
-                <ArrowUpRight size={12} /> +12% vs last month
+                <ArrowUpRight size={12} /> Registered accounts
               </p>
             </div>
             <div className="v2-stat-icon-circle bg-teal">
@@ -73,9 +105,9 @@ const AdminDashboardV2 = () => {
             <div className="v2-stat-glass-overlay" />
             <div className="v2-stat-info">
               <span className="label">Registered Caregivers</span>
-              <h3 className="value">{mockStats.activeCaregivers}</h3>
+              <h3 className="value">{stats.total_caregivers}</h3>
               <p className="detail neutral">
-                {mockStats.pendingApprovals} applications pending
+                {stats.pending_approvals} applications pending
               </p>
             </div>
             <div className="v2-stat-icon-circle bg-indigo">
@@ -87,9 +119,9 @@ const AdminDashboardV2 = () => {
             <div className="v2-stat-glass-overlay" />
             <div className="v2-stat-info">
               <span className="label">Elders Monitored</span>
-              <h3 className="value">{mockStats.monitoredSeniors}</h3>
+              <h3 className="value">{stats.total_elders}</h3>
               <p className="detail positive">
-                <ArrowUpRight size={12} /> +4 active profiles
+                Active profiles
               </p>
             </div>
             <div className="v2-stat-icon-circle bg-orange">
@@ -101,9 +133,9 @@ const AdminDashboardV2 = () => {
             <div className="v2-stat-glass-overlay" />
             <div className="v2-stat-info">
               <span className="label">Critical Active Alerts</span>
-              <h3 className="value">{mockStats.activeAlerts}</h3>
-              <p className="detail critical animate-pulse-glow">
-                Requires immediate resolution
+              <h3 className="value">{stats.active_alerts}</h3>
+              <p className={`detail ${stats.critical_alerts > 0 ? 'critical animate-pulse-glow' : 'neutral'}`}>
+                {stats.critical_alerts > 0 ? `${stats.critical_alerts} requires immediate resolution` : 'All criticals resolved'}
               </p>
             </div>
             <div className="v2-stat-icon-circle bg-rose">
@@ -180,23 +212,38 @@ const AdminDashboardV2 = () => {
             </div>
 
             <div className="v2-feed-list">
-              {recentActivity.map((act, i) => (
-                <div key={i} className="v2-feed-item">
-                  <div className={`v2-feed-icon-badge ${act.type}`}>
-                    {act.type === 'approval' && <UserCheck size={14} />}
-                    {act.type === 'alert' && <AlertCircle size={14} />}
-                    {act.type === 'parent' && <Heart size={14} />}
-                    {act.type === 'log' && <Activity size={14} />}
-                  </div>
-                  <div className="v2-feed-details">
-                    <div className="v2-feed-title-time">
-                      <h5>{act.text}</h5>
-                      <span>{act.time}</span>
-                    </div>
-                    <p>{act.desc}</p>
-                  </div>
+              {loadingActivity ? (
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem 0' }}>
+                  <Loader2 className="animate-spin" size={24} color="#00A896" />
                 </div>
-              ))}
+              ) : recentActivity.length === 0 ? (
+                <p style={{ textAlign: 'center', color: '#94A3B8', fontSize: '0.9rem', padding: '1rem 0' }}>No recent activity found.</p>
+              ) : (
+                recentActivity.slice(0, 5).map((act, i) => {
+                  let type = 'log';
+                  if (act.icon === 'UserPlus' || act.icon === 'UserCheck') type = 'approval';
+                  else if (act.icon === 'AlertTriangle' || act.icon === 'Bell') type = 'alert';
+                  else if (act.title.toLowerCase().includes('senior')) type = 'parent';
+
+                  return (
+                    <div key={i} className="v2-feed-item">
+                      <div className={`v2-feed-icon-badge ${type}`}>
+                        {type === 'approval' && <UserCheck size={14} />}
+                        {type === 'alert' && <AlertCircle size={14} />}
+                        {type === 'parent' && <Heart size={14} />}
+                        {type === 'log' && <Activity size={14} />}
+                      </div>
+                      <div className="v2-feed-details">
+                        <div className="v2-feed-title-time">
+                          <h5>{act.title}</h5>
+                          <span>{formatActivityTime(act.ts)}</span>
+                        </div>
+                        <p>{act.desc}</p>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
 

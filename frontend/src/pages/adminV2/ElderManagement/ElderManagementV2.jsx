@@ -1,30 +1,90 @@
-import React, { useState } from 'react';
-import { Search, Heart, User, Phone, Eye, ClipboardList, X, Activity, Thermometer, Info } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Search, Heart, User, Phone, Eye, ClipboardList, X, Activity, Thermometer, Info, Plus, Loader2, UserPlus } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
+import api from '../../../services/api';
 import './ElderManagementV2.css';
 
-const initialElders = [
-  { id: 1, name: 'Eleanor Vance', age: 82, room: '402', status: 'stable', caregiver: 'Ravi Kumar', contact: 'Alice Vance (Daughter)', phone: '+1 555-0199', conditions: 'Hypertension, Type 2 DM' },
-  { id: 2, name: 'Robert Sterling', age: 78, room: '215', status: 'stable', caregiver: 'Ravi Kumar', contact: 'John Sterling (Son)', phone: '+1 555-0144', conditions: 'Post-Stroke Recovery' },
-  { id: 3, name: 'Clara Oswald', age: 74, room: '318', status: 'needs-attention', caregiver: 'Clara Oswald', contact: 'Danny Pink (Spouse)', phone: '+1 555-0182', conditions: 'Type 2 Diabetes' },
-  { id: 4, name: 'Arthur Jenkins', age: 80, room: '101', status: 'critical', caregiver: 'Unassigned', contact: 'Marta Jenkins (Sibling)', phone: '+1 555-0155', conditions: 'Congestive Heart Failure' }
-];
-
-const caregiversList = ['Ravi Kumar', 'Clara Oswald', 'Arthur Jenkins', 'Unassigned'];
-
 const ElderManagementV2 = () => {
-  const [elders, setElders] = useState(initialElders);
+  const [elders, setElders] = useState([]);
+  const [caregivers, setCaregivers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedElder, setSelectedElder] = useState(null);
+  
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addForm, setAddForm] = useState({
+    name: '', age: '', room_number: '', medical_conditions: '', care_status: 'STABLE', assigned_caregiver_id: ''
+  });
+  const [adding, setAdding] = useState(false);
 
-  const handleAssignCaregiver = (id, caregiverName) => {
-    setElders(elders.map(e => {
-      if (e.id === id) {
-        return { ...e, caregiver: caregiverName };
-      }
-      return e;
-    }));
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [{ data: res }, { data: cgs }] = await Promise.all([
+        api.get('/admin/residents'),
+        api.get('/admin/caregivers')
+      ]);
+      setElders(res.map(r => {
+        let mappedStatus = 'stable';
+        if (r.care_status === 'NEEDS ATTENTION') mappedStatus = 'needs-attention';
+        else if (r.care_status === 'CRITICAL') mappedStatus = 'critical';
+
+        return {
+          id: r.id,
+          name: r.name,
+          age: r.age || '—',
+          room: r.room_number || 'N/A',
+          status: mappedStatus,
+          caregiver: r.caregiver_name || 'Unassigned',
+          caregiver_id: r.caregiver_id,
+          contact: 'Family Contact (N/A)',
+          phone: 'N/A',
+          conditions: r.medical_conditions || 'None reported'
+        };
+      }));
+      setCaregivers(cgs);
+    } catch (err) {
+      console.error('Failed to load elders/caregivers:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const handleAssignCaregiver = async (residentId, caregiverId) => {
+    try {
+      await api.put(`/admin/residents/${residentId}/assign`, {
+        caregiver_id: caregiverId ? Number(caregiverId) : null,
+      });
+      fetchData();
+    } catch (err) {
+      alert('Failed to assign caregiver.');
+    }
+  };
+
+  const handleAddResident = async (e) => {
+    e.preventDefault();
+    if (!addForm.name.trim()) return;
+    setAdding(true);
+    try {
+      await api.post('/admin/residents', {
+        ...addForm,
+        age: addForm.age ? Number(addForm.age) : null,
+        assigned_caregiver_id: addForm.assigned_caregiver_id ? Number(addForm.assigned_caregiver_id) : null
+      });
+      setShowAddModal(false);
+      setAddForm({ name: '', age: '', room_number: '', medical_conditions: '', care_status: 'STABLE', assigned_caregiver_id: '' });
+      fetchData();
+    } catch (err) {
+      alert('Failed to add resident.');
+    } finally {
+      setAdding(false);
+    }
   };
 
   const filteredElders = elders.filter(e => {
@@ -66,13 +126,25 @@ const ElderManagementV2 = () => {
               <option value="needs-attention">Needs Attention</option>
               <option value="critical">Critical</option>
             </select>
+
+            <button 
+              className="user-v2-add-btn" 
+              onClick={() => setShowAddModal(true)}
+              style={{ marginLeft: '10px' }}
+            >
+              <Plus size={16} /> Add Resident
+            </button>
           </div>
         </div>
 
         {/* Elders Grid Layout */}
         <div className="elder-v2-grid">
-          {filteredElders.length === 0 ? (
-            <div className="elder-v2-empty">
+          {loading ? (
+             <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center', padding: '4rem 0' }}>
+               <Loader2 className="animate-spin" size={32} color="#00A896" />
+             </div>
+          ) : filteredElders.length === 0 ? (
+            <div className="elder-v2-empty" style={{ gridColumn: '1 / -1' }}>
               <Info size={48} />
               <p>No elder profiles match your search criteria.</p>
             </div>
@@ -84,7 +156,7 @@ const ElderManagementV2 = () => {
                 <div className="elder-v2-card-header">
                   <div className="elder-v2-avatar-name">
                     <div className="elder-v2-avatar">
-                      {e.name.split(' ').map(n => n[0]).join('')}
+                      {e.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
                     </div>
                     <div>
                       <h4>{e.name}</h4>
@@ -108,12 +180,13 @@ const ElderManagementV2 = () => {
                   <span className="label">Assigned Caregiver</span>
                   <div className="select-wrapper">
                     <select 
-                      value={e.caregiver} 
+                      value={e.caregiver_id || ''} 
                       onChange={eOpt => handleAssignCaregiver(e.id, eOpt.target.value)}
                       className={`caregiver-select ${e.caregiver === 'Unassigned' ? 'unassigned' : ''}`}
                     >
-                      {caregiversList.map(cg => (
-                        <option key={cg} value={cg}>{cg}</option>
+                      <option value="">Unassigned</option>
+                      {caregivers.map(cg => (
+                        <option key={cg.id} value={cg.id}>{cg.name || cg.user_name}</option>
                       ))}
                     </select>
                   </div>
@@ -144,7 +217,7 @@ const ElderManagementV2 = () => {
         {/* Health Record Details Modal */}
         {selectedElder && (
           <div className="elder-v2-modal-overlay" onClick={() => setSelectedElder(null)}>
-            <div className="elder-v2-modal" onClick={e => e.stopPropagation()}>
+            <div className="elder-v2-modal" onClick={evt => evt.stopPropagation()}>
               <button className="elder-v2-modal-close" onClick={() => setSelectedElder(null)}>
                 <X size={20} />
               </button>
@@ -190,6 +263,99 @@ const ElderManagementV2 = () => {
                   Close Chart
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Add Resident Modal */}
+        {showAddModal && (
+          <div className="elder-v2-modal-overlay" onClick={() => setShowAddModal(false)}>
+            <div className="elder-v2-modal" onClick={evt => evt.stopPropagation()} style={{ maxWidth: '500px' }}>
+              <button className="elder-v2-modal-close" onClick={() => setShowAddModal(false)}>
+                <X size={20} />
+              </button>
+
+              <form onSubmit={handleAddResident}>
+                <div className="elder-v2-modal-header" style={{ background: 'linear-gradient(135deg, #F59E0B, #D97706)' }}>
+                  <div className="elder-v2-modal-icon">
+                    <UserPlus size={28} color="white" />
+                  </div>
+                  <div>
+                    <h2 className="elder-v2-modal-title">Add New Resident</h2>
+                    <p className="elder-v2-modal-desc">Register a new elder to the system.</p>
+                  </div>
+                </div>
+
+                <div className="elder-v2-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569', marginBottom: '4px', display: 'block' }}>Full Name *</label>
+                    <input 
+                      type="text" required
+                      value={addForm.name} onChange={e => setAddForm({...addForm, name: e.target.value})}
+                      style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #E2E8F0', background: '#F8FAFC' }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', gap: '1rem' }}>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569', marginBottom: '4px', display: 'block' }}>Age</label>
+                      <input 
+                        type="number" 
+                        value={addForm.age} onChange={e => setAddForm({...addForm, age: e.target.value})}
+                        style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #E2E8F0', background: '#F8FAFC' }}
+                      />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569', marginBottom: '4px', display: 'block' }}>Room Number</label>
+                      <input 
+                        type="text" 
+                        value={addForm.room_number} onChange={e => setAddForm({...addForm, room_number: e.target.value})}
+                        style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #E2E8F0', background: '#F8FAFC' }}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569', marginBottom: '4px', display: 'block' }}>Medical Conditions</label>
+                    <input 
+                      type="text" placeholder="e.g. Hypertension, Type 2 Diabetes"
+                      value={addForm.medical_conditions} onChange={e => setAddForm({...addForm, medical_conditions: e.target.value})}
+                      style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #E2E8F0', background: '#F8FAFC' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569', marginBottom: '4px', display: 'block' }}>Care Status</label>
+                    <select 
+                      value={addForm.care_status} onChange={e => setAddForm({...addForm, care_status: e.target.value})}
+                      style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #E2E8F0', background: '#F8FAFC' }}
+                    >
+                      <option value="STABLE">Stable</option>
+                      <option value="NEEDS ATTENTION">Needs Attention</option>
+                      <option value="CRITICAL">Critical</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: '0.8rem', fontWeight: 700, color: '#475569', marginBottom: '4px', display: 'block' }}>Assign Caregiver</label>
+                    <select 
+                      value={addForm.assigned_caregiver_id} onChange={e => setAddForm({...addForm, assigned_caregiver_id: e.target.value})}
+                      style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid #E2E8F0', background: '#F8FAFC' }}
+                    >
+                      <option value="">— Unassigned —</option>
+                      {caregivers.map(cg => (
+                        <option key={cg.id} value={cg.id}>{cg.name || cg.user_name}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="elder-v2-modal-actions" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px', padding: '20px' }}>
+                  <button type="button" onClick={() => setShowAddModal(false)} style={{ padding: '10px 20px', borderRadius: '10px', background: 'white', border: '1px solid #E2E8F0', fontWeight: 'bold' }}>
+                    Cancel
+                  </button>
+                  <button type="submit" disabled={adding} style={{ padding: '10px 20px', borderRadius: '10px', background: '#D97706', color: 'white', border: 'none', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {adding ? <Loader2 className="animate-spin" size={16} /> : <Plus size={16} />} 
+                    Add Resident
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         )}

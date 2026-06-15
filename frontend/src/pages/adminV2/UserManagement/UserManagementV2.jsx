@@ -1,25 +1,14 @@
-import React, { useState } from 'react';
-import { Search, UserPlus, Trash2, ToggleLeft, ToggleRight, X, Mail, ShieldCheck, Users, CheckCircle, XCircle, Clock, FileText, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Search, UserPlus, Trash2, X, Mail, ShieldCheck, Users, CheckCircle, XCircle, Clock, FileText, AlertCircle, Loader2 } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
+import api from '../../../services/api';
 import './UserManagementV2.css';
 
-const initialUsers = [
-  // Pending users
-  { id: 101, name: 'Emily Vance', email: 'emily.v@email.com', role: 'child', status: 'pending', joined: 'Just now', 
-    associatedElder: 'Eleanor Vance', relationship: 'Granddaughter', phone: '+1 555-0128', backgroundCheck: 'N/A', certifications: 'None', notes: 'Would like access to grandmother\'s health updates.' },
-  { id: 102, name: 'Marcus Johnson', email: 'marcus.j@care.com', role: 'caregiver', status: 'pending', joined: '2 hours ago', 
-    associatedElder: 'Any Available', relationship: 'Professional', phone: '+1 555-0193', backgroundCheck: 'Cleared', certifications: 'CNA, CPR Certified', notes: 'Available for night shifts.' },
-  
-  // Existing users
-  { id: 1, name: 'Clara Oswald', email: 'clara@care.com', role: 'caregiver', status: 'active', joined: 'Jan 10, 2026' },
-  { id: 2, name: 'Rithwik Sen', email: 'rithwik@familycare.com', role: 'admin', status: 'active', joined: 'Dec 15, 2025' },
-  { id: 3, name: 'Alice Smith', email: 'alice@family.com', role: 'child', status: 'active', joined: 'Mar 02, 2026' },
-  { id: 4, name: 'Bob Johnson', email: 'bob@caregiver.com', role: 'caregiver', status: 'suspended', joined: 'Feb 18, 2026' },
-  { id: 5, name: 'Sarah Connor', email: 'sarah@family.com', role: 'child', status: 'active', joined: 'Mar 08, 2026' }
-];
-
 const UserManagementV2 = () => {
-  const [users, setUsers] = useState(initialUsers);
+  const [users, setUsers] = useState([]);
+  const [pendingUsers, setPendingUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -30,57 +19,110 @@ const UserManagementV2 = () => {
   const [newEmail, setNewEmail] = useState('');
   const [newRole, setNewRole] = useState('child');
 
-  const pendingUsers = users.filter(u => u.status === 'pending');
-  const activeOrSuspendedUsers = users.filter(u => u.status !== 'pending');
+  const fetchUsers = useCallback(async () => {
+    try {
+      const { data } = await api.get('/admin/users');
+      setUsers(data.map(u => ({
+        id: u._id,
+        name: u.name,
+        email: u.email,
+        role: u.role,
+        status: 'active',
+        joined: new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+      })));
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+    }
+  }, []);
 
-  const filteredUsers = activeOrSuspendedUsers.filter(u => {
+  const fetchPending = useCallback(async () => {
+    try {
+      const { data } = await api.get('/admin/caregivers/pending');
+      setPendingUsers(data.map(c => ({
+        id: c._id,
+        name: c.userId?.name || 'Unknown',
+        email: c.userId?.email || '',
+        role: 'caregiver',
+        status: 'pending',
+        joined: new Date(c.createdAt || Date.now()).toLocaleDateString(),
+        associatedElder: 'N/A',
+        relationship: 'Professional',
+        phone: 'N/A',
+        backgroundCheck: 'Pending',
+        certifications: c.certifications?.join(', ') || 'None',
+        notes: `Experience: ${c.experienceYears} years.`
+      })));
+    } catch (error) {
+      console.error('Failed to fetch pending caregivers:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      await Promise.all([fetchUsers(), fetchPending()]);
+      setLoading(false);
+    };
+    loadData();
+  }, [fetchUsers, fetchPending]);
+
+  const filteredUsers = users.filter(u => {
     const matchesSearch = u.name.toLowerCase().includes(search.toLowerCase()) || 
                           u.email.toLowerCase().includes(search.toLowerCase());
     const matchesRole = roleFilter === 'all' || u.role === roleFilter;
     return matchesSearch && matchesRole;
   });
 
-  const handleDelete = (id) => {
-    setUsers(users.filter(u => u.id !== id));
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+    try {
+      await api.delete(`/admin/users/${id}`);
+      setUsers(users.filter(u => u.id !== id));
+    } catch (err) {
+      alert('Failed to delete user.');
+    }
   };
 
-  const toggleStatus = (id) => {
-    setUsers(users.map(u => {
-      if (u.id === id) {
-        return { ...u, status: u.status === 'active' ? 'suspended' : 'active' };
-      }
-      return u;
-    }));
+  const handleApprove = async (id) => {
+    try {
+      await api.put(`/admin/caregivers/${id}/approve`);
+      setReviewUser(null);
+      fetchPending();
+      fetchUsers();
+    } catch (err) {
+      alert('Failed to approve.');
+    }
   };
 
-  const handleApprove = (id) => {
-    setUsers(users.map(u => u.id === id ? { ...u, status: 'active', joined: 'Today' } : u));
-    setReviewUser(null);
+  const handleReject = async (id) => {
+    try {
+      await api.put(`/admin/caregivers/${id}/reject`);
+      setReviewUser(null);
+      fetchPending();
+    } catch (err) {
+      alert('Failed to reject.');
+    }
   };
 
-  const handleReject = (id) => {
-    setUsers(users.filter(u => u.id !== id));
-    setReviewUser(null);
-  };
-
-  const handleAddUser = (e) => {
+  const handleAddUser = async (e) => {
     e.preventDefault();
     if (!newName.trim() || !newEmail.trim()) return;
 
-    const newUser = {
-      id: Date.now(),
-      name: newName,
-      email: newEmail,
-      role: newRole,
-      status: 'active',
-      joined: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
-    };
-
-    setUsers([newUser, ...users]);
-    setNewName('');
-    setNewEmail('');
-    setNewRole('child');
-    setShowAddModal(false);
+    try {
+      await api.post('/admin/users', {
+        name: newName,
+        email: newEmail,
+        password: 'Password123!', 
+        role: newRole
+      });
+      setShowAddModal(false);
+      setNewName('');
+      setNewEmail('');
+      setNewRole('child');
+      fetchUsers();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to add user');
+    }
   };
 
   return (
@@ -88,7 +130,7 @@ const UserManagementV2 = () => {
       <div className="user-v2-container">
         
         {/* Pending Approvals Section */}
-        {pendingUsers.length > 0 && (
+        {!loading && pendingUsers.length > 0 && (
           <div className="user-v2-pending-section">
             <div className="section-header">
               <AlertCircle size={20} color="#EA580C" />
@@ -171,7 +213,15 @@ const UserManagementV2 = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredUsers.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan={5}>
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem 0' }}>
+                      <Loader2 className="animate-spin" size={32} color="#00A896" />
+                    </div>
+                  </td>
+                </tr>
+              ) : filteredUsers.length === 0 ? (
                 <tr>
                   <td colSpan={5}>
                     <div className="no-records-cell">
@@ -210,19 +260,6 @@ const UserManagementV2 = () => {
                     <td>{u.joined}</td>
                     <td>
                       <div className="user-v2-actions-cell">
-                        {u.status !== 'pending' && (
-                          <button 
-                            className="action-btn toggle-btn" 
-                            onClick={() => toggleStatus(u.id)}
-                            title={u.status === 'active' ? 'Suspend Account' : 'Activate Account'}
-                          >
-                            {u.status === 'active' ? (
-                              <ToggleRight size={22} color="#00A896" />
-                            ) : (
-                              <ToggleLeft size={22} color="#94A3B8" />
-                            )}
-                          </button>
-                        )}
                         <button 
                           className="action-btn delete-btn" 
                           onClick={() => handleDelete(u.id)}

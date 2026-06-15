@@ -1,20 +1,72 @@
-import React, { useState } from 'react';
-import { Search, Heart, User, Clock, ClipboardList, X, Activity, Thermometer, Info, FileText } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Search, Heart, User, Clock, ClipboardList, X, Activity, Thermometer, Info, FileText, Loader2 } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
+import api from '../../../services/api';
 import './AdminHealthLogsV2.css';
 
-const initialHealthLogs = [
-  { id: 1, parentName: 'Eleanor Vance', bp: '135/88', hr: 78, temp: 98.6, spo2: 98, bloodSugar: 105, hydration: '1.5L', sleep: '7 hrs (Good)', weight: '142 lbs', meds: 'Taken on time', meal: 'Full Breakfast', notes: 'Normal morning reading. Patient rested and took hypertension medication.', caregiver: 'Ravi Kumar', date: 'Today, 09:30 AM', mood: 'Cheerful', condition: 'stable' },
-  { id: 2, parentName: 'Robert Sterling', bp: '120/80', hr: 72, temp: 98.4, spo2: 97, bloodSugar: 98, hydration: '1.2L', sleep: '6.5 hrs (Fair)', weight: '168 lbs', meds: 'Taken on time', meal: 'Partial Lunch', notes: 'Took post-stroke recovery medication as scheduled. Patient walked 15 mins.', caregiver: 'Ravi Kumar', date: 'Today, 01:15 PM', mood: 'Calm', condition: 'stable' },
-  { id: 3, parentName: 'Clara Oswald', bp: '158/92', hr: 88, temp: 99.2, spo2: 95, bloodSugar: 142, hydration: '0.8L', sleep: '5 hrs (Poor)', weight: '135 lbs', meds: 'Delayed', meal: 'Full Lunch', notes: 'Blood pressure is slightly elevated. Advised bed rest and monitored glucose level.', caregiver: 'Clara Oswald', date: 'Yesterday, 02:40 PM', mood: 'Tired', condition: 'needs-attention' },
-  { id: 4, parentName: 'Arthur Jenkins', bp: '145/95', hr: 102, temp: 99.5, spo2: 92, bloodSugar: 110, hydration: '0.5L', sleep: '4 hrs (Restless)', weight: '155 lbs', meds: 'Refused', meal: 'Refused Meal', notes: 'Heart rate is high. Patient refused afternoon meal. Heavy breathing noted.', caregiver: 'Unassigned', date: 'Yesterday, 04:00 PM', mood: 'Agitated', condition: 'critical' }
-];
+const deriveFlag = (log) => {
+  if (log.flag) return log.flag;
+  const cond = (log.overall_condition || '').toLowerCase();
+  if (cond.includes('critical') || cond.includes('poor')) return 'Critical';
+  if (cond.includes('fair') || cond.includes('concern')) return 'Warning';
+  return 'Normal';
+};
+
+const formatDate = (iso) => {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const now = new Date();
+  const diffD = Math.floor((now - d) / 86400000);
+  if (diffD === 0) return `Today, ${d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+  if (diffD === 1) return `Yesterday, ${d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ` ${d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
+};
 
 const AdminHealthLogsV2 = () => {
-  const [logs] = useState(initialHealthLogs);
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedLog, setSelectedLog] = useState(null);
+
+  const fetchLogs = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data } = await api.get('/admin/health-logs', { params: { limit: 200 } });
+      setLogs(data.map(l => {
+        const flag = deriveFlag(l);
+        const condition = flag === 'Critical' ? 'critical' : flag === 'Warning' ? 'needs-attention' : 'stable';
+        
+        return {
+          id: l.id,
+          parentName: l.elder_name || 'Unknown',
+          caregiver: l.caregiver_name || 'Unknown',
+          bp: l.blood_pressure || 'N/A',
+          hr: l.heart_rate || 'N/A',
+          temp: l.temperature || 'N/A',
+          spo2: l.oxygen_level || 'N/A',
+          bloodSugar: l.blood_sugar || 'N/A',
+          hydration: l.hydration_level || 'N/A',
+          sleep: l.sleep_quality || 'N/A',
+          weight: l.weight || 'N/A',
+          meds: l.medication_status || 'N/A',
+          meal: l.meal_consumption || 'N/A',
+          notes: l.notes || 'No notes provided.',
+          date: formatDate(l.logged_at),
+          mood: l.mood || 'N/A',
+          condition
+        };
+      }));
+    } catch (err) {
+      console.error('Failed to fetch logs', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchLogs();
+  }, [fetchLogs]);
 
   const filteredLogs = logs.filter(l => {
     const matchesSearch = l.parentName.toLowerCase().includes(search.toLowerCase()) || 
@@ -60,8 +112,12 @@ const AdminHealthLogsV2 = () => {
 
         {/* Logs Grid Layout */}
         <div className="health-v2-grid">
-          {filteredLogs.length === 0 ? (
-            <div className="health-v2-empty">
+          {loading ? (
+             <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'center', padding: '4rem 0' }}>
+               <Loader2 className="animate-spin" size={32} color="#00A896" />
+             </div>
+          ) : filteredLogs.length === 0 ? (
+            <div className="health-v2-empty" style={{ gridColumn: '1 / -1' }}>
               <Info size={48} />
               <p>No health logs match your search criteria.</p>
             </div>
@@ -73,7 +129,7 @@ const AdminHealthLogsV2 = () => {
                 <div className="health-v2-card-header">
                   <div className="health-v2-avatar-name">
                     <div className="health-v2-avatar">
-                      {l.parentName.split(' ').map(n => n[0]).join('')}
+                      {l.parentName.split(' ').map(n => n[0]).join('').substring(0, 2)}
                     </div>
                     <div>
                       <h4>{l.parentName}</h4>
@@ -101,7 +157,7 @@ const AdminHealthLogsV2 = () => {
                   <div className="vital-indicator">
                     <Thermometer size={14} color="#EA580C" />
                     <span className="label">Temp:</span>
-                    <span className="value">{l.temp}°</span>
+                    <span className="value">{l.temp !== 'N/A' ? `${l.temp}°` : 'N/A'}</span>
                   </div>
                 </div>
 
@@ -147,15 +203,15 @@ const AdminHealthLogsV2 = () => {
                   </div>
                   <div className="vital-box">
                     <span className="label">Heart Rate</span>
-                    <span className="value">{selectedLog.hr} bpm</span>
+                    <span className="value">{selectedLog.hr !== 'N/A' ? `${selectedLog.hr} bpm` : 'N/A'}</span>
                   </div>
                   <div className="vital-box">
                     <span className="label">Temperature</span>
-                    <span className="value">{selectedLog.temp} °F</span>
+                    <span className="value">{selectedLog.temp !== 'N/A' ? `${selectedLog.temp} °F` : 'N/A'}</span>
                   </div>
                   <div className="vital-box">
                     <span className="label">SpO2</span>
-                    <span className="value">{selectedLog.spo2}%</span>
+                    <span className="value">{selectedLog.spo2 !== 'N/A' ? `${selectedLog.spo2}%` : 'N/A'}</span>
                   </div>
                   <div className="vital-box">
                     <span className="label">Blood Sugar</span>
