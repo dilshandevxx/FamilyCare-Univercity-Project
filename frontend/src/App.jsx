@@ -31,18 +31,7 @@ import CaregiverSettings     from './pages/caregiver/CaregiverSettings/caregiver
 import AddHealthLog          from './pages/caregiver/HealthLog/AddHealthLog';
 import CaregiverVisitHistory from './pages/caregiver/CaregiverVisitHistory/caregivervisithistor';
 
-// Admin pages
-import AdminDashboard    from './pages/admin/Dashboard/AdminDashboard';
-import UserManagement    from './pages/admin/UserManagement/UserManagement';
-import CaregiverApproval from './pages/admin/CaregiverApproval/CaregiverApproval';
-import ElderManagement   from './pages/admin/ElderManagement/ElderManagement';
-import AdminHealthLogs   from './pages/admin/HealthLogs/AdminHealthLogs';
-import AdminAlerts       from './pages/admin/Alerts/AdminAlerts';
-import AdminAnalytics    from './pages/admin/Analytics/AdminAnalytics';
-import SystemMonitoring  from './pages/admin/SystemMonitoring/SystemMonitoring';
-import AdminSettings     from './pages/admin/Settings/AdminSettings';
-
-// Admin V2 pages
+// Admin V2 pages (Now default for /admin/*)
 import AdminDashboardV2    from './pages/adminV2/Dashboard/AdminDashboardV2';
 import UserManagementV2    from './pages/adminV2/UserManagement/UserManagementV2';
 import CaregiverApprovalV2 from './pages/adminV2/CaregiverApproval/CaregiverApprovalV2';
@@ -77,7 +66,6 @@ const AppContent = () => {
   const hideNav = DASHBOARD_PATHS.some(p => location.pathname.startsWith(p))
     || location.pathname.startsWith('/caregiver/')
     || location.pathname.startsWith('/admin/')
-    || location.pathname.startsWith('/admin-v2/')
     || location.pathname === '/login'
     || location.pathname === '/register';
 
@@ -113,27 +101,16 @@ const AppContent = () => {
         <Route path="/caregiver/healthlog/add" element={<PrivateRoute><AddHealthLog /></PrivateRoute>} />
         <Route path="/caregiver/history"      element={<PrivateRoute><CaregiverVisitHistory /></PrivateRoute>} />
 
-        {/* Protected – Admin (role === 'admin' required) */}
-        <Route path="/admin/dashboard"          element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-        <Route path="/admin/users"              element={<AdminRoute><UserManagement /></AdminRoute>} />
-        <Route path="/admin/caregiver-approval" element={<AdminRoute><CaregiverApproval /></AdminRoute>} />
-        <Route path="/admin/elders"             element={<AdminRoute><ElderManagement /></AdminRoute>} />
-        <Route path="/admin/health-logs"        element={<AdminRoute><AdminHealthLogs /></AdminRoute>} />
-        <Route path="/admin/alerts"             element={<AdminRoute><AdminAlerts /></AdminRoute>} />
-        <Route path="/admin/analytics"          element={<AdminRoute><AdminAnalytics /></AdminRoute>} />
-        <Route path="/admin/monitoring"         element={<AdminRoute><SystemMonitoring /></AdminRoute>} />
-        <Route path="/admin/settings"           element={<AdminRoute><AdminSettings /></AdminRoute>} />
-
         {/* Protected – Admin V2 (role === 'admin' required) */}
-        <Route path="/admin-v2/dashboard"          element={<AdminRoute><AdminDashboardV2 /></AdminRoute>} />
-        <Route path="/admin-v2/users"              element={<AdminRoute><UserManagementV2 /></AdminRoute>} />
-        <Route path="/admin-v2/caregiver-approval" element={<AdminRoute><CaregiverApprovalV2 /></AdminRoute>} />
-        <Route path="/admin-v2/elders"             element={<AdminRoute><ElderManagementV2 /></AdminRoute>} />
-        <Route path="/admin-v2/health-logs"        element={<AdminRoute><AdminHealthLogsV2 /></AdminRoute>} />
-        <Route path="/admin-v2/alerts"             element={<AdminRoute><AdminAlertsV2 /></AdminRoute>} />
-        <Route path="/admin-v2/analytics"          element={<AdminRoute><AdminAnalyticsV2 /></AdminRoute>} />
-        <Route path="/admin-v2/monitoring"         element={<AdminRoute><SystemMonitoringV2 /></AdminRoute>} />
-        <Route path="/admin-v2/settings"           element={<AdminRoute><AdminSettingsV2 /></AdminRoute>} />
+        <Route path="/admin/dashboard"          element={<AdminRoute><AdminDashboardV2 /></AdminRoute>} />
+        <Route path="/admin/users"              element={<AdminRoute><UserManagementV2 /></AdminRoute>} />
+        <Route path="/admin/caregiver-approval" element={<AdminRoute><CaregiverApprovalV2 /></AdminRoute>} />
+        <Route path="/admin/elders"             element={<AdminRoute><ElderManagementV2 /></AdminRoute>} />
+        <Route path="/admin/health-logs"        element={<AdminRoute><AdminHealthLogsV2 /></AdminRoute>} />
+        <Route path="/admin/alerts"             element={<AdminRoute><AdminAlertsV2 /></AdminRoute>} />
+        <Route path="/admin/analytics"          element={<AdminRoute><AdminAnalyticsV2 /></AdminRoute>} />
+        <Route path="/admin/monitoring"         element={<AdminRoute><SystemMonitoringV2 /></AdminRoute>} />
+        <Route path="/admin/settings"           element={<AdminRoute><AdminSettingsV2 /></AdminRoute>} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" />} />

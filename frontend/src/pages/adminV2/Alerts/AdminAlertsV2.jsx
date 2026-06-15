@@ -1,26 +1,68 @@
-import React, { useState } from 'react';
-import { ShieldAlert, Bell, CheckCircle, Activity, X, Heart, Shield } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ShieldAlert, Bell, CheckCircle, Activity, X, Heart, Shield, Loader2 } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
+import api from '../../../services/api';
 import './AdminAlertsV2.css';
 
-const initialAlerts = [
-  { id: 1, type: 'critical', title: 'Heart Rate Spike', desc: 'Arthur Jenkins recorded 102 bpm heart rate. Refused meal.', time: '5m ago', resident: 'Arthur Jenkins' },
-  { id: 2, type: 'warning', title: 'Hypertension Warning', desc: 'Clara Oswald blood pressure recorded 158/92 (irregular high).', time: '18m ago', resident: 'Clara Oswald' },
-  { id: 3, type: 'critical', title: 'Missing Vitals Log', desc: 'No morning vitals submitted for Robert Sterling by 11:00 AM.', time: '1h ago', resident: 'Robert Sterling' },
-  { id: 4, type: 'info', title: 'Weekly Report Ready', desc: 'System generated analytics health summary reports.', time: '3h ago', resident: 'All Elders' }
-];
+const formatTime = (iso) => {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMs = now - d;
+  const diffM = Math.floor(diffMs / 60000);
+  const diffH = Math.floor(diffMs / 3600000);
+  const diffD = Math.floor(diffMs / 86400000);
+  if (diffM < 1)  return 'Just now';
+  if (diffM < 60) return `${diffM}m ago`;
+  if (diffH < 24) return `${diffH}h ago`;
+  if (diffD === 1) return 'Yesterday';
+  if (diffD < 7)  return `${diffD}d ago`;
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+};
 
 const AdminAlertsV2 = () => {
-  const [alerts, setAlerts] = useState(initialAlerts);
+  const [alerts, setAlerts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [resolvedIds, setResolvedIds] = useState([]);
   const [category, setCategory] = useState('all');
 
-  const handleResolve = (id) => {
+  const fetchAlerts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data } = await api.get('/admin/alerts');
+      // Map data to match V2 format
+      setAlerts(data.map(a => ({
+        id: a.id,
+        type: (a.type || 'info').toLowerCase(),
+        title: a.title || 'Health Alert',
+        desc: a.description || 'No description provided.',
+        time: formatTime(a.created_at),
+        resident: a.elder_name || a.parent_name || 'System',
+        is_resolved: a.is_resolved
+      })).filter(a => !a.is_resolved)); // Only show unresolved in this V2 feed
+    } catch (err) {
+      console.error('Failed to load alerts', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAlerts();
+  }, [fetchAlerts]);
+
+  const handleResolve = async (id) => {
     setResolvedIds([...resolvedIds, id]);
-    setTimeout(() => {
-      setAlerts(prev => prev.filter(a => a.id !== id));
+    try {
+      await api.put(`/admin/alerts/${id}/resolve`);
+      setTimeout(() => {
+        setAlerts(prev => prev.filter(a => a.id !== id));
+        setResolvedIds(prev => prev.filter(x => x !== id));
+      }, 800);
+    } catch (err) {
+      alert('Failed to resolve alert.');
       setResolvedIds(prev => prev.filter(x => x !== id));
-    }, 800);
+    }
   };
 
   const filteredAlerts = alerts.filter(a => {
@@ -64,7 +106,11 @@ const AdminAlertsV2 = () => {
 
         {/* Alerts List */}
         <div className="alerts-v2-feed">
-          {filteredAlerts.length === 0 ? (
+          {loading ? (
+             <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem 0', width: '100%' }}>
+               <Loader2 className="animate-spin" size={32} color="#00A896" />
+             </div>
+          ) : filteredAlerts.length === 0 ? (
             <div className="alerts-v2-empty">
               <CheckCircle size={48} color="#00A896" />
               <h3>All Alerts Resolved</h3>
