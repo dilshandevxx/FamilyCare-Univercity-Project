@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
-import { Search, UserPlus, Trash2, Shield, ToggleLeft, ToggleRight, X, Mail, ShieldCheck, Users } from 'lucide-react';
+import { Search, UserPlus, Trash2, ToggleLeft, ToggleRight, X, Mail, ShieldCheck, Users, CheckCircle, XCircle, Clock, FileText, AlertCircle } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
 import './UserManagementV2.css';
 
 const initialUsers = [
+  // Pending users
+  { id: 101, name: 'Emily Vance', email: 'emily.v@email.com', role: 'child', status: 'pending', joined: 'Just now', 
+    associatedElder: 'Eleanor Vance', relationship: 'Granddaughter', phone: '+1 555-0128', backgroundCheck: 'N/A', certifications: 'None', notes: 'Would like access to grandmother\'s health updates.' },
+  { id: 102, name: 'Marcus Johnson', email: 'marcus.j@care.com', role: 'caregiver', status: 'pending', joined: '2 hours ago', 
+    associatedElder: 'Any Available', relationship: 'Professional', phone: '+1 555-0193', backgroundCheck: 'Cleared', certifications: 'CNA, CPR Certified', notes: 'Available for night shifts.' },
+  
+  // Existing users
   { id: 1, name: 'Clara Oswald', email: 'clara@care.com', role: 'caregiver', status: 'active', joined: 'Jan 10, 2026' },
   { id: 2, name: 'Rithwik Sen', email: 'rithwik@familycare.com', role: 'admin', status: 'active', joined: 'Dec 15, 2025' },
   { id: 3, name: 'Alice Smith', email: 'alice@family.com', role: 'child', status: 'active', joined: 'Mar 02, 2026' },
@@ -16,11 +23,22 @@ const UserManagementV2 = () => {
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [showAddModal, setShowAddModal] = useState(false);
+  const [reviewUser, setReviewUser] = useState(null);
 
   // Form states
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newRole, setNewRole] = useState('child');
+
+  const pendingUsers = users.filter(u => u.status === 'pending');
+  const activeOrSuspendedUsers = users.filter(u => u.status !== 'pending');
+
+  const filteredUsers = activeOrSuspendedUsers.filter(u => {
+    const matchesSearch = u.name.toLowerCase().includes(search.toLowerCase()) || 
+                          u.email.toLowerCase().includes(search.toLowerCase());
+    const matchesRole = roleFilter === 'all' || u.role === roleFilter;
+    return matchesSearch && matchesRole;
+  });
 
   const handleDelete = (id) => {
     setUsers(users.filter(u => u.id !== id));
@@ -33,6 +51,16 @@ const UserManagementV2 = () => {
       }
       return u;
     }));
+  };
+
+  const handleApprove = (id) => {
+    setUsers(users.map(u => u.id === id ? { ...u, status: 'active', joined: 'Today' } : u));
+    setReviewUser(null);
+  };
+
+  const handleReject = (id) => {
+    setUsers(users.filter(u => u.id !== id));
+    setReviewUser(null);
   };
 
   const handleAddUser = (e) => {
@@ -55,18 +83,52 @@ const UserManagementV2 = () => {
     setShowAddModal(false);
   };
 
-  const filteredUsers = users.filter(u => {
-    const matchesSearch = u.name.toLowerCase().includes(search.toLowerCase()) || 
-                          u.email.toLowerCase().includes(search.toLowerCase());
-    const matchesRole = roleFilter === 'all' || u.role === roleFilter;
-    return matchesSearch && matchesRole;
-  });
-
   return (
     <AdminLayoutV2 title="User Management">
       <div className="user-v2-container">
         
-        {/* Filter and Search Bar */}
+        {/* Pending Approvals Section */}
+        {pendingUsers.length > 0 && (
+          <div className="user-v2-pending-section">
+            <div className="section-header">
+              <AlertCircle size={20} color="#EA580C" />
+              <h3>Action Required: Pending Approvals ({pendingUsers.length})</h3>
+            </div>
+            
+            <div className="pending-grid">
+              {pendingUsers.map(u => (
+                <div key={u.id} className="pending-card">
+                  <div className="pending-card-glow"></div>
+                  <div className="pending-header">
+                    <div className="pending-avatar">
+                      {u.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <h4>{u.name}</h4>
+                      <p className="pending-role">Requested Role: <span className={`role-text role-${u.role}`}>{u.role}</span></p>
+                    </div>
+                  </div>
+                  
+                  <div className="pending-quick-info">
+                    <div className="info-row">
+                      <Clock size={14} /> <span>Applied: {u.joined}</span>
+                    </div>
+                    <div className="info-row">
+                      <Mail size={14} /> <span>{u.email}</span>
+                    </div>
+                  </div>
+
+                  <button className="review-btn" onClick={() => setReviewUser(u)}>
+                    <FileText size={16} />
+                    Review Application
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Filter and Search Bar for Active Users */}
         <div className="user-v2-header-actions">
           <div className="user-v2-search-group">
             <div className="user-v2-search-input">
@@ -96,7 +158,7 @@ const UserManagementV2 = () => {
           </button>
         </div>
 
-        {/* Users Table */}
+        {/* Active/Suspended Users Table */}
         <div className="user-v2-table-wrapper">
           <table className="user-v2-table">
             <thead>
@@ -148,17 +210,19 @@ const UserManagementV2 = () => {
                     <td>{u.joined}</td>
                     <td>
                       <div className="user-v2-actions-cell">
-                        <button 
-                          className="action-btn toggle-btn" 
-                          onClick={() => toggleStatus(u.id)}
-                          title={u.status === 'active' ? 'Suspend Account' : 'Activate Account'}
-                        >
-                          {u.status === 'active' ? (
-                            <ToggleRight size={22} color="#00A896" />
-                          ) : (
-                            <ToggleLeft size={22} color="#94A3B8" />
-                          )}
-                        </button>
+                        {u.status !== 'pending' && (
+                          <button 
+                            className="action-btn toggle-btn" 
+                            onClick={() => toggleStatus(u.id)}
+                            title={u.status === 'active' ? 'Suspend Account' : 'Activate Account'}
+                          >
+                            {u.status === 'active' ? (
+                              <ToggleRight size={22} color="#00A896" />
+                            ) : (
+                              <ToggleLeft size={22} color="#94A3B8" />
+                            )}
+                          </button>
+                        )}
                         <button 
                           className="action-btn delete-btn" 
                           onClick={() => handleDelete(u.id)}
@@ -174,6 +238,77 @@ const UserManagementV2 = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Application Review Modal */}
+        {reviewUser && (
+          <div className="user-v2-modal-overlay" onClick={() => setReviewUser(null)}>
+            <div className="user-v2-modal review-modal" onClick={e => e.stopPropagation()}>
+              <button className="user-v2-modal-close" onClick={() => setReviewUser(null)}>
+                <X size={20} />
+              </button>
+
+              <div className="user-v2-modal-header review-header">
+                <div className="user-v2-modal-icon review-icon">
+                  <UserPlus size={28} color="white" />
+                </div>
+                <div>
+                  <h2 className="user-v2-modal-title">Review Application</h2>
+                  <p className="user-v2-modal-desc">Submitted by {reviewUser.name} on {reviewUser.joined}</p>
+                </div>
+              </div>
+
+              <div className="user-v2-modal-body">
+                <div className="review-grid">
+                  <div className="review-box">
+                    <span className="label">Requested Role</span>
+                    <span className={`value role-text role-${reviewUser.role}`}>{reviewUser.role.toUpperCase()}</span>
+                  </div>
+                  <div className="review-box">
+                    <span className="label">Email Address</span>
+                    <span className="value">{reviewUser.email}</span>
+                  </div>
+                  <div className="review-box">
+                    <span className="label">Phone Number</span>
+                    <span className="value">{reviewUser.phone}</span>
+                  </div>
+                  <div className="review-box">
+                    <span className="label">Background Check</span>
+                    <span className={`value ${reviewUser.backgroundCheck === 'Cleared' ? 'text-teal' : 'text-warning'}`}>{reviewUser.backgroundCheck}</span>
+                  </div>
+                </div>
+
+                <div className="review-details-list">
+                  <div className="review-item">
+                    <span className="label">Associated Elder:</span>
+                    <span className="value">{reviewUser.associatedElder}</span>
+                  </div>
+                  <div className="review-item">
+                    <span className="label">Relationship:</span>
+                    <span className="value">{reviewUser.relationship}</span>
+                  </div>
+                  <div className="review-item">
+                    <span className="label">Certifications:</span>
+                    <span className="value">{reviewUser.certifications}</span>
+                  </div>
+                </div>
+
+                <div className="applicant-notes-box">
+                  <h5>Applicant Notes</h5>
+                  <p>{reviewUser.notes}</p>
+                </div>
+              </div>
+
+              <div className="review-modal-actions">
+                <button className="reject-btn" onClick={() => handleReject(reviewUser.id)}>
+                  <XCircle size={18} /> Reject
+                </button>
+                <button className="approve-btn" onClick={() => handleApprove(reviewUser.id)}>
+                  <CheckCircle size={18} /> Approve Account
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Add User Modal */}
         {showAddModal && (
@@ -194,50 +329,52 @@ const UserManagementV2 = () => {
                   </div>
                 </div>
 
-                <div className="user-v2-form-group">
-                  <label>Full Name</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g. John Doe"
-                    value={newName}
-                    onChange={e => setNewName(e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="user-v2-form-group">
-                  <label>Email Address</label>
-                  <div className="input-with-icon">
-                    <Mail size={16} className="input-icon" />
+                <div className="user-v2-modal-body">
+                  <div className="user-v2-form-group">
+                    <label>Full Name</label>
                     <input 
-                      type="email" 
-                      placeholder="e.g. john@example.com"
-                      value={newEmail}
-                      onChange={e => setNewEmail(e.target.value)}
+                      type="text" 
+                      placeholder="e.g. John Doe"
+                      value={newName}
+                      onChange={e => setNewName(e.target.value)}
                       required
                     />
                   </div>
-                </div>
 
-                <div className="user-v2-form-group">
-                  <label>Account Role</label>
-                  <select 
-                    value={newRole}
-                    onChange={e => setNewRole(e.target.value)}
-                  >
-                    <option value="child">Family Member (Child)</option>
-                    <option value="caregiver">Professional Caregiver</option>
-                    <option value="admin">System Administrator</option>
-                  </select>
-                </div>
+                  <div className="user-v2-form-group">
+                    <label>Email Address</label>
+                    <div className="input-with-icon">
+                      <Mail size={16} className="input-icon" />
+                      <input 
+                        type="email" 
+                        placeholder="e.g. john@example.com"
+                        value={newEmail}
+                        onChange={e => setNewEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
 
-                <div className="user-v2-modal-actions">
-                  <button type="button" className="user-v2-modal-cancel" onClick={() => setShowAddModal(false)}>
-                    Cancel
-                  </button>
-                  <button type="submit" className="user-v2-modal-submit">
-                    Create User
-                  </button>
+                  <div className="user-v2-form-group">
+                    <label>Account Role</label>
+                    <select 
+                      value={newRole}
+                      onChange={e => setNewRole(e.target.value)}
+                    >
+                      <option value="child">Family Member (Child)</option>
+                      <option value="caregiver">Professional Caregiver</option>
+                      <option value="admin">System Administrator</option>
+                    </select>
+                  </div>
+
+                  <div className="user-v2-modal-actions">
+                    <button type="button" className="user-v2-modal-cancel" onClick={() => setShowAddModal(false)}>
+                      Cancel
+                    </button>
+                    <button type="submit" className="user-v2-modal-submit">
+                      Create User
+                    </button>
+                  </div>
                 </div>
               </form>
             </div>

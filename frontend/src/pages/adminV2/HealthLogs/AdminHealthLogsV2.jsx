@@ -4,10 +4,10 @@ import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
 import './AdminHealthLogsV2.css';
 
 const initialHealthLogs = [
-  { id: 1, parentName: 'Eleanor Vance', bp: '135/88', hr: 78, temp: 98.6, meal: 'Full Breakfast', notes: 'Normal morning reading. Patient rested and took hypertension medication.', caregiver: 'Ravi Kumar', date: 'Today, 09:30 AM', mood: 'Cheerful', condition: 'stable' },
-  { id: 2, parentName: 'Robert Sterling', bp: '120/80', hr: 72, temp: 98.4, meal: 'Partial Lunch', notes: 'Took post-stroke recovery medication as scheduled. Patient walked 15 mins.', caregiver: 'Ravi Kumar', date: 'Today, 01:15 PM', mood: 'Calm', condition: 'stable' },
-  { id: 3, parentName: 'Clara Oswald', bp: '158/92', hr: 88, temp: 99.2, meal: 'Full Lunch', notes: 'Blood pressure is slightly elevated. Advised bed rest and monitored glucose level.', caregiver: 'Clara Oswald', date: 'Yesterday, 02:40 PM', mood: 'Tired', condition: 'needs-attention' },
-  { id: 4, parentName: 'Arthur Jenkins', bp: '145/95', hr: 102, temp: 99.5, meal: 'Refused Meal', notes: 'Heart rate is high. Patient refused afternoon meal. Heavy breathing noted.', caregiver: 'Unassigned', date: 'Yesterday, 04:00 PM', mood: 'Agitated', condition: 'critical' }
+  { id: 1, parentName: 'Eleanor Vance', bp: '135/88', hr: 78, temp: 98.6, spo2: 98, bloodSugar: 105, hydration: '1.5L', sleep: '7 hrs (Good)', weight: '142 lbs', meds: 'Taken on time', meal: 'Full Breakfast', notes: 'Normal morning reading. Patient rested and took hypertension medication.', caregiver: 'Ravi Kumar', date: 'Today, 09:30 AM', mood: 'Cheerful', condition: 'stable' },
+  { id: 2, parentName: 'Robert Sterling', bp: '120/80', hr: 72, temp: 98.4, spo2: 97, bloodSugar: 98, hydration: '1.2L', sleep: '6.5 hrs (Fair)', weight: '168 lbs', meds: 'Taken on time', meal: 'Partial Lunch', notes: 'Took post-stroke recovery medication as scheduled. Patient walked 15 mins.', caregiver: 'Ravi Kumar', date: 'Today, 01:15 PM', mood: 'Calm', condition: 'stable' },
+  { id: 3, parentName: 'Clara Oswald', bp: '158/92', hr: 88, temp: 99.2, spo2: 95, bloodSugar: 142, hydration: '0.8L', sleep: '5 hrs (Poor)', weight: '135 lbs', meds: 'Delayed', meal: 'Full Lunch', notes: 'Blood pressure is slightly elevated. Advised bed rest and monitored glucose level.', caregiver: 'Clara Oswald', date: 'Yesterday, 02:40 PM', mood: 'Tired', condition: 'needs-attention' },
+  { id: 4, parentName: 'Arthur Jenkins', bp: '145/95', hr: 102, temp: 99.5, spo2: 92, bloodSugar: 110, hydration: '0.5L', sleep: '4 hrs (Restless)', weight: '155 lbs', meds: 'Refused', meal: 'Refused Meal', notes: 'Heart rate is high. Patient refused afternoon meal. Heavy breathing noted.', caregiver: 'Unassigned', date: 'Yesterday, 04:00 PM', mood: 'Agitated', condition: 'critical' }
 ];
 
 const AdminHealthLogsV2 = () => {
@@ -142,7 +142,7 @@ const AdminHealthLogsV2 = () => {
               <div className="health-v2-modal-body">
                 <div className="v2-vitals-grid">
                   <div className="vital-box">
-                    <span className="label">Blood Pressure</span>
+                    <span className="label">BP</span>
                     <span className="value">{selectedLog.bp}</span>
                   </div>
                   <div className="vital-box">
@@ -153,21 +153,52 @@ const AdminHealthLogsV2 = () => {
                     <span className="label">Temperature</span>
                     <span className="value">{selectedLog.temp} °F</span>
                   </div>
+                  <div className="vital-box">
+                    <span className="label">SpO2</span>
+                    <span className="value">{selectedLog.spo2}%</span>
+                  </div>
+                  <div className="vital-box">
+                    <span className="label">Blood Sugar</span>
+                    <span className="value">{selectedLog.bloodSugar}</span>
+                  </div>
+                  <div className="vital-box">
+                    <span className="label">Weight</span>
+                    <span className="value">{selectedLog.weight}</span>
+                  </div>
                 </div>
 
-                <div className="chart-stat">
-                  <span className="label">Condition Severity</span>
-                  <span className={`value-pill status-${selectedLog.condition}`}>{selectedLog.condition.toUpperCase().replace('-', ' ')}</span>
-                </div>
-                
-                <div className="chart-stat">
-                  <span className="label">Meal Consumption</span>
-                  <span className="value">{selectedLog.meal}</span>
-                </div>
-                
-                <div className="chart-stat">
-                  <span className="label">Mood/Behavior</span>
-                  <span className="value">{selectedLog.mood}</span>
+                <div className="health-v2-tracking-grid">
+                  <div className="chart-stat">
+                    <span className="label">Condition Severity</span>
+                    <span className={`value-pill status-${selectedLog.condition}`}>{selectedLog.condition.toUpperCase().replace('-', ' ')}</span>
+                  </div>
+                  
+                  <div className="chart-stat">
+                    <span className="label">Medication Status</span>
+                    <span className={`value ${selectedLog.meds === 'Taken on time' ? 'text-teal' : selectedLog.meds === 'Refused' ? 'text-coral' : 'text-warning'}`}>
+                      {selectedLog.meds}
+                    </span>
+                  </div>
+
+                  <div className="chart-stat">
+                    <span className="label">Hydration Intake</span>
+                    <span className="value">{selectedLog.hydration}</span>
+                  </div>
+
+                  <div className="chart-stat">
+                    <span className="label">Sleep Quality</span>
+                    <span className="value">{selectedLog.sleep}</span>
+                  </div>
+                  
+                  <div className="chart-stat">
+                    <span className="label">Meal Consumption</span>
+                    <span className="value">{selectedLog.meal}</span>
+                  </div>
+                  
+                  <div className="chart-stat">
+                    <span className="label">Mood/Behavior</span>
+                    <span className="value">{selectedLog.mood}</span>
+                  </div>
                 </div>
 
                 <div className="clinical-notes-box">

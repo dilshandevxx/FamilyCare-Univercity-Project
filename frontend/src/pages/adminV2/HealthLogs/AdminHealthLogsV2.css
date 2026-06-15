@@ -472,6 +472,15 @@
 
 .vital-box:nth-child(2) .value { color: #EF4444; }
 .vital-box:nth-child(3) .value { color: #EA580C; }
+.vital-box:nth-child(4) .value { color: #3B82F6; } /* SpO2 */
+.vital-box:nth-child(5) .value { color: #8B5CF6; } /* Blood Sugar */
+.vital-box:nth-child(6) .value { color: #475569; } /* Weight */
+
+.health-v2-tracking-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
 
 /* Modals Chart layout */
 .chart-stat {
@@ -496,6 +505,21 @@
   color: var(--text-dark);
   font-weight: 600;
   font-size: 0.95rem;
+}
+
+.chart-stat .text-coral {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.chart-stat .text-teal {
+  color: var(--primary-teal);
+  font-weight: 700;
+}
+
+.chart-stat .text-warning {
+  color: var(--warning);
+  font-weight: 700;
 }
 
 .value-pill {
