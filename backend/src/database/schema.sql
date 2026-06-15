@@ -57,6 +57,8 @@ CREATE TABLE IF NOT EXISTS parents (
   medical_conditions      TEXT,
   allergies               TEXT,
   current_medications     TEXT,
+  room_number             VARCHAR(50),
+  care_status             VARCHAR(50) DEFAULT 'STABLE',
   assigned_caregiver_id   INT,
   created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (child_id) REFERENCES users(id) ON DELETE CASCADE,
