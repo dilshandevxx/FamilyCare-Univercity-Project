@@ -157,7 +157,7 @@ const CaregiverSettings = () => {
 
   const [profile, setProfile] = useState({
     name: '', email: '', phone: '',
-    experience_years: '', bio: '', certification: '', license_id: '',
+    experience_years: '', bio: '', certification: '', license_id: '', hourly_rate: '',
   });
 
   const [availability, setAvailability] = useState({
@@ -204,6 +204,7 @@ const CaregiverSettings = () => {
           bio:              data.bio              || '',
           certification:    data.certification    || '',
           license_id:       data.license_id       || '',
+          hourly_rate:      data.hourly_rate != null ? String(data.hourly_rate) : '',
         });
         setAvailability({
           is_available:            !!data.is_available,
@@ -535,14 +536,25 @@ const CaregiverSettings = () => {
                     <InputField label="LICENSE / ID (optional)" value={profile.license_id} onChange={pf('license_id')} placeholder="e.g. CNA-123456" />
                   </div>
 
-                  <div className="mobile-only full-width">
+                  <div className="desktop-only">
                     <div className="settings-input-group">
-                      <label>BIO</label>
-                      <textarea value={profile.bio} onChange={pf('bio')} placeholder="Tell families about yourself..." />
+                      <label>HOURLY RATE ($ / hr)</label>
+                      <div style={{ position: 'relative' }}>
+                        <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#718096', fontWeight: '600', fontSize: '0.95rem' }}>$</span>
+                        <input
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value={profile.hourly_rate}
+                          onChange={pf('hourly_rate')}
+                          placeholder="e.g. 25"
+                          style={{ paddingLeft: '1.8rem' }}
+                        />
+                      </div>
                     </div>
                   </div>
 
-                  <div className="desktop-only full-width">
+                  <div className="full-width">
                     <div className="settings-input-group">
                       <label>BIO</label>
                       <textarea value={profile.bio} onChange={pf('bio')} placeholder="Tell families about yourself..." rows={3} />
