@@ -56,13 +56,13 @@ const Footer = () => {
   ];
   const company = [
     { label: 'About Us', action: () => navigate('/about') },
-    { label: 'Careers',  action: () => soon('Careers') },
-    { label: 'Blog',     action: () => soon('Blog') },
+    { label: 'Careers',  action: () => navigate('/careers') },
+    { label: 'Blog',     action: () => navigate('/blog') },
   ];
   const support = [
-    { label: 'Help Center',    action: () => soon('Help Center') },
-    { label: 'Tours & Safety', action: () => soon('Tours & Safety') },
-    { label: 'Privacy Policy', action: () => soon('Privacy Policy') },
+    { label: 'Help Center',    action: () => navigate('/help-center') },
+    { label: 'Tours & Safety', action: () => navigate('/tours-and-safety') },
+    { label: 'Privacy Policy', action: () => navigate('/privacy-policy') },
   ];
 
   return (
