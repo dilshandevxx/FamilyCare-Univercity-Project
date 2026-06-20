@@ -15,7 +15,7 @@ const About = () => {
     <div style={{ fontFamily: '"Inter", sans-serif', color: '#333', background: '#FAFAFA' }}>
       {/* HERO SECTION */}
       <section style={{ padding: '120px 5% 80px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '40px', background: '#F8FBFB' }}>
-        <div style={{ flex: '1 1 400px' }}>
+        <div className="ab-hero-text" style={{ flex: '1 1 400px' }}>
           <span style={{ 
             display: 'inline-block', background: '#E6F7F5', color: '#00A896', 
             padding: '6px 12px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', 
@@ -33,7 +33,7 @@ const About = () => {
             healthy, connected life.
           </p>
         </div>
-        <div style={{ flex: '1 1 400px', position: 'relative' }}>
+        <div className="ab-hero-img" style={{ flex: '1 1 400px', position: 'relative' }}>
           <img src={elderlyWomanImg} alt="Elderly woman with tablet" style={{ width: '100%', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }} />
           
           <div style={{ 
@@ -54,7 +54,7 @@ const About = () => {
 
       {/* MISSION & VISION */}
       <section style={{ padding: '0 5%', marginTop: '-40px', position: 'relative', zIndex: 10, display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
-        <div style={{ flex: '1 1 300px', background: 'white', padding: '40px', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div className="ab-mission" style={{ flex: '1 1 300px', background: 'white', padding: '40px', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', fontWeight: 'bold', fontSize: '1.2rem' }}>
               <Shield color="#00A896" size={24} />
@@ -69,7 +69,7 @@ const About = () => {
           </div>
         </div>
 
-        <div style={{ flex: '1 1 400px', background: '#0A5C48', padding: '40px', borderRadius: '24px', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div className="ab-vision" style={{ flex: '1 1 400px', background: '#0A5C48', padding: '40px', borderRadius: '24px', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', fontWeight: 'bold', fontSize: '1.2rem', color: '#E6F7F5' }}>
               <Activity size={24} />
@@ -100,7 +100,7 @@ const About = () => {
       {/* CHALLENGE & SOLUTION */}
       <section style={{ padding: '100px 5%', display: 'flex', flexWrap: 'wrap', gap: '60px' }}>
         {/* Left side */}
-        <div style={{ flex: '1 1 400px' }}>
+        <div className="ab-challenge" style={{ flex: '1 1 400px' }}>
           <span style={{ color: '#D97706', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '1px' }}>THE CHALLENGE</span>
           <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginTop: '10px', marginBottom: '20px', lineHeight: '1.2', color: '#111' }}>
             The invisible weight of<br />distance.
@@ -131,7 +131,7 @@ const About = () => {
         </div>
 
         {/* Right side */}
-        <div style={{ flex: '1 1 400px', background: '#F8FBFB', padding: '40px', borderRadius: '24px' }}>
+        <div className="ab-solution" style={{ flex: '1 1 400px', background: '#F8FBFB', padding: '40px', borderRadius: '24px' }}>
           <span style={{ color: '#00A896', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '1px' }}>THE SOLUTION</span>
           <h2 style={{ fontSize: '2rem', fontWeight: '800', marginTop: '10px', marginBottom: '16px', color: '#111' }}>
             Real-time presence.
@@ -161,7 +161,7 @@ const About = () => {
       </section>
 
       {/* TEAM SECTION */}
-      <section style={{ padding: '60px 5% 100px', textAlign: 'center' }}>
+      <section className="ab-team-header" style={{ padding: '60px 5% 100px', textAlign: 'center' }}>
         <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '16px', color: '#111' }}>
           The Heart of our Sanctuary
         </h2>
@@ -175,7 +175,7 @@ const About = () => {
             { img: marcusThorneImg, name: 'Dr. Marcus Thorne', role: 'Medical Director', desc: 'Ensuring that our platform meets the highest standards of clinical excellence.' },
             { img: elenaRodriguezImg, name: 'Elena Rodriguez', role: 'Head of Care', desc: 'Passionate about crafting an experience that feels personal and supportive.' }
           ].map((member, i) => (
-            <div key={i} style={{ flex: '1 1 250px', maxWidth: '300px', textAlign: 'left' }}>
+            <div key={i} className="ab-team-card" style={{ flex: '1 1 250px', maxWidth: '300px', textAlign: 'left' }}>
               <img src={member.img} alt={member.name} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: '24px', marginBottom: '20px' }} />
               <h4 style={{ fontWeight: 'bold', fontSize: '1.2rem', marginBottom: '4px' }}>{member.name}</h4>
               <div style={{ color: '#00A896', fontSize: '0.9rem', fontWeight: '600', marginBottom: '12px' }}>{member.role}</div>
@@ -187,7 +187,7 @@ const About = () => {
 
       {/* CTA SECTION */}
       <section style={{ padding: '0 5% 100px' }}>
-        <div style={{ 
+        <div className="ab-cta" style={{ 
           background: '#1A1A1A', borderRadius: '32px', padding: '60px 40px', 
           textAlign: 'center', color: 'white', position: 'relative', overflow: 'hidden' 
         }}>
@@ -221,6 +221,29 @@ const About = () => {
           </div>
         </div>
       </section>
+
+      <style>{`
+        @keyframes abFadeUp {
+          from { opacity: 0; transform: translateY(30px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes abFloat {
+          0%, 100% { transform: translateY(0px); }
+          50%       { transform: translateY(-12px); }
+        }
+        .ab-hero-text { animation: abFadeUp 0.8s ease-out both; }
+        .ab-hero-img { animation: abFadeUp 0.8s 0.2s ease-out both, abFloat 6s ease-in-out infinite; }
+        .ab-mission { animation: abFadeUp 0.8s 0.3s ease-out both; }
+        .ab-vision { animation: abFadeUp 0.8s 0.4s ease-out both; }
+        .ab-challenge { animation: abFadeUp 0.8s 0.2s ease-out both; }
+        .ab-solution { animation: abFadeUp 0.8s 0.3s ease-out both; }
+        .ab-team-header { animation: abFadeUp 0.8s ease-out both; }
+        .ab-team-card { animation: abFadeUp 0.8s ease-out both; }
+        .ab-team-card:nth-child(1) { animation-delay: 0.2s; }
+        .ab-team-card:nth-child(2) { animation-delay: 0.3s; }
+        .ab-team-card:nth-child(3) { animation-delay: 0.4s; }
+        .ab-cta { animation: abFadeUp 0.8s ease-out both; }
+      `}</style>
 
       <Footer />
     </div>
