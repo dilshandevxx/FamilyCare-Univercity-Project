@@ -83,7 +83,7 @@ const getCaregiverSettings = async (req, res) => {
     if (userRows.length === 0) return res.status(404).json({ error: 'User not found' });
 
     const [cgRows] = await pool.query(
-      `SELECT experience_years, bio, certification, license_id, is_available,
+      `SELECT experience_years, bio, certification, license_id, hourly_rate, is_available,
               notif_messages, notif_health, notif_visits,
               schedule_weekday_start, schedule_weekday_end, schedule_weekday_active,
               schedule_sat_start, schedule_sat_end, schedule_sat_active, schedule_sun_active
@@ -92,7 +92,7 @@ const getCaregiverSettings = async (req, res) => {
     );
 
     const cg = cgRows[0] || {
-      experience_years: '', bio: '', certification: '', license_id: '',
+      experience_years: '', bio: '', certification: '', license_id: '', hourly_rate: '',
       is_available: true,
       notif_messages: true, notif_health: true, notif_visits: false,
       schedule_weekday_start: '08:00', schedule_weekday_end: '17:30', schedule_weekday_active: true,
@@ -108,22 +108,23 @@ const getCaregiverSettings = async (req, res) => {
 
 // PUT /api/users/caregiver-settings/profile
 const updateCaregiverProfile = async (req, res) => {
-  const { name, email, phone, experience_years, bio, certification, license_id } = req.body;
+  const { name, email, phone, experience_years, bio, certification, license_id, hourly_rate } = req.body;
   try {
     await pool.query(
       'UPDATE users SET name = ?, email = ?, phone = ? WHERE id = ?',
       [name, email, phone || null, req.user.id]
     );
     await pool.query(
-      `INSERT INTO caregivers (user_id, name, experience_years, bio, certification, license_id)
-       VALUES (?, ?, ?, ?, ?, ?)
+      `INSERT INTO caregivers (user_id, name, experience_years, bio, certification, license_id, hourly_rate)
+       VALUES (?, ?, ?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE
          name             = VALUES(name),
          experience_years = VALUES(experience_years),
          bio              = VALUES(bio),
          certification    = VALUES(certification),
-         license_id       = VALUES(license_id)`,
-      [req.user.id, name, experience_years || null, bio || null, certification || null, license_id || null]
+         license_id       = VALUES(license_id),
+         hourly_rate      = VALUES(hourly_rate)`,
+      [req.user.id, name, experience_years || null, bio || null, certification || null, license_id || null, hourly_rate || 0]
     );
     res.json({ message: 'Profile updated successfully' });
   } catch (err) {

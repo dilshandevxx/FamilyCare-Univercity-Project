@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Shield, MapPin, Activity, CheckCircle2, Plus, Star } from 'lucide-react';
+import { Shield, MapPin, Activity, CheckCircle2, Plus, Star, Heart } from 'lucide-react';
 import Footer from '../../../components/Landing/Footer';
+import './About.css';
 
-// Importing images
-import elderlyWomanImg from '../../../assets/about/elderly_woman_tablet.png';
-import nurseHandsImg from '../../../assets/about/nurse_holding_hands.png';
-import sarahChenImg from '../../../assets/about/sarah_chen.png';
-import marcusThorneImg from '../../../assets/about/marcus_thorne.png';
+import elderlyWomanImg   from '../../../assets/about/elderly_woman_tablet.png';
+import nurseHandsImg     from '../../../assets/about/nurse_holding_hands.png';
+import sarahChenImg      from '../../../assets/about/sarah_chen.png';
+import marcusThorneImg   from '../../../assets/about/marcus_thorne.png';
 import elenaRodriguezImg from '../../../assets/about/elena_rodriguez.png';
 
 const About = () => {
@@ -15,7 +15,7 @@ const About = () => {
     <div style={{ fontFamily: '"Inter", sans-serif', color: '#333', background: '#FAFAFA' }}>
       {/* HERO SECTION */}
       <section style={{ padding: '120px 5% 80px', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '40px', background: '#F8FBFB' }}>
-        <div className="ab-hero-text" style={{ flex: '1 1 400px' }}>
+        <div style={{ flex: '1 1 400px' }}>
           <span style={{ 
             display: 'inline-block', background: '#E6F7F5', color: '#00A896', 
             padding: '6px 12px', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 'bold', 
@@ -33,7 +33,7 @@ const About = () => {
             healthy, connected life.
           </p>
         </div>
-        <div className="ab-hero-img" style={{ flex: '1 1 400px', position: 'relative' }}>
+        <div style={{ flex: '1 1 400px', position: 'relative' }}>
           <img src={elderlyWomanImg} alt="Elderly woman with tablet" style={{ width: '100%', borderRadius: '24px', boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }} />
           
           <div style={{ 
@@ -54,7 +54,7 @@ const About = () => {
 
       {/* MISSION & VISION */}
       <section style={{ padding: '0 5%', marginTop: '-40px', position: 'relative', zIndex: 10, display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
-        <div className="ab-mission" style={{ flex: '1 1 300px', background: 'white', padding: '40px', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div style={{ flex: '1 1 300px', background: 'white', padding: '40px', borderRadius: '24px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', fontWeight: 'bold', fontSize: '1.2rem' }}>
               <Shield color="#00A896" size={24} />
@@ -69,7 +69,7 @@ const About = () => {
           </div>
         </div>
 
-        <div className="ab-vision" style={{ flex: '1 1 400px', background: '#0A5C48', padding: '40px', borderRadius: '24px', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div style={{ flex: '1 1 400px', background: '#0A5C48', padding: '40px', borderRadius: '24px', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', fontWeight: 'bold', fontSize: '1.2rem', color: '#E6F7F5' }}>
               <Activity size={24} />
@@ -100,7 +100,7 @@ const About = () => {
       {/* CHALLENGE & SOLUTION */}
       <section style={{ padding: '100px 5%', display: 'flex', flexWrap: 'wrap', gap: '60px' }}>
         {/* Left side */}
-        <div className="ab-challenge" style={{ flex: '1 1 400px' }}>
+        <div style={{ flex: '1 1 400px' }}>
           <span style={{ color: '#D97706', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '1px' }}>THE CHALLENGE</span>
           <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginTop: '10px', marginBottom: '20px', lineHeight: '1.2', color: '#111' }}>
             The invisible weight of<br />distance.
@@ -112,26 +112,28 @@ const About = () => {
           <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
             <div style={{ color: '#666' }}><MapPin size={24} /></div>
             <div>
-              <h4 style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '1.1rem' }}>Geographical distance</h4>
-              <p style={{ color: '#666', fontSize: '0.95rem', lineHeight: '1.5' }}>
-                And lack of opportunities to check in all features fully and keep passively connected to loved ones.
+              <p className="about-point-title">Geographical Distance</p>
+              <p className="about-point-desc">
+                Limited visibility into daily routines makes it nearly impossible
+                to stay passively connected to a loved ones well-being.
               </p>
             </div>
           </div>
-
-          <div style={{ display: 'flex', gap: '20px' }}>
-            <div style={{ color: '#666' }}><CheckCircle2 size={24} /></div>
+          <div className="about-challenge-point">
+            <div className="about-point-icon"><CheckCircle2 size={22} /></div>
             <div>
-              <h4 style={{ fontWeight: 'bold', marginBottom: '8px', fontSize: '1.1rem' }}>Complex choices</h4>
-              <p style={{ color: '#666', fontSize: '0.95rem', lineHeight: '1.5' }}>
-                Choosing kind of elderly homecare options is hard and very stressful to make the right choice.
+              <p className="about-point-title">Complex Choices</p>
+              <p className="about-point-desc">
+                Navigating elderly homecare options is stressful. Families deserve
+                clear guidance to make the right decision with confidence.
               </p>
             </div>
           </div>
         </div>
+      </div>
 
         {/* Right side */}
-        <div className="ab-solution" style={{ flex: '1 1 400px', background: '#F8FBFB', padding: '40px', borderRadius: '24px' }}>
+        <div style={{ flex: '1 1 400px', background: '#F8FBFB', padding: '40px', borderRadius: '24px' }}>
           <span style={{ color: '#00A896', fontSize: '0.8rem', fontWeight: 'bold', letterSpacing: '1px' }}>THE SOLUTION</span>
           <h2 style={{ fontSize: '2rem', fontWeight: '800', marginTop: '10px', marginBottom: '16px', color: '#111' }}>
             Real-time presence.
@@ -143,25 +145,24 @@ const About = () => {
           <div style={{ background: 'white', padding: '20px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px', boxShadow: '0 4px 15px rgba(0,0,0,0.03)' }}>
             <div style={{ background: '#E6F7F5', padding: '12px', borderRadius: '12px', color: '#00A896' }}><Shield size={24} /></div>
             <div>
-              <div style={{ fontWeight: 'bold' }}>Centralized Care</div>
-              <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '4px' }}>All communication, documents, and updates in one place.</div>
+              <p className="about-solution-card-title">Real-time Alerts</p>
+              <p className="about-solution-card-desc">Instant notifications about your loved ones well-being.</p>
             </div>
           </div>
-
-          <div style={{ background: 'white', padding: '20px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '30px', boxShadow: '0 4px 15px rgba(0,0,0,0.03)' }}>
-            <div style={{ background: '#FFF5F0', padding: '12px', borderRadius: '12px', color: '#D97706' }}><Activity size={24} /></div>
+          <div className="about-solution-card">
+            <div className="about-solution-icon blue"><CheckCircle2 size={22} /></div>
             <div>
-              <div style={{ fontWeight: 'bold' }}>Real-time alerts</div>
-              <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '4px' }}>Get instant notifications about your loved ones well-being.</div>
+              <p className="about-solution-card-title">Verified Caregivers</p>
+              <p className="about-solution-card-desc">Background-checked specialists matched to your family needs.</p>
             </div>
           </div>
-
-          <img src={nurseHandsImg} alt="Nurse holding hands" style={{ width: '100%', borderRadius: '16px', objectFit: 'cover', height: '180px' }} />
         </div>
-      </section>
+        <img src={nurseHandsImg} alt="Nurse holding hands" className="about-solution-img" />
+      </div>
+    </section>
 
       {/* TEAM SECTION */}
-      <section className="ab-team-header" style={{ padding: '60px 5% 100px', textAlign: 'center' }}>
+      <section style={{ padding: '60px 5% 100px', textAlign: 'center' }}>
         <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '16px', color: '#111' }}>
           The Heart of our Sanctuary
         </h2>
@@ -175,7 +176,7 @@ const About = () => {
             { img: marcusThorneImg, name: 'Dr. Marcus Thorne', role: 'Medical Director', desc: 'Ensuring that our platform meets the highest standards of clinical excellence.' },
             { img: elenaRodriguezImg, name: 'Elena Rodriguez', role: 'Head of Care', desc: 'Passionate about crafting an experience that feels personal and supportive.' }
           ].map((member, i) => (
-            <div key={i} className="ab-team-card" style={{ flex: '1 1 250px', maxWidth: '300px', textAlign: 'left' }}>
+            <div key={i} style={{ flex: '1 1 250px', maxWidth: '300px', textAlign: 'left' }}>
               <img src={member.img} alt={member.name} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: '24px', marginBottom: '20px' }} />
               <h4 style={{ fontWeight: 'bold', fontSize: '1.2rem', marginBottom: '4px' }}>{member.name}</h4>
               <div style={{ color: '#00A896', fontSize: '0.9rem', fontWeight: '600', marginBottom: '12px' }}>{member.role}</div>
@@ -187,7 +188,7 @@ const About = () => {
 
       {/* CTA SECTION */}
       <section style={{ padding: '0 5% 100px' }}>
-        <div className="ab-cta" style={{ 
+        <div style={{ 
           background: '#1A1A1A', borderRadius: '32px', padding: '60px 40px', 
           textAlign: 'center', color: 'white', position: 'relative', overflow: 'hidden' 
         }}>
@@ -222,32 +223,8 @@ const About = () => {
         </div>
       </section>
 
-      <style>{`
-        @keyframes abFadeUp {
-          from { opacity: 0; transform: translateY(30px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes abFloat {
-          0%, 100% { transform: translateY(0px); }
-          50%       { transform: translateY(-12px); }
-        }
-        .ab-hero-text { animation: abFadeUp 0.8s ease-out both; }
-        .ab-hero-img { animation: abFadeUp 0.8s 0.2s ease-out both, abFloat 6s ease-in-out infinite; }
-        .ab-mission { animation: abFadeUp 0.8s 0.3s ease-out both; }
-        .ab-vision { animation: abFadeUp 0.8s 0.4s ease-out both; }
-        .ab-challenge { animation: abFadeUp 0.8s 0.2s ease-out both; }
-        .ab-solution { animation: abFadeUp 0.8s 0.3s ease-out both; }
-        .ab-team-header { animation: abFadeUp 0.8s ease-out both; }
-        .ab-team-card { animation: abFadeUp 0.8s ease-out both; }
-        .ab-team-card:nth-child(1) { animation-delay: 0.2s; }
-        .ab-team-card:nth-child(2) { animation-delay: 0.3s; }
-        .ab-team-card:nth-child(3) { animation-delay: 0.4s; }
-        .ab-cta { animation: abFadeUp 0.8s ease-out both; }
-      `}</style>
-
-      <Footer />
-    </div>
-  );
-};
+    <Footer />
+  </div>
+);
 
 export default About;

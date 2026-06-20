@@ -6,7 +6,7 @@ import {
   Search, Phone, Info, Plus, Image as ImageIcon, Send,
   Calendar, Pill, FileText, Download, MessageSquarePlus,
   LayoutGrid, Users, ClipboardList, MessageSquare,
-  MessageCircle, Loader2, ChevronLeft, X, PenSquare,
+  MessageCircle, Loader2, ChevronLeft, X, PenSquare, Trash2,
 } from 'lucide-react';
 import './caregiverMessage.css';
 
@@ -211,6 +211,26 @@ const CaregiverMessage = () => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
 
+  /* delete a message (own messages only) */
+  const handleDelete = async (msg) => {
+    // Local-only optimistic/failed bubble — nothing saved server-side yet
+    if (typeof msg.id === 'string' && msg.id.startsWith('opt-')) {
+      setMessages((prev) => prev.filter((m) => m.id !== msg.id));
+      return;
+    }
+
+    const prevMessages = messages;
+    setMessages((prev) => prev.filter((m) => m.id !== msg.id));
+
+    try {
+      await api.delete(`/messages/${msg.id}`);
+      loadContacts(true);
+    } catch (err) {
+      setMessages(prevMessages);
+      console.error('handleDelete:', err);
+    }
+  };
+
   /* compose: open modal + fetch all users */
   const openCompose = async () => {
     setShowCompose(true);
@@ -397,16 +417,27 @@ const CaregiverMessage = () => {
                 ) : (
                   messages.map((msg) => {
                     const isMe = Number(msg.sender_id) === Number(user?.id);
+                    const canDelete = isMe && !msg.pending;
                     return (
-                      <div
-                        key={msg.id}
-                        className={`message-bubble ${isMe ? 'me' : 'them'}${msg.failed ? ' failed' : ''}${msg.pending ? ' pending' : ''}`}
-                      >
-                        {msg.message}
-                        {msg.failed && (
-                          <span className="msg-failed-label">⚠ Failed to send</span>
+                      <div key={msg.id} className={`message-row ${isMe ? 'me' : 'them'}`}>
+                        {canDelete && (
+                          <button
+                            className="msg-delete-btn"
+                            onClick={() => handleDelete(msg)}
+                            title="Delete message"
+                          >
+                            <Trash2 size={14} />
+                          </button>
                         )}
-                        <div className="message-time">{formatTime(msg.created_at)}</div>
+                        <div
+                          className={`message-bubble ${isMe ? 'me' : 'them'}${msg.failed ? ' failed' : ''}${msg.pending ? ' pending' : ''}`}
+                        >
+                          {msg.message}
+                          {msg.failed && (
+                            <span className="msg-failed-label">⚠ Failed to send</span>
+                          )}
+                          <div className="message-time">{formatTime(msg.created_at)}</div>
+                        </div>
                       </div>
                     );
                   })

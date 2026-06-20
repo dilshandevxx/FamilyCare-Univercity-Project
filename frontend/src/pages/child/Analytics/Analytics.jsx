@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Heart, Thermometer, FileText, AlertTriangle, 
-  TrendingUp, Calendar, Download, RefreshCw, 
-  Plus, CheckCircle, Clock, ChevronRight, Activity, Award
+import { Link } from 'react-router-dom';
+import {
+  Heart, Thermometer, FileText, AlertTriangle,
+  TrendingUp, Calendar, Download, RefreshCw,
+  Plus, CheckCircle, Clock, ChevronRight, Activity, Award, HeartPulse
 } from 'lucide-react';
 import ChildLayout from '../../../layouts/ChildLayout';
 import api from '../../../services/api';
@@ -162,8 +163,8 @@ const Analytics = () => {
             {/* Range Selector */}
             <div className="an-filter-pill">
               <Calendar size={14} className="an-pill-icon" />
-              <select 
-                value={selectedRange} 
+              <select
+                value={selectedRange}
                 onChange={(e) => setSelectedRange(e.target.value)}
                 className="an-select"
               >
@@ -172,6 +173,12 @@ const Analytics = () => {
                 <option>Last 6 Months</option>
               </select>
             </div>
+
+            {/* Caregivers Navigation Link */}
+            <Link to="/caregivers-list" className="an-filter-pill an-caregivers-link">
+              <HeartPulse size={14} className="an-pill-icon" />
+              <span className="an-filter-label an-caregivers-label">Caregivers</span>
+            </Link>
           </div>
         </div>
 

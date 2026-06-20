@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Caregivers.css';
 
 /* ── Talk to a Specialist modal ─────────────────────────────── */
@@ -235,57 +236,70 @@ const HowItWorksModal = ({ onClose }) => {
   );
 };
 
-const caregiversData = [
-  {
-    id: 1,
-    name: "Dr. Elena Rodriguez",
-    title: "GERIATRIC SPECIALIST",
-    price: "$45",
-    rating: "4.9",
-    reviews: 124,
-    tags: ["12 Years Exp.", "In-home"],
-    quote: '"I believe in providing care that honors the dignity of every individual. Specialized in dementia support and palliative care, ensuring..."',
-    image: "https://i.pravatar.cc/150?img=32"
-  },
-  {
-    id: 2,
-    name: "Marcus Thompson, CNA",
-    title: "PHYSICAL REHAB ASSISTANT",
-    price: "$38",
-    rating: "4.8",
-    reviews: 89,
-    tags: ["8 Years Exp.", "CPR Certified"],
-    quote: '"Focusing on mobility and restorative exercises to help seniors regain independence. Dedicated to safety, patience, and positive..."',
-    image: "https://i.pravatar.cc/150?img=11"
-  },
-  {
-    id: 3,
-    name: "Sarah Jenkins",
-    title: "REGISTERED NURSE (RN)",
-    price: "$52",
-    rating: "5.0",
-    reviews: 210,
-    tags: ["15 Years Exp.", "Clinical Exp."],
-    quote: '"Bringing hospital-level clinical precision to your home. Expert in medication management and post-surgical recovery for long-term health."',
-    image: "https://i.pravatar.cc/150?img=44"
-  },
-  {
-    id: 4,
-    name: "Linda Chen",
-    title: "COMPANION CARE SPECIALIST",
-    price: "$32",
-    rating: "4.7",
-    reviews: 54,
-    tags: ["5 Years Exp.", "Meal Prep"],
-    quote: '"I provide more than just help; I provide companionship. I love engaging in storytelling, light gardening, and preparing nutritious, hom..."',
-    image: "https://i.pravatar.cc/150?img=5"
-  }
-];
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+const AVATAR_POOL = [32, 44, 5, 11, 26, 68, 47, 57, 33, 16, 21, 43, 65, 23, 53, 36, 12, 51, 70, 3];
+const CARD_ACCENTS = ['#0d9488','#0ea5e9','#8b5cf6','#f59e0b','#10b981','#ef4444','#3b82f6','#ec4899'];
+
+function mapCaregiver(c) {
+  const tags = [];
+  if (c.experience_years) tags.push({ label: `${c.experience_years} Exp.`, icon: '🗓' });
+  if (c.certification)    tags.push({ label: c.certification, icon: '🏅' });
+  if (c.license_id)       tags.push({ label: `Lic. ${c.license_id}`, icon: '📋' });
+  if (c.languages)        tags.push({ label: c.languages, icon: '🌐' });
+
+  const imgIdx = AVATAR_POOL[(c.id - 1) % AVATAR_POOL.length];
+  return {
+    id:           c.id,
+    name:         c.name,
+    title:        c.specialization ? c.specialization.toUpperCase() : 'CAREGIVER',
+    price:        c.hourly_rate ? `$${Number(c.hourly_rate).toFixed(0)}` : null,
+    rating:       c.rating ? Number(c.rating).toFixed(1) : null,
+    reviews:      c.total_reviews || 0,
+    tags,
+    bio:          c.bio || '',
+    image:        c.avatar_url || `https://i.pravatar.cc/300?img=${imgIdx}`,
+    available:    c.is_available,
+    location:     c.location || 'In-home & Facility',
+    accent:       CARD_ACCENTS[(c.id - 1) % CARD_ACCENTS.length],
+  };
+}
+
+function StarRating({ value }) {
+  const full  = Math.floor(value);
+  const half  = value - full >= 0.5;
+  return (
+    <span className="cg-stars">
+      {[1,2,3,4,5].map(i => (
+        <span key={i} style={{ color: i <= full ? '#f59e0b' : (i === full + 1 && half ? '#f59e0b' : '#e2e8f0') }}>
+          {i <= full ? '★' : (i === full + 1 && half ? '⯨' : '★')}
+        </span>
+      ))}
+    </span>
+  );
+}
 
 const Caregivers = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [showTalkModal, setShowTalkModal] = useState(false);
   const [showHowModal, setShowHowModal] = useState(false);
+  const [caregivers, setCaregivers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE}/caregivers/public`)
+      .then(res => { if (!res.ok) throw new Error('Failed to load caregivers'); return res.json(); })
+      .then(data => { setCaregivers(data.map(mapCaregiver)); setLoading(false); })
+      .catch(err => { setError(err.message); setLoading(false); });
+  }, []);
+
+  const filtered = caregivers.filter(c =>
+    !searchQuery ||
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <div className="caregivers-page">
@@ -366,40 +380,97 @@ const Caregivers = () => {
 
         {/* Caregiver Grid */}
         <div className="caregivers-grid">
-          {caregiversData.map((caregiver) => (
-            <div className="caregiver-card" key={caregiver.id}>
-              <div className="card-top-section">
-                <div className="avatar-wrapper">
-                  <div className="avatar-bg"></div>
-                  <img src={caregiver.image} alt={caregiver.name} className="avatar-img" />
-                  <div className="verified-badge">
-                    <svg viewBox="0 0 24 24" fill="white" width="12" height="12">
-                      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"></path>
-                    </svg>
-                    <span>VERIFIED</span>
-                  </div>
+          {loading && (
+            <p style={{ gridColumn: '1/-1', textAlign: 'center', color: '#718096', padding: '2rem' }}>
+              Loading caregivers…
+            </p>
+          )}
+          {error && (
+            <p style={{ gridColumn: '1/-1', textAlign: 'center', color: '#e53e3e', padding: '2rem' }}>
+              {error}
+            </p>
+          )}
+          {!loading && !error && filtered.length === 0 && (
+            <p style={{ gridColumn: '1/-1', textAlign: 'center', color: '#718096', padding: '2rem' }}>
+              No caregivers found.
+            </p>
+          )}
+          {filtered.map((cg) => (
+            <div className="caregiver-card cg-card-v2" key={cg.id}>
+
+              {/* Accent header strip */}
+              <div className="cg-accent-strip" style={{ background: cg.accent }} />
+
+              {/* Top row: avatar + price/rating */}
+              <div className="cg-top-row">
+                <div className="cg-avatar-wrap">
+                  <img src={cg.image} alt={cg.name} className="cg-avatar" onError={e => { e.target.src = `https://i.pravatar.cc/300?img=${cg.id + 10}`; }} />
+                  <span className="cg-verified-dot" title="Verified">
+                    <svg viewBox="0 0 24 24" fill="white" width="10" height="10"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                  </span>
                 </div>
-                <div className="price-rating">
-                  <div className="price">{caregiver.price}<span className="unit">/hr</span></div>
-                  <div className="rating">
-                    <span className="star">★</span> {caregiver.rating} <span className="reviews">({caregiver.reviews})</span>
-                  </div>
+
+                <div className="cg-price-block">
+                  {cg.price
+                    ? <><span className="cg-price">{cg.price}</span><span className="cg-unit"> /hr</span></>
+                    : <span className="cg-price-na">Contact</span>
+                  }
+                  {cg.rating ? (
+                    <div className="cg-rating-row">
+                      <StarRating value={Number(cg.rating)} />
+                      <span className="cg-rating-num">{cg.rating}</span>
+                      {cg.reviews > 0 && <span className="cg-reviews">({cg.reviews})</span>}
+                    </div>
+                  ) : (
+                    <span className="cg-new-badge">New</span>
+                  )}
                 </div>
               </div>
-              
-              <div className="card-content">
-                <h3 className="caregiver-name">{caregiver.name}</h3>
-                <p className="caregiver-title">{caregiver.title}</p>
-                
-                <div className="tags-container">
-                  {caregiver.tags.map((tag, index) => (
-                    <span className="tag" key={index}>{tag}</span>
-                  ))}
+
+              {/* Name + title */}
+              <div className="cg-body">
+                <div className="cg-name-row">
+                  <h3 className="cg-name">{cg.name}</h3>
+                  <span className="cg-verified-pill">✓ Verified</span>
                 </div>
-                
-                <p className="caregiver-quote">{caregiver.quote}</p>
-                
-                <button className="btn-view-profile">View Profile</button>
+                <p className="cg-specialty" style={{ color: cg.accent }}>{cg.title}</p>
+
+                {/* Info grid */}
+                <div className="cg-info-grid">
+                  <div className="cg-info-item">
+                    <span className="cg-info-icon">📍</span>
+                    <span>{cg.location}</span>
+                  </div>
+                  {cg.available !== undefined && (
+                    <div className="cg-info-item">
+                      <span className="cg-info-icon">{cg.available ? '✅' : '🕐'}</span>
+                      <span style={{ color: cg.available ? '#10b981' : '#f59e0b', fontWeight: 600 }}>
+                        {cg.available ? 'Available Now' : 'On Request'}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Tags */}
+                {cg.tags.length > 0 && (
+                  <div className="cg-tags">
+                    {cg.tags.map((t, i) => (
+                      <span className="cg-tag" key={i}>{t.icon} {t.label}</span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Bio */}
+                {cg.bio && (
+                  <p className="cg-bio">
+                    &ldquo;{cg.bio.length > 130 ? cg.bio.slice(0, 130) + '…' : cg.bio}&rdquo;
+                  </p>
+                )}
+
+                {/* CTA */}
+                <button className="cg-btn-profile" style={{ '--accent': cg.accent }} onClick={() => navigate(`/caregivers/${cg.id}`)}>
+                  View Full Profile
+                </button>
               </div>
             </div>
           ))}
@@ -422,16 +493,7 @@ const Caregivers = () => {
           </div>
         </div>
 
-        {/* Pagination */}
-        <div className="pagination">
-          <button className="page-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-          </button>
-          <span className="page-text">Page 1 of 12</span>
-          <button className="page-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
-          </button>
-        </div>
+       
 
       </div>
     </div>

@@ -6,11 +6,17 @@ import Navbar from './components/Navbar';
 // Public pages
 import Home       from './pages/public/Landing/Landing';
 import FeaturesPage from './pages/public/Features/Features';
-import Caregivers from './pages/public/Caregivers/Caregivers';
+import Caregivers        from './pages/public/Caregivers/Caregivers';
+import CaregiverProfile  from './pages/public/Caregivers/CaregiverProfile';
 import About      from './pages/public/About/About';
 import Login      from './pages/public/Login/Login';
 import Register      from './pages/public/Register/Register';
 import OAuthCallback from './pages/public/OAuthCallback/OAuthCallback';
+import Careers      from './pages/public/Careers/Careers';
+import Blog         from './pages/public/Blog/Blog';
+import HelpCenter   from './pages/public/HelpCenter/HelpCenter';
+import ToursAndSafety from './pages/public/ToursAndSafety/ToursAndSafety';
+import PrivacyPolicy  from './pages/public/PrivacyPolicy/PrivacyPolicy';
 
 // Child pages
 import Dashboard  from './pages/child/Dashboard/Dashboard';
@@ -76,11 +82,17 @@ const AppContent = () => {
         {/* Public */}
         <Route path="/"          element={<Home />} />
         <Route path="/features"  element={<FeaturesPage />} />
-        <Route path="/caregivers" element={<Caregivers />} />
+        <Route path="/caregivers"     element={<Caregivers />} />
+        <Route path="/caregivers/:id" element={<CaregiverProfile />} />
         <Route path="/about"     element={<About />} />
         <Route path="/login"     element={<Login />} />
         <Route path="/register"       element={<Register />} />
         <Route path="/oauth/callback" element={<OAuthCallback />} />
+        <Route path="/careers"        element={<Careers />} />
+        <Route path="/blog"           element={<Blog />} />
+        <Route path="/help-center"    element={<HelpCenter />} />
+        <Route path="/tours-and-safety" element={<ToursAndSafety />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
         {/* Protected – Child */}
         <Route path="/dashboard"  element={<PrivateRoute><Dashboard /></PrivateRoute>} />

@@ -54,6 +54,29 @@
   color: #64748b;
 }
 
+.an-caregivers-link {
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.an-caregivers-link:hover {
+  background-color: #f0fdfa;
+  border-color: #00A896;
+}
+
+.an-caregivers-link:hover .an-pill-icon {
+  color: #00A896;
+}
+
+.an-caregivers-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
 .an-select {
   border: none;
   font-size: 0.8rem;

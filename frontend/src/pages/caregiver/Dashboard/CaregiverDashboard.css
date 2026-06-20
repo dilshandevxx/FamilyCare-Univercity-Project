@@ -631,3 +631,204 @@
 }
 
 .ack-btn:hover { color: #b91c1c; }
+
+/* ============================================================
+   Micro-interactions & Aesthetic Polish
+   (visual only — no markup, text or behavior changes)
+   ============================================================ */
+
+/* Smooth lift transitions for interactive cards */
+.stat-card,
+.resident-card,
+.task-item,
+.alert-item {
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+}
+
+.stat-card.urgent:hover {
+  box-shadow: 0 14px 32px rgba(220, 38, 38, 0.12);
+}
+
+.stat-icon {
+  transition: transform 0.3s ease;
+}
+
+.stat-card:hover .stat-icon {
+  transform: scale(1.12) rotate(-6deg);
+}
+
+/* Resident cards */
+.resident-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+  border-color: #99f6e4;
+}
+
+.resident-avatar img {
+  transition: transform 0.4s ease;
+}
+
+.resident-card:hover .resident-avatar img {
+  transform: scale(1.12);
+}
+
+.care-badge {
+  transition: transform 0.2s ease;
+}
+
+.resident-card:hover .care-badge {
+  transform: scale(1.06);
+}
+
+/* Status colors used by careStatusClass() that were previously unstyled */
+.care-badge.critical { background-color: #fee2e2; color: #dc2626; }
+.care-badge.attention { background-color: #fef9c3; color: #ca8a04; }
+
+/* Buttons — hover lift & press feedback */
+.btn-primary,
+.btn-secondary,
+.submit-btn,
+.meal-btn,
+.ack-btn {
+  transition: background-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+.btn-primary:hover,
+.submit-btn:hover {
+  box-shadow: 0 6px 16px rgba(13, 148, 136, 0.28);
+  transform: translateY(-1px);
+}
+
+.btn-secondary:hover {
+  transform: translateY(-1px);
+}
+
+.btn-primary:active,
+.btn-secondary:active,
+.submit-btn:active,
+.meal-btn:active,
+.ack-btn:active,
+.view-all-btn:active {
+  transform: scale(0.96);
+}
+
+.meal-btn.active {
+  box-shadow: 0 4px 12px rgba(13, 148, 136, 0.25);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.view-all-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.view-all-btn:hover svg {
+  transform: translateX(3px);
+}
+
+/* Activity feed */
+.activity-icon {
+  transition: transform 0.25s ease;
+}
+
+.activity-item:hover .activity-icon {
+  transform: scale(1.15);
+}
+
+.activity-title {
+  transition: color 0.2s ease;
+}
+
+.activity-item:hover .activity-title {
+  color: #0d9488;
+}
+
+/* Tasks */
+.task-item:hover {
+  transform: translateX(3px);
+  border-color: #99f6e4;
+}
+
+.task-checkbox {
+  transition: transform 0.15s ease, color 0.2s ease;
+}
+
+.task-checkbox:active {
+  transform: scale(0.8);
+}
+
+.task-item.completed {
+  animation: taskComplete 0.35s ease;
+}
+
+@keyframes taskComplete {
+  0%   { transform: scale(0.97); }
+  60%  { transform: scale(1.01); }
+  100% { transform: scale(1); }
+}
+
+/* Urgent alerts */
+.urgent-header svg {
+  animation: pulseWarn 2s ease-in-out infinite;
+}
+
+@keyframes pulseWarn {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(1.18); }
+}
+
+.alert-item:hover {
+  transform: translateX(4px);
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.12);
+}
+
+/* Subtle hover glow for large panels */
+.activity-feed,
+.quick-entry,
+.tasks-card {
+  transition: box-shadow 0.3s ease;
+}
+
+.activity-feed:hover,
+.quick-entry:hover,
+.tasks-card:hover {
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+/* Entrance animation on page load */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.stats-grid .stat-card,
+.residents-grid .resident-card,
+.activity-feed,
+.quick-entry,
+.tasks-card,
+.urgent-card {
+  animation: fadeSlideUp 0.5s ease backwards;
+}
+
+.stats-grid .stat-card:nth-child(1) { animation-delay: 0.02s; }
+.stats-grid .stat-card:nth-child(2) { animation-delay: 0.08s; }
+.stats-grid .stat-card:nth-child(3) { animation-delay: 0.14s; }
+.stats-grid .stat-card:nth-child(4) { animation-delay: 0.2s; }
+
+.residents-grid .resident-card:nth-child(1) { animation-delay: 0.1s; }
+.residents-grid .resident-card:nth-child(2) { animation-delay: 0.16s; }
+
+.quick-entry   { animation-delay: 0.06s; }
+.tasks-card    { animation-delay: 0.12s; }
+.activity-feed { animation-delay: 0.18s; }
+.urgent-card   { animation-delay: 0.24s; }

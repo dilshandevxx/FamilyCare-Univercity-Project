@@ -6,9 +6,11 @@ import {
 } from 'lucide-react';
 import ChildLayout from '../../../layouts/ChildLayout';
 import api from '../../../services/api';
+import { useAuth } from '../../../context/AuthContext';
 import './Settings.css';
 
 const Settings = () => {
+  const { refreshUser } = useAuth();
   // Profile State
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -65,6 +67,8 @@ const Settings = () => {
         name,
         email
       });
+
+      await refreshUser();
 
       setSuccessMsg('Account settings updated successfully.');
       setTimeout(() => setSuccessMsg(''), 4000);
