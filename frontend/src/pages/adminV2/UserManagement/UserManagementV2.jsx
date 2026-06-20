@@ -23,12 +23,12 @@ const UserManagementV2 = () => {
     try {
       const { data } = await api.get('/admin/users');
       setUsers(data.map(u => ({
-        id: u._id,
+        id: u.id,
         name: u.name,
         email: u.email,
         role: u.role,
         status: 'active',
-        joined: new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+        joined: new Date(u.created_at || u.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
       })));
     } catch (error) {
       console.error('Failed to fetch users:', error);
@@ -39,18 +39,18 @@ const UserManagementV2 = () => {
     try {
       const { data } = await api.get('/admin/caregivers/pending');
       setPendingUsers(data.map(c => ({
-        id: c._id,
-        name: c.userId?.name || 'Unknown',
-        email: c.userId?.email || '',
+        id: c.id,
+        name: c.user_name || c.name || 'Unknown',
+        email: c.email || '',
         role: 'caregiver',
         status: 'pending',
-        joined: new Date(c.createdAt || Date.now()).toLocaleDateString(),
+        joined: new Date(c.created_at || c.createdAt || Date.now()).toLocaleDateString(),
         associatedElder: 'N/A',
         relationship: 'Professional',
-        phone: 'N/A',
+        phone: c.phone || 'N/A',
         backgroundCheck: 'Pending',
-        certifications: c.certifications?.join(', ') || 'None',
-        notes: `Experience: ${c.experienceYears} years.`
+        certifications: c.certification || c.certifications?.join(', ') || 'None',
+        notes: `Experience: ${c.experience_years || c.experienceYears} years.`
       })));
     } catch (error) {
       console.error('Failed to fetch pending caregivers:', error);

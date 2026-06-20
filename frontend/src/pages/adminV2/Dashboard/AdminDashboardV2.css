@@ -19,6 +19,7 @@
   position: relative;
   overflow: hidden;
   box-shadow: 0 10px 20px -5px rgba(0, 168, 150, 0.25);
+  animation: dashboardFadeUp 0.6s ease both;
 }
 
 .v2-dash-hero::before {
@@ -78,6 +79,12 @@
   border-radius: 20px;
   font-size: 0.78rem;
   font-weight: 600;
+  transition: transform 0.2s ease, background-color 0.2s;
+}
+
+.v2-hero-stat-pill:hover {
+  transform: translateY(-2px);
+  background-color: rgba(255, 255, 255, 0.25);
 }
 
 .v2-hero-stat-pill .dot {
@@ -88,12 +95,12 @@
 
 .v2-hero-stat-pill .dot.active {
   background-color: #EF4444;
-  box-shadow: 0 0 8px #EF4444;
+  animation: livePulseRed 2s ease-in-out infinite;
 }
 
 .v2-hero-stat-pill .dot.pending {
   background-color: #F59E0B;
-  box-shadow: 0 0 8px #F59E0B;
+  animation: livePulseOrange 2s ease-in-out infinite;
 }
 
 /* 2. Stats Grid */
@@ -114,7 +121,13 @@
   align-items: center;
   box-shadow: 0 8px 16px -4px rgba(0, 0, 0, 0.04);
   transition: transform 0.25s, box-shadow 0.25s;
+  animation: dashboardFadeUp 0.6s ease both;
 }
+
+.v2-stat-card:nth-child(1) { animation-delay: 0.1s; }
+.v2-stat-card:nth-child(2) { animation-delay: 0.2s; }
+.v2-stat-card:nth-child(3) { animation-delay: 0.3s; }
+.v2-stat-card:nth-child(4) { animation-delay: 0.4s; }
 
 .v2-stat-card:hover {
   transform: translateY(-4px);
@@ -177,6 +190,7 @@
   align-items: center;
   justify-content: center;
   z-index: 2;
+  animation: dashboardFloat 3.5s ease-in-out infinite;
 }
 
 /* 3. Central Dashboard layout (Charts & Timeline) */
@@ -192,7 +206,11 @@
   border-radius: 20px;
   padding: 1.8rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  animation: dashboardFadeUp 0.6s ease both;
 }
+
+.v2-dashboard-body > .v2-dashboard-panel:nth-child(1) { animation-delay: 0.3s; }
+.v2-dashboard-body > .v2-dashboard-panel:nth-child(2) { animation-delay: 0.4s; }
 
 .v2-panel-header {
   display: flex;
@@ -336,6 +354,7 @@
   border-radius: 20px;
   padding: 1.8rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  animation: dashboardFadeUp 0.6s 0.5s ease both;
 }
 
 .v2-controls-panel h4 {
@@ -431,4 +450,25 @@
   .v2-dashboard-body {
     grid-template-columns: 1fr;
   }
+}
+
+/* Dashboard Animations (Matching Home) */
+@keyframes dashboardFadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes dashboardFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes livePulseRed {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+  50%       { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+}
+
+@keyframes livePulseOrange {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6); }
+  50%       { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
 }

@@ -16,7 +16,7 @@
   gap: 60px;
 }
 
-.about-hero-text { flex: 1 1 420px; }
+.about-hero-text { flex: 1 1 420px; animation: abFadeUp 0.8s ease-out both; }
 
 .about-badge {
   display: inline-flex;
@@ -54,6 +54,7 @@
 .about-hero-img-wrap {
   flex: 1 1 420px;
   position: relative;
+  animation: abFadeUp 0.8s 0.2s ease-out both;
 }
 
 .about-hero-img {
@@ -61,6 +62,7 @@
   border-radius: 28px;
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.12);
   display: block;
+  animation: abFloat 6s ease-in-out infinite;
 }
 
 .about-hero-badge-float {
@@ -123,6 +125,7 @@
   flex-direction: column;
   justify-content: space-between;
   border: 1px solid #f1f5f9;
+  animation: abFadeUp 0.8s 0.2s ease-out both;
 }
 
 .about-card-label {
@@ -168,6 +171,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  animation: abFadeUp 0.8s 0.4s ease-out both;
 }
 
 .about-vision-card .about-card-label { color: #a7f3d0; }
@@ -209,7 +213,7 @@
   align-items: center;
 }
 
-.about-challenge { flex: 1 1 420px; }
+.about-challenge { flex: 1 1 420px; animation: abFadeUp 0.8s 0.2s ease-out both; }
 
 .about-section-tag {
   display: inline-block;
@@ -282,6 +286,7 @@
   border-radius: 28px;
   padding: 44px;
   border: 1px solid #e2e8f0;
+  animation: abFadeUp 0.8s 0.4s ease-out both;
 }
 
 .about-solution-cards {
@@ -353,6 +358,7 @@
 .about-team-header {
   text-align: center;
   margin-bottom: 64px;
+  animation: abFadeUp 0.8s ease-out both;
 }
 
 .about-team-header h2 {
@@ -386,7 +392,12 @@
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   border: 1px solid #f1f5f9;
   transition: transform 0.25s, box-shadow 0.25s;
+  animation: abFadeUp 0.8s ease-out both;
 }
+
+.about-team-card:nth-child(1) { animation-delay: 0.1s; }
+.about-team-card:nth-child(2) { animation-delay: 0.2s; }
+.about-team-card:nth-child(3) { animation-delay: 0.3s; }
 
 .about-team-card:hover {
   transform: translateY(-6px);
@@ -464,6 +475,7 @@
   color: white;
   position: relative;
   overflow: hidden;
+  animation: abFadeUp 0.8s ease-out both;
 }
 
 .about-cta-glow-1 {
@@ -581,4 +593,15 @@
   .about-vision-stats { gap: 28px; }
   .about-mission-card,
   .about-vision-card  { padding: 30px 26px; }
+}
+
+/* Animations */
+@keyframes abFadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes abFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
 }

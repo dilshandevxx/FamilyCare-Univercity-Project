@@ -523,6 +523,7 @@ const FeaturesPage = () => {
           line-height: 1.15;
           margin-bottom: 1.25rem;
           color: #1A202C;
+          animation: fpFadeUp 0.8s ease-out both;
         }
         .fp-hero__subtitle {
           font-size: 1.05rem;
@@ -530,13 +531,21 @@ const FeaturesPage = () => {
           line-height: 1.7;
           max-width: 500px;
           margin-bottom: 2.2rem;
+          animation: fpFadeUp 0.8s 0.2s ease-out both;
         }
         .fp-hero__actions {
           display: flex;
           gap: 1rem;
           flex-wrap: wrap;
+          animation: fpFadeUp 0.8s 0.4s ease-out both;
         }
 
+        /* Hero Visual Card */
+        .fp-hero__visual {
+          display: flex;
+          justify-content: center;
+          animation: fpFadeUp 1s 0.3s ease-out both;
+        }
         /* ---- Animated "Smarter" text ---- */
         .fp-teal { color: #00A896; }
         .fp-teal--anim {
@@ -587,8 +596,9 @@ const FeaturesPage = () => {
           border-radius: 20px;
           padding: 1.5rem;
           width: 300px;
-          box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+          box-shadow: 0 25px 60px rgba(0,0,0,0.18);
           transition: box-shadow 0.3s ease;
+          animation: fpFloat 6s ease-in-out infinite;
         }
         .fp-hero__card--main { background: #1E2A38; }
         .fp-hero__card--float { animation: fp-float 5s ease-in-out infinite; }
@@ -816,10 +826,17 @@ const FeaturesPage = () => {
           transition: transform 0.35s cubic-bezier(0.23,1,0.32,1),
                       box-shadow 0.35s ease,
                       border-color 0.25s ease;
-          cursor: default;
-          opacity: 0;
-          transform: translateY(30px);
-          will-change: transform;
+          animation: fpFadeUp 0.8s ease-out both;
+        }
+        .fc-card:nth-child(1) { animation-delay: 0.1s; }
+        .fc-card:nth-child(2) { animation-delay: 0.2s; }
+        .fc-card:nth-child(3) { animation-delay: 0.3s; }
+        .fc-card:nth-child(4) { animation-delay: 0.4s; }
+        .fc-card:nth-child(5) { animation-delay: 0.5s; }
+        .fc-card:nth-child(6) { animation-delay: 0.6s; }
+        .fc-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 20px 40px rgba(0,0,0,0.07);
         }
         .fc-grid--revealed .fc-card {
           animation: fp-card-grid-in 0.55s cubic-bezier(0.23,1,0.32,1) both;
@@ -923,8 +940,8 @@ const FeaturesPage = () => {
           box-shadow: 0 20px 50px rgba(0,0,0,0.1);
           transition: box-shadow 0.35s ease, transform 0.35s ease;
         }
-        .fp-mockup--teal { background: linear-gradient(145deg, #e0f2f1, #b2dfdb); }
-        .fp-mockup--blue { background: linear-gradient(145deg, #eff6ff, #bfdbfe); }
+        .fp-mockup--teal { background: linear-gradient(145deg, #e0f2f1, #b2dfdb); animation: fpFloat 5s ease-in-out infinite; }
+        .fp-mockup--blue { background: linear-gradient(145deg, #eff6ff, #bfdbfe); animation: fpFloatAlt 5.5s ease-in-out infinite; }
         .fp-mockup--float { animation: fp-float-alt 4.5s ease-in-out infinite; }
         .fp-mockup:hover {
           transform: scale(1.03) translateY(-4px);
@@ -1099,6 +1116,20 @@ const FeaturesPage = () => {
           .fp-hero { padding: 100px 0 60px; }
           .fp-section { padding: 70px 0; }
           .fp-cta { padding: 60px 0; }
+        }
+
+        /* ---- Animations ---- */
+        @keyframes fpFadeUp {
+          from { opacity: 0; transform: translateY(30px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fpFloat {
+          0%, 100% { transform: translateY(0px); }
+          50%       { transform: translateY(-12px); }
+        }
+        @keyframes fpFloatAlt {
+          0%, 100% { transform: translateY(0px); }
+          50%       { transform: translateY(12px); }
         }
       `}</style>
     </div>
