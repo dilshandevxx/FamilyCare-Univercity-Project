@@ -174,7 +174,7 @@ const CaregiversList = () => {
     // 1. Search Query
     const query = searchQuery.toLowerCase();
     const safeName = cg.name || '';
-    const safeSpec = cg.specialization || '';
+    const safeSpec = cg.specialization || 'General Care';
     const matchesSearch = safeName.toLowerCase().includes(query) || 
                           safeSpec.toLowerCase().includes(query) ||
                           (cg.bio && cg.bio.toLowerCase().includes(query));
@@ -210,7 +210,7 @@ const CaregiversList = () => {
 
   // Assigned Caregivers filter
   const assignedCaregivers = caregivers.filter(cg => 
-    parents.some(p => p.assigned_caregiver_id === cg.id)
+    Array.isArray(parents) && parents.some(p => p.assigned_caregiver_id === cg.id)
   );
 
   const displayCaregivers = activeTab === 'browse' ? filteredCaregivers : assignedCaregivers;
@@ -254,7 +254,7 @@ const CaregiversList = () => {
             className={`cg-tab-btn${activeTab === 'assigned' ? ' active' : ''}`}
             onClick={() => setActiveTab('assigned')}
           >
-            Assigned Caregivers ({parents.filter(p => p.assigned_caregiver_id).length})
+            Assigned Caregivers ({Array.isArray(parents) ? parents.filter(p => p.assigned_caregiver_id).length : 0})
           </button>
         </div>
 
@@ -349,7 +349,7 @@ const CaregiversList = () => {
 
                         {/* Specializations Badges */}
                         <div className="cg-badges-row">
-                          {cg.specialization.split(',').map((spec, i) => (
+                          {(cg.specialization || 'General Care').split(',').map((spec, i) => (
                             <span key={i} className="cg-badge">
                               {spec.trim()}
                             </span>
@@ -465,7 +465,7 @@ const CaregiversList = () => {
               <form onSubmit={handleAssignSubmit}>
                 <div className="cg-modal-field">
                   <label>Select Parent / Resident</label>
-                  {parents.length === 0 ? (
+                  {!Array.isArray(parents) || parents.length === 0 ? (
                     <p className="cg-modal-warning">
                       No parent profiles found. Please <Link to="/add-parent">create a parent profile</Link> first.
                     </p>
