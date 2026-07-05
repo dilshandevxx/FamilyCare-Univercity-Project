@@ -7,6 +7,7 @@ import {
   Plus, Heart
 } from 'lucide-react';
 import ChildLayout from '../../../layouts/ChildLayout';
+import { useAuth } from '../../../context/AuthContext';
 import api from '../../../services/api';
 import './Dashboard.css';
 
@@ -16,6 +17,7 @@ const barHeights = [30, 50, 38, 65, 85, 55, 70];
 const barDays    = ['M','T','W','T','F','S','S'];
 
 const Dashboard = () => {
+  const { user } = useAuth();
   const [dbParents, setDbParents] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [dashboardData, setDashboardData] = useState(null);
@@ -58,7 +60,7 @@ const Dashboard = () => {
         {/* ── Hero Banner ── */}
         <div className="cd-hero-banner animate-fade-in">
           <div className="cd-hero-content">
-            <h1 className="cd-hero-title">{getGreeting()}, Dilshan!</h1>
+            <h1 className="cd-hero-title">{getGreeting()}, {user?.name || 'User'}!</h1>
             <p className="cd-hero-subtitle">Here's the latest update on your family's health and activity.</p>
           </div>
           <div className="cd-hero-decoration">
