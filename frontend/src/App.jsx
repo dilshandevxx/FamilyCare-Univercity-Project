@@ -38,6 +38,7 @@ import AddHealthLog          from './pages/caregiver/HealthLog/AddHealthLog';
 import CaregiverVisitHistory from './pages/caregiver/CaregiverVisitHistory/caregivervisithistor';
 
 // Admin V2 pages (Now default for /admin/*)
+import AdminLogin          from './pages/adminV2/Login/AdminLogin';
 import AdminDashboardV2    from './pages/adminV2/Dashboard/AdminDashboardV2';
 import UserManagementV2    from './pages/adminV2/UserManagement/UserManagementV2';
 import CaregiverApprovalV2 from './pages/adminV2/CaregiverApproval/CaregiverApprovalV2';
@@ -73,6 +74,7 @@ const AppContent = () => {
     || location.pathname.startsWith('/caregiver/')
     || location.pathname.startsWith('/admin/')
     || location.pathname === '/login'
+    || location.pathname === '/admin/login'
     || location.pathname === '/register';
 
   return (
@@ -86,6 +88,7 @@ const AppContent = () => {
         <Route path="/caregivers/:id" element={<CaregiverProfile />} />
         <Route path="/about"     element={<About />} />
         <Route path="/login"     element={<Login />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/register"       element={<Register />} />
         <Route path="/oauth/callback" element={<OAuthCallback />} />
         <Route path="/careers"        element={<Careers />} />
