@@ -2,12 +2,22 @@ const express = require('express');
 const router = express.Router();
 const { register, login, validate2FA } = require('../controllers/authController');
 const { passport, generateToken } = require('../config/passport');
+const rateLimit = require('express-rate-limit');
 
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
 
+// Rate limiter: max 10 login/2fa attempts per IP per 15 minutes
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many login attempts. Please wait 15 minutes before trying again.' },
+});
+
 router.post('/register', register);
-router.post('/login', login);
-router.post('/2fa/validate', validate2FA);
+router.post('/login', authLimiter, login);
+router.post('/2fa/validate', authLimiter, validate2FA);
 
 // ── Google OAuth ──────────────────────────────────────────────
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));

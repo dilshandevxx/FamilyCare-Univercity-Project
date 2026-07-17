@@ -129,3 +129,16 @@ CREATE TABLE IF NOT EXISTS alerts (
   created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (parent_id) REFERENCES parents(id) ON DELETE CASCADE
 );
+
+-- ── Admin Login Audit Logs ────────────────────────────────────
+-- Tracks every admin login attempt (success and failure) for security auditing
+CREATE TABLE IF NOT EXISTS admin_login_logs (
+  id               INT AUTO_INCREMENT PRIMARY KEY,
+  user_id          INT,                             -- NULL if email not found
+  email_attempted  VARCHAR(150) NOT NULL,
+  ip_address       VARCHAR(45),
+  success          BOOLEAN NOT NULL DEFAULT FALSE,
+  failure_reason   VARCHAR(255),                    -- e.g. 'Invalid credentials', 'Wrong role'
+  created_at       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
