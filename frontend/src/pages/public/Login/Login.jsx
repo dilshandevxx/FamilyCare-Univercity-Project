@@ -108,8 +108,7 @@ const Login = () => {
               <div className="role-tabs">
                 {[
                   { id: 'family', label: 'Family' },
-                  { id: 'caregiver', label: 'Caregiver' },
-                  { id: 'admin', label: 'Admin' }
+                  { id: 'caregiver', label: 'Caregiver' }
                 ].map((role) => (
                   <button
                     key={role.id}

@@ -3,7 +3,7 @@
   display: flex;
   min-height: 100vh;
   font-family: 'Inter', sans-serif;
-  background-color: #f4f7f6; /* Softer, slightly cooler background */
+  background-color: #f0f4f8; /* Soft, premium light blue-gray */
   align-items: center;
   justify-content: center;
   padding: 2rem;
@@ -13,21 +13,24 @@
 /* ── MAIN CARD ────────────────────────────────────────────── */
 .login-card {
   display: flex;
-  width: 100%;
-  max-width: 1100px; /* Increased from 950px to reduce outer whitespace */
-  min-height: 650px; /* Increased height */
+  width: 90vw; /* Take up 90% of the screen width */
+  max-width: 1200px; /* Cap it so it doesn't get ridiculously wide on 4K */
+  height: 85vh; /* Take up 85% of the screen height */
+  min-height: 600px;
+  max-height: 800px;
   background-color: #ffffff;
   border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   position: relative;
 }
 
 /* ── LEFT PANEL (FORM) ────────────────────────────────────── */
 .login-left {
-  flex: 1;
+  width: 40%;
+  flex: none;
   background-color: #ffffff;
-  padding: 3rem 4rem;
+  padding: 3rem 2.5rem;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -270,7 +273,8 @@
 
 /* ── RIGHT PANEL (BANNER) ─────────────────────────────────── */
 .login-right {
-  flex: 1;
+  width: 60%;
+  flex: none;
   background: linear-gradient(135deg, #00d2ff 0%, #1e8cd9 100%);
   /* Vibrant teal to blue gradient */
   position: relative;
@@ -417,10 +421,12 @@
   .login-card {
     flex-direction: column;
     max-width: 500px;
+    height: auto;
   }
 
   .login-left {
     order: 2;
+    width: 100%;
     padding: 3rem 2.5rem;
   }
 
@@ -430,6 +436,7 @@
 
   .login-right {
     order: 1;
+    width: 100%;
     padding: 2.5rem;
     padding-bottom: 5rem;
   }
