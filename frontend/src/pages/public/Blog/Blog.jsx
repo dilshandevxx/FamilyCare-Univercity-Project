@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Clock, Tag, ArrowRight, Search } from 'lucide-react';
+import { Clock, Tag, Search } from 'lucide-react';
 import Footer from '../../../components/Landing/Footer';
 
 const posts = [
@@ -144,9 +144,6 @@ const Blog = () => {
                         <span style={{ display:'flex', alignItems:'center', gap:'4px', fontSize:'0.78rem', color:'#718096' }}><Clock size={12} />{post.date}</span>
                         <span style={{ display:'flex', alignItems:'center', gap:'4px', fontSize:'0.78rem', color:'#718096' }}><Tag size={12} />{post.readTime}</span>
                       </div>
-                      <span style={{ display:'flex', alignItems:'center', gap:'4px', fontSize:'0.82rem', color:post.accent, fontWeight:'600', cursor:'pointer' }}>
-                        Read <ArrowRight size={13} />
-                      </span>
                     </div>
                   </div>
                 </div>
