@@ -249,8 +249,7 @@ const Register = () => {
 
             <img src={nurseImage} alt="Care illustration" className="register-right-image" />
 
-            <div className="register-bottom-arc-ring" />
-            <div className="register-bottom-arc">
+            <div className="register-signin-footer">
               <span className="register-signin-text">Already have an account?</span>
               <Link to="/login" className="register-signin-link">Sign In</Link>
             </div>
