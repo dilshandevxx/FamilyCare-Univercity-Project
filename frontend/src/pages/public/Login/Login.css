@@ -275,20 +275,19 @@
 .login-right {
   width: 60%;
   flex: none;
-  background: linear-gradient(135deg, #00d2ff 0%, #1e8cd9 100%);
-  /* Vibrant teal to blue gradient */
+  background: linear-gradient(135deg, #00C9B5 0%, #00A896 100%);
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 4rem 3rem 3rem 3rem;
+  padding: 2.5rem 2rem 2rem 2rem;
   color: white;
   text-align: center;
   overflow: hidden;
 }
 
 .login-right-title {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 500;
   letter-spacing: 1px;
   margin-bottom: 0.2rem;
@@ -297,68 +296,78 @@
 }
 
 .login-right-subtitle {
-  font-size: 2.2rem;
+  font-size: 2rem;
   font-weight: 800;
-  margin-bottom: 3rem;
+  margin-bottom: 1.5rem;
   position: relative;
   z-index: 2;
 }
 
 .login-right-image {
-  max-width: 75%;
+  max-width: 55%;
+  max-height: 250px;
+  object-fit: cover;
   height: auto;
   position: relative;
   z-index: 2;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
-/* Bottom Arc for "Sign Up" */
-.login-bottom-arc-ring {
-  position: absolute;
-  bottom: -150px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  border: 15px solid rgba(255, 255, 255, 0.2);
-  z-index: 1;
-}
-
-.login-bottom-arc {
-  position: absolute;
-  bottom: -135px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 270px;
-  height: 270px;
-  background-color: white;
-  border-radius: 50%;
+/* Glassmorphism bottom footer */
+.login-signup-footer {
+  margin-top: auto;
+  position: relative;
   z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 30px;
-  /* Position text near top of the circle */
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 1rem 2rem;
+  border-radius: 16px;
+  width: 80%;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
 }
 
 .login-signup-text {
   font-size: 0.85rem;
-  color: #4b5563;
+  color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
-  margin-bottom: 4px;
 }
 
 .login-signup-link {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #1e8cd9;
+  color: #ffffff;
   text-decoration: none;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.4);
+  padding-bottom: 2px;
+  transition: all 0.2s ease;
 }
 
 .login-signup-link:hover {
+  color: #ffd29d;
+  border-color: #ffd29d;
+  text-decoration: none;
+}
+
+.login-footer {
+  display: none;
+  font-size: 0.9rem;
+  color: #4b5563;
+  text-align: center;
+  margin-top: 1rem;
+}
+.login-footer a {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+.login-footer a:hover {
   text-decoration: underline;
 }
 
@@ -422,6 +431,8 @@
     flex-direction: column;
     max-width: 500px;
     height: auto;
+    max-height: none;
+    min-height: unset;
   }
 
   .login-left {
@@ -445,16 +456,12 @@
     max-width: 60%;
   }
 
-  .login-bottom-arc-ring {
-    bottom: -220px;
-    width: 400px;
-    height: 400px;
+  .login-signup-footer {
+    display: none !important;
   }
 
-  .login-bottom-arc {
-    bottom: -205px;
-    width: 370px;
-    height: 370px;
+  .login-footer {
+    display: block;
   }
 }
 
