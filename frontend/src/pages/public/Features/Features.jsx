@@ -355,7 +355,6 @@ const FeaturesPage = () => {
           </p>
           <div className="fp-cta__actions">
             <Link to="/register" className="fp-btn fp-btn--primary fp-btn--lg fp-btn--cta-white">Create Free Account</Link>
-            <button className="fp-btn fp-btn--outline-white fp-btn--lg">Schedule a Demo</button>
           </div>
         </div>
       </section>
