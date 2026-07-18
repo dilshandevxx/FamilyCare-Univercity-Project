@@ -23,7 +23,7 @@ const OAuthCallback = () => {
     // Fetch full profile then redirect
     api.get('/users/profile')
       .then(() => {
-        if (role === 'admin') navigate('/admin-v2/dashboard');
+        if (role === 'admin') navigate('/admin/dashboard');
         else if (role === 'caregiver') navigate('/caregiver/dashboard');
         else navigate('/dashboard');
       })
