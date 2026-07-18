@@ -178,11 +178,11 @@ const Testimonials = () => {
         }
 
         .tm-eyebrow {
-          display:inline-block; font-size:0.75rem; font-weight:700;
+          display:block; font-size:0.75rem; font-weight:700;
           letter-spacing:1.5px; color:#00A896; margin-bottom:0.75rem;
           text-transform:uppercase;
         }
-        .tm-title { position:relative; display:inline-block; }
+        .tm-title { position:relative; display:block; }
         .tm-title-line {
           width:0; height:4px; margin:0.8rem auto 0;
           background:linear-gradient(90deg,#00A896,#00d4bf);
