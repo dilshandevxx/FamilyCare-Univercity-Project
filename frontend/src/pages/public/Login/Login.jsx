@@ -182,6 +182,9 @@ const Login = () => {
             </form>
           )}
 
+          <p className="login-footer" style={{ marginTop: '0.75rem' }}>
+            Don't have an account yet? <Link to="/register">Sign Up</Link>
+          </p>
         </div>
 
         {/* ── RIGHT PANEL (BANNER) ── */}
@@ -191,10 +194,8 @@ const Login = () => {
           
           <img src={nurseImage} alt="Welcome illustration" className="login-right-image" />
 
-          {/* Bottom circular "Sign Up" cutout */}
-          <div className="login-bottom-arc-ring"></div>
-          <div className="login-bottom-arc">
-            <span className="login-signup-text">Don't have an account yet ?</span>
+          <div className="login-signup-footer">
+            <span className="login-signup-text">Don't have an account yet?</span>
             <Link to="/register" className="login-signup-link">Sign Up</Link>
           </div>
         </div>

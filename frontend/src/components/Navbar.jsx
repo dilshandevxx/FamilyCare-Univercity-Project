@@ -74,7 +74,7 @@ const Navbar = () => {
           <div className="navbar__auth">
             {user ? (
               <>
-                <Link to={user.role === 'admin' ? '/admin-v2/dashboard' : user.role === 'caregiver' ? '/caregiver/dashboard' : '/dashboard'} className="nav-link">Dashboard</Link>
+                <Link to={user.role === 'admin' ? '/admin/dashboard' : user.role === 'caregiver' ? '/caregiver/dashboard' : '/dashboard'} className="nav-link">Dashboard</Link>
                 <button onClick={handleLogout} className="btn btn-secondary navbar__cta">Logout</button>
               </>
             ) : (
@@ -141,7 +141,7 @@ const Navbar = () => {
           {user ? (
             <>
               <Link
-                to={user.role === 'admin' ? '/admin-v2/dashboard' : user.role === 'caregiver' ? '/caregiver/dashboard' : '/dashboard'}
+                to={user.role === 'admin' ? '/admin/dashboard' : user.role === 'caregiver' ? '/caregiver/dashboard' : '/dashboard'}
                 className="mobile-nav-link"
                 onClick={() => setMenuOpen(false)}
               >
@@ -156,6 +156,9 @@ const Navbar = () => {
               </Link>
               <Link to="/register" className="mobile-btn-primary" onClick={() => setMenuOpen(false)}>
                 Sign Up
+              </Link>
+              <Link to="/admin/login" className="mobile-admin-link" onClick={() => setMenuOpen(false)}>
+                Admin Portal
               </Link>
             </>
           )}
@@ -303,6 +306,19 @@ const Navbar = () => {
         .mobile-btn-primary:hover {
           background: var(--color-primary-dark);
           box-shadow: 0 6px 20px rgba(0,168,150,0.45);
+        }
+
+        .mobile-admin-link {
+          text-align: center;
+          margin-top: 1.2rem;
+          font-size: 0.9rem;
+          color: #718096;
+          font-weight: 600;
+          text-decoration: none;
+          transition: color 0.2s;
+        }
+        .mobile-admin-link:hover {
+          color: var(--color-primary);
         }
 
         /* ── Responsive breakpoint ── */
