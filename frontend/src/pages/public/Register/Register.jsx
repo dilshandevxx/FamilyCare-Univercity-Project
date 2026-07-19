@@ -105,7 +105,6 @@ const Register = () => {
 
           {/* ── LEFT PANEL (FORM) ── */}
           <div className="register-left">
-            <div className="register-top-arc" />
             <h2 className="register-header-text">CREATE ACCOUNT</h2>
 
             {/* Role Tabs */}

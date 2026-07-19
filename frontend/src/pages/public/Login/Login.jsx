@@ -74,7 +74,6 @@ const Login = () => {
         {/* ── LEFT PANEL (FORM) ── */}
         <div className="login-left">
           
-          <div className="login-top-arc"></div>
           <h2 className="login-header-text">SIGN IN</h2>
 
           {error && <div className="login-error">{error}</div>}
