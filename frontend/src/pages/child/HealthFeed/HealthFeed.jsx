@@ -317,21 +317,33 @@ const HealthFeed = () => {
             {/* Widget 2: Caregiver widget */}
             <div className="hf-card">
               <span className="hf-widget-lbl">CURRENT CAREGIVER</span>
-              <div className="hf-caregiver-widget">
-                <img 
-                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(activeParentObj.caregiver_name || 'Sarah')}`} 
-                  alt="Caregiver avatar" 
-                  className="hf-cg-avatar"
-                />
-                <div className="hf-cg-info">
-                  <h4 className="hf-cg-name">{activeParentObj.caregiver_name || 'Sarah Jenkins, RN'}</h4>
-                  <p className="hf-cg-duty">On Duty: 08:00 AM - 04:00 PM</p>
+              {activeParentObj.assigned_caregiver_id ? (
+                <div className="hf-caregiver-widget">
+                  <img 
+                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(activeParentObj.caregiver_name || 'Caregiver')}`} 
+                    alt="Caregiver avatar" 
+                    className="hf-cg-avatar"
+                  />
+                  <div className="hf-cg-info">
+                    <h4 className="hf-cg-name">{activeParentObj.caregiver_name}</h4>
+                    <p className="hf-cg-duty">{activeParentObj.caregiver_specialization || 'Assigned Caregiver'}</p>
+                  </div>
+                  <div className="hf-cg-actions">
+                    <Link to={`/messages?recipient=${activeParentObj.assigned_caregiver_id}`} className="hf-cg-icon-btn"><MessageSquare size={16} /></Link>
+                    <button className="hf-cg-icon-btn"><Video size={16} /></button>
+                  </div>
                 </div>
-                <div className="hf-cg-actions">
-                  <button className="hf-cg-icon-btn"><MessageSquare size={16} /></button>
-                  <button className="hf-cg-icon-btn"><Video size={16} /></button>
+              ) : (
+                <div className="hf-caregiver-widget unassigned">
+                  <div className="hf-cg-info">
+                    <h4 className="hf-cg-name text-gray">No Caregiver Assigned</h4>
+                    <p className="hf-cg-duty">Enable tracking & messaging</p>
+                  </div>
+                  <div className="hf-cg-actions">
+                    <Link to="/caregivers-list" className="hf-cg-assign-btn">Assign Now</Link>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             {/* Widget 3: Vitality index dial */}
