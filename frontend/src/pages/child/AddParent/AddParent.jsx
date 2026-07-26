@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   User, Calendar, Heart, ShieldAlert, Phone, MapPin, 
-  UserRoundCheck, ShieldCheck, HeartPulse, Sparkles, Upload
+  UserRoundCheck, ShieldCheck, HeartPulse, Sparkles, Upload, CheckCircle
 } from 'lucide-react';
 import ChildLayout from '../../../layouts/ChildLayout';
 import api from '../../../services/api';
@@ -82,9 +82,7 @@ const AddParent = () => {
       });
       
       setSuccess(true);
-      setTimeout(() => {
-        navigate('/parents');
-      }, 1500);
+      // Removed setTimeout. The UI will show the success state.
     } catch (err) {
       console.error('Error adding parent:', err);
       setError(err.response?.data?.error || 'Failed to save parent profile. Please try again.');
@@ -106,7 +104,34 @@ const AddParent = () => {
           <span className="ap-bc-active">Add Parent</span>
         </div>
 
-        <form onSubmit={handleSubmit} className="ap-form">
+        {success ? (
+          <div className="ap-success-view">
+            <div className="ap-success-card-large">
+              <div className="ap-success-icon-wrap">
+                <CheckCircle size={64} className="ap-success-icon" />
+              </div>
+              <h2 className="ap-success-title">Profile Created Successfully!</h2>
+              <p className="ap-success-subtitle">
+                You have successfully created the profile for <strong>{formData.name}</strong>.
+              </p>
+              
+              <div className="ap-success-next-steps">
+                <h3>What's Next?</h3>
+                <p>To ensure your loved one receives the best care, we recommend assigning a professional caregiver immediately.</p>
+              </div>
+
+              <div className="ap-success-actions">
+                <button onClick={() => navigate('/caregivers')} className="ap-btn-primary ap-btn-large">
+                  <UserRoundCheck size={18} /> Assign Caregiver Now
+                </button>
+                <button onClick={() => navigate('/parents')} className="ap-btn-secondary ap-btn-large">
+                  Go to My Parents
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="ap-form">
           <div className="ap-grid-layout">
             
             {/* LEFT COLUMN - Main Form Fields */}
@@ -396,6 +421,7 @@ const AddParent = () => {
             </div>
           </div>
         </form>
+        )}
         
         <div className="ap-footer-session">
           <div className="ap-session-dot"></div>
@@ -408,3 +434,4 @@ const AddParent = () => {
 };
 
 export default AddParent;
+
