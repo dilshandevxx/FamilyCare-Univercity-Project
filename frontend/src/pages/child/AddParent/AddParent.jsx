@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   User, Calendar, Heart, ShieldAlert, Phone, MapPin, 
@@ -121,7 +121,7 @@ const AddParent = () => {
               </div>
 
               <div className="ap-success-actions">
-                <button onClick={() => navigate('/caregivers')} className="ap-btn-primary ap-btn-large">
+                <button onClick={() => navigate('/caregivers-list')} className="ap-btn-primary ap-btn-large">
                   <UserRoundCheck size={18} /> Assign Caregiver Now
                 </button>
                 <button onClick={() => navigate('/parents')} className="ap-btn-secondary ap-btn-large">
@@ -385,7 +385,7 @@ const AddParent = () => {
           {/* Form Actions Footer */}
           {error && (
             <div className="ap-error-banner">
-              <span>✕</span> {error}
+              <span>âœ•</span> {error}
             </div>
           )}
 
@@ -434,4 +434,5 @@ const AddParent = () => {
 };
 
 export default AddParent;
+
 
