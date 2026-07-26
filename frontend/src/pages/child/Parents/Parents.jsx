@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Plus, User, HeartPulse, ShieldAlert, Phone, MapPin, 
-  UserSearch, Sparkles, Heart, Activity, Thermometer
+  UserSearch, Sparkles, Heart, Activity, Thermometer, Trash2, Edit2, X
 } from 'lucide-react';
 import ChildLayout from '../../../layouts/ChildLayout';
 import api from '../../../services/api';
@@ -12,6 +12,9 @@ const Parents = () => {
   const [parents, setParents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  
+  const [editingParent, setEditingParent] = useState(null);
+  const [editForm, setEditForm] = useState({});
 
   const fetchParents = async () => {
     try {
@@ -30,11 +33,38 @@ const Parents = () => {
     fetchParents();
   }, []);
 
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this parent? This action cannot be undone.')) return;
+    try {
+      await api.delete(/parents/ + id);
+      setParents(parents.filter(p => p.id !== id));
+    } catch (err) {
+      console.error('Error deleting parent:', err);
+      setError('Failed to delete parent.');
+    }
+  };
+
+  const startEdit = (parent) => {
+    setEditingParent(parent.id);
+    setEditForm(parent);
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await api.put(/parents/ + editingParent, editForm);
+      setParents(parents.map(p => p.id === editingParent ? { ...p, ...editForm } : p));
+      setEditingParent(null);
+    } catch (err) {
+      console.error('Error updating parent:', err);
+      setError('Failed to update parent profile.');
+    }
+  };
+
   return (
     <ChildLayout title="My Parents">
       <div className="pm-container">
         
-        {/* Header section with page title and action button */}
         <div className="pm-header-row">
           <div className="pm-header-left">
             <p className="pm-subtitle">Manage profiles and view real-time status of your loved ones.</p>
@@ -47,6 +77,7 @@ const Parents = () => {
         {error && (
           <div className="pm-error-banner">
             <span>✕</span> {error}
+            <button onClick={() => setError('')} style={{background:'none',border:'none',color:'white',float:'right',cursor:'pointer'}}>Close</button>
           </div>
         )}
 
@@ -56,7 +87,6 @@ const Parents = () => {
             <p>Loading parent profiles...</p>
           </div>
         ) : parents.length === 0 ? (
-          /* Empty state when no parents are registered */
           <div className="pm-empty-state">
             <div className="pm-empty-icon-wrap">
               <User size={48} className="pm-empty-icon" />
@@ -68,32 +98,38 @@ const Parents = () => {
             </Link>
           </div>
         ) : (
-          /* Grid of parent cards */
           <div className="pm-grid">
             {parents.map(parent => {
               const seed = parent.name || 'avatar';
               return (
-                <div key={parent.id} className="pm-card">
+                <div key={parent.id} className="pm-card" style={{ position: 'relative' }}>
                   
-                  {/* Top Header Section */}
+                  {/* Edit/Delete Actions */}
+                  <div style={{ position: 'absolute', top: '16px', right: '16px', display: 'flex', gap: '8px' }}>
+                    <button onClick={() => startEdit(parent)} style={{ background: 'rgba(13,148,136,0.1)', color: 'var(--color-primary)', border: 'none', padding: '6px', borderRadius: '6px', cursor: 'pointer' }}>
+                      <Edit2 size={16} />
+                    </button>
+                    <button onClick={() => handleDelete(parent.id)} style={{ background: 'rgba(239,68,68,0.1)', color: '#EF4444', border: 'none', padding: '6px', borderRadius: '6px', cursor: 'pointer' }}>
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+
                   <div className="pm-card-top">
                     <img 
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}`} 
+                      src={"https://api.dicebear.com/7.x/avataaars/svg?seed=" + encodeURIComponent(seed)} 
                       alt={parent.name} 
                       className="pm-avatar"
                     />
                     <div className="pm-name-section">
                       <h3 className="pm-name">{parent.name}</h3>
                       <p className="pm-relationship">
-                        {parent.relationship ? `${parent.relationship}` : 'Family Member'}
-                        {parent.age ? ` • ${parent.age} yrs old` : ''}
-                        {parent.gender ? ` • ${parent.gender.charAt(0).toUpperCase() + parent.gender.slice(1)}` : ''}
+                        {parent.relationship ? parent.relationship : 'Family Member'}
+                        {parent.age ? ' • ' + parent.age + ' yrs old' : ''}
                       </p>
                     </div>
-                    <span className="pm-status-badge good">ACTIVE</span>
+                    <span className="pm-status-badge good" style={{ marginTop: '30px' }}>ACTIVE</span>
                   </div>
 
-                  {/* Contact Info Grid */}
                   <div className="pm-card-section">
                     <div className="pm-info-row">
                       <Phone size={14} className="pm-info-icon" />
@@ -105,7 +141,6 @@ const Parents = () => {
                     </div>
                   </div>
 
-                  {/* Medical Baseline / Summary */}
                   <div className="pm-card-section bg-light">
                     <h4 className="pm-section-title">
                       <HeartPulse size={14} className="pm-section-icon teal" />
@@ -121,52 +156,75 @@ const Parents = () => {
                         <p className="pm-med-val text-red">{parent.allergies || 'None listed'}</p>
                       </div>
                     </div>
-                    {parent.current_medications && (
-                      <div className="pm-med-meds">
-                        <span className="pm-med-lbl">MEDICATIONS</span>
-                        <p className="pm-med-val">{parent.current_medications}</p>
-                      </div>
-                    )}
                   </div>
 
-                  {/* Caregiver and Emergency Contact */}
                   <div className="pm-card-section">
                     <div className="pm-split-row">
                       <div>
                         <span className="pm-med-lbl">ASSIGNED CAREGIVER</span>
                         <p className="pm-caregiver-name">
                           {parent.caregiver_name ? (
-                            <>👩‍⚕️ {parent.caregiver_name}</>
+                            <>Caregiver: {parent.caregiver_name}</>
                           ) : (
                             <span className="pm-unassigned">None Assigned</span>
                           )}
                         </p>
                       </div>
-                      
-                      {parent.emergency_contact_name && (
-                        <div>
-                          <span className="pm-med-lbl">EMERGENCY CONTACT</span>
-                          <p className="pm-emergency-name">
-                            🚨 {parent.emergency_contact_name} ({parent.emergency_contact_phone || 'No number'})
-                          </p>
-                        </div>
-                      )}
                     </div>
                   </div>
 
-                  {/* Card Action Buttons */}
                   <div className="pm-card-actions">
-                    <Link to={`/health-feed?parent_id=${parent.id}`} className="pm-card-btn primary">
+                    <Link to={"/health-feed?parent_id=" + parent.id} className="pm-card-btn primary">
                       <Activity size={14} /> Health Feed
                     </Link>
-                    <Link to="/messages" className="pm-card-btn secondary">
-                      Contact Caregiver
-                    </Link>
                   </div>
-
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Edit Modal */}
+        {editingParent && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+            <div style={{ background: 'white', padding: '24px', borderRadius: '12px', width: '90%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <h3 style={{ margin: 0, color: 'var(--color-text-main)' }}>Edit Parent Profile</h3>
+                <button onClick={() => setEditingParent(null)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
+              </div>
+              <form onSubmit={handleEditSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px', color: '#4b5563' }}>Name</label>
+                  <input type="text" value={editForm.name || ''} onChange={e => setEditForm({...editForm, name: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px' }} required />
+                </div>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px', color: '#4b5563' }}>Age</label>
+                    <input type="number" value={editForm.age || ''} onChange={e => setEditForm({...editForm, age: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px' }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px', color: '#4b5563' }}>Phone</label>
+                    <input type="text" value={editForm.phone || ''} onChange={e => setEditForm({...editForm, phone: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px' }} />
+                  </div>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px', color: '#4b5563' }}>Address</label>
+                  <input type="text" value={editForm.address || ''} onChange={e => setEditForm({...editForm, address: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px', color: '#4b5563' }}>Medical Conditions</label>
+                  <input type="text" value={editForm.medical_conditions || ''} onChange={e => setEditForm({...editForm, medical_conditions: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px' }} />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '0.85rem', marginBottom: '4px', color: '#4b5563' }}>Allergies</label>
+                  <input type="text" value={editForm.allergies || ''} onChange={e => setEditForm({...editForm, allergies: e.target.value})} style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '6px' }} />
+                </div>
+                <div style={{ marginTop: '16px', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                  <button type="button" onClick={() => setEditingParent(null)} style={{ padding: '8px 16px', border: '1px solid #d1d5db', background: 'white', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>
+                  <button type="submit" style={{ padding: '8px 16px', border: 'none', background: 'var(--color-primary)', color: 'white', borderRadius: '6px', cursor: 'pointer' }}>Save Changes</button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
 

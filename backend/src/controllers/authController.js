@@ -8,29 +8,58 @@ const ROLE_MAP = { family: 'child', caregiver: 'caregiver', admin: 'admin' };
 
 // POST /api/auth/register
 const register = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const {
+    name, email, password, phone, role,
+    // Family-specific
+    relationship,
+    // Caregiver-specific
+    specialization, experience_years, certification, license_id, hourly_rate, bio,
+  } = req.body;
+
   const dbRole = ROLE_MAP[role] || 'child';
+
   try {
     const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
     if (existing.length > 0) return res.status(422).json({ error: 'Email already in use' });
 
     const hashed = await bcrypt.hash(password, 10);
     const [result] = await pool.query(
-      'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
-      [name, email, hashed, dbRole]
+      'INSERT INTO users (name, email, password, phone, role) VALUES (?, ?, ?, ?, ?)',
+      [name, email, hashed, phone || null, dbRole]
     );
 
-    // Auto-create caregivers row — new registrations start as 'pending' for admin approval
-    if (dbRole === 'caregiver') {
+    const userId = result.insertId;
+
+    if (dbRole === 'child') {
+      // Save family profile with relationship
       await pool.query(
-        "INSERT IGNORE INTO caregivers (user_id, name, status) VALUES (?, ?, 'pending')",
-        [result.insertId, name]
+        'INSERT INTO family_profiles (user_id, relationship) VALUES (?, ?)',
+        [userId, relationship || null]
       );
     }
 
-    const token = jwt.sign({ id: result.insertId, role: dbRole }, process.env.JWT_SECRET, {
+    if (dbRole === 'caregiver') {
+      // Save full caregiver profile — starts as 'pending' for admin approval
+      await pool.query(
+        `INSERT INTO caregivers 
+          (user_id, name, specialization, experience_years, certification, license_id, hourly_rate, bio, is_available)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, TRUE)`,
+        [
+          userId, name,
+          specialization || null,
+          experience_years || null,
+          certification || null,
+          license_id || null,
+          hourly_rate ? parseFloat(hourly_rate) : 0.00,
+          bio || null,
+        ]
+      );
+    }
+
+    const token = jwt.sign({ id: userId, role: dbRole }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN || '7d',
     });
+
     res.status(201).json({ message: 'User registered', token, role: dbRole });
   } catch (err) {
     res.status(500).json({ error: err.message });
