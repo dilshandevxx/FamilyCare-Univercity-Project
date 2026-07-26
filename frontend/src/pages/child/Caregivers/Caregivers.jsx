@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Search, SlidersHorizontal, CheckCircle, HelpCircle, 
@@ -85,13 +85,13 @@ const CaregiversList = () => {
             }
           ];
         } else {
-          // Add styling metadata to actual DB caregivers
+                    // Add styling metadata to actual DB caregivers
           cgData = cgData.map((cg, index) => ({
             ...cg,
             rating: cg.rating || (4.5 + (index * 0.1) % 0.5),
-            reviews_count: cg.reviews_count || (45 + index * 12),
-            availability: cg.availability || 'Weekdays',
-            avatar: cg.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cg.name)}`
+            reviews_count: cg.total_reviews || cg.reviews_count || (45 + index * 12),
+            availability: (cg.is_available ? 'Immediate' : 'Weekdays') || cg.availability || 'Weekdays',
+            avatar: cg.avatar_url || cg.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cg.name)}"
           }));
         }
 
@@ -377,7 +377,7 @@ const CaregiversList = () => {
                                   className="cg-unassign-x"
                                   title="Unassign Caregiver"
                                 >
-                                  ×
+                                  Ã—
                                 </button>
                               </div>
                             ))}
@@ -435,7 +435,7 @@ const CaregiversList = () => {
                     className="cg-mkt-image"
                   />
                   <div className="cg-verified-badge">
-                    <span className="cg-v-icon">✓</span>
+                    <span className="cg-v-icon">âœ“</span>
                     <div>
                       <span className="cg-v-lbl">VERIFIED STAFF</span>
                       <p className="cg-v-text">All our caregivers are licensed professionals with active certifications.</p>
@@ -512,3 +512,4 @@ const CaregiversList = () => {
 };
 
 export default CaregiversList;
+

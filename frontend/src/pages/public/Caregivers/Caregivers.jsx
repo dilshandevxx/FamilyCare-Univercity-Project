@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Caregivers.css';
 
-/* ── Talk to a Specialist modal ─────────────────────────────── */
+/* â”€â”€ Talk to a Specialist modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const TalkModal = ({ onClose }) => {
   const [form, setForm] = useState({ name: '', email: '', phone: '', time: '', message: '' });
   const [sent, setSent] = useState(false);
@@ -40,11 +40,11 @@ const TalkModal = ({ onClose }) => {
         <button onClick={onClose} style={{
           position: 'absolute', top: '1.2rem', right: '1.2rem', background: 'none',
           border: 'none', fontSize: '1.4rem', cursor: 'pointer', color: '#718096',
-        }}>×</button>
+        }}>Ã—</button>
 
         {sent ? (
           <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-            <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🎉</div>
+            <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>ðŸŽ‰</div>
             <h3 style={{ color: 'var(--color-primary)', marginBottom: '0.75rem' }}>Request Sent!</h3>
             <p style={{ color: '#718096', fontSize: '0.9rem', lineHeight: 1.6 }}>
               Your email client should open shortly. A Family Concierge specialist will reach out within 24 hours.
@@ -87,16 +87,16 @@ const TalkModal = ({ onClose }) => {
                 <select style={{ ...inputStyle, background: 'white', cursor: 'pointer' }}
                   value={form.time} onChange={e => setForm({ ...form, time: e.target.value })}
                   onFocus={focus} onBlur={blur}>
-                  <option value="">Select a time window…</option>
-                  <option>Morning (8am – 12pm)</option>
-                  <option>Afternoon (12pm – 5pm)</option>
-                  <option>Evening (5pm – 8pm)</option>
+                  <option value="">Select a time windowâ€¦</option>
+                  <option>Morning (8am â€“ 12pm)</option>
+                  <option>Afternoon (12pm â€“ 5pm)</option>
+                  <option>Evening (5pm â€“ 8pm)</option>
                   <option>Any time</option>
                 </select>
               </div>
               <div>
                 <label style={labelStyle}>Tell us about your needs</label>
-                <textarea required rows={3} placeholder="E.g. looking for a nurse for my mother, 3 days a week…"
+                <textarea required rows={3} placeholder="E.g. looking for a nurse for my mother, 3 days a weekâ€¦"
                   style={{ ...inputStyle, resize: 'vertical' }}
                   value={form.message} onChange={e => setForm({ ...form, message: e.target.value })}
                   onFocus={focus} onBlur={blur} />
@@ -119,30 +119,30 @@ const TalkModal = ({ onClose }) => {
   );
 };
 
-/* ── How it Works modal ─────────────────────────────────────── */
+/* â”€â”€ How it Works modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const HowItWorksModal = ({ onClose }) => {
   const [active, setActive] = useState(0);
   const steps = [
     {
-      icon: '🔍',
+      icon: 'ðŸ”',
       title: 'Browse & Filter',
       desc: 'Explore our pool of verified, background-checked caregivers. Use filters like specialty, experience, price, and rating to narrow down the best candidates for your loved one.',
       detail: 'Every caregiver on FamilyCare is identity-verified, reference-checked, and holds valid certifications for their listed specialties.',
     },
     {
-      icon: '📋',
+      icon: 'ðŸ“‹',
       title: 'Review Profiles',
-      desc: 'Read detailed profiles including qualifications, patient reviews, specialties, and personal care philosophy — so you know exactly who you\'re trusting with your family.',
+      desc: 'Read detailed profiles including qualifications, patient reviews, specialties, and personal care philosophy â€” so you know exactly who you\'re trusting with your family.',
       detail: 'Profiles include video introductions, verified credentials, response time, and availability calendars.',
     },
     {
-      icon: '🤝',
+      icon: 'ðŸ¤',
       title: 'Schedule a Match Call',
       desc: 'Not sure who to choose? Our Family Concierge team will schedule a free consultation to understand your needs and personally recommend the best matches.',
-      detail: 'Consultations are free, no-commitment, and typically last 20–30 minutes.',
+      detail: 'Consultations are free, no-commitment, and typically last 20â€“30 minutes.',
     },
     {
-      icon: '💚',
+      icon: 'ðŸ’š',
       title: 'Start Care',
       desc: 'Once you\'ve chosen, we handle the contracts, scheduling, and ongoing check-ins. Your dedicated care manager monitors health logs and keeps you updated in real time.',
       detail: 'Cancel or reschedule anytime. Our platform tracks health logs, visit history, and sends alerts directly to your phone.',
@@ -168,7 +168,7 @@ const HowItWorksModal = ({ onClose }) => {
             position: 'absolute', top: '1.2rem', right: '1.2rem', background: 'rgba(255,255,255,0.15)',
             border: 'none', borderRadius: '50%', width: '32px', height: '32px',
             fontSize: '1.1rem', cursor: 'pointer', color: 'white', lineHeight: '32px',
-          }}>×</button>
+          }}>Ã—</button>
           <h3 style={{ fontSize: '1.5rem', marginBottom: '0.4rem' }}>How FamilyCare Works</h3>
           <p style={{ opacity: 0.85, fontSize: '0.9rem' }}>Four simple steps to the right care.</p>
         </div>
@@ -214,20 +214,20 @@ const HowItWorksModal = ({ onClose }) => {
                 padding: '0.6rem 1.2rem', borderRadius: '10px', border: '1.5px solid #e2e8f0',
                 background: 'none', cursor: active === 0 ? 'not-allowed' : 'pointer',
                 color: active === 0 ? '#cbd5e0' : '#4a5568', fontWeight: '600', fontSize: '0.88rem',
-              }}>← Previous</button>
+              }}>â† Previous</button>
             <span style={{ color: '#a0aec0', fontSize: '0.82rem' }}>Step {active + 1} of {steps.length}</span>
             {active < steps.length - 1 ? (
               <button onClick={() => setActive(p => p + 1)} style={{
                 padding: '0.6rem 1.2rem', borderRadius: '10px', border: 'none',
                 background: 'var(--color-primary)', color: 'white',
                 cursor: 'pointer', fontWeight: '600', fontSize: '0.88rem',
-              }}>Next →</button>
+              }}>Next â†’</button>
             ) : (
               <button onClick={onClose} style={{
                 padding: '0.6rem 1.2rem', borderRadius: '10px', border: 'none',
                 background: 'var(--color-primary)', color: 'white',
                 cursor: 'pointer', fontWeight: '600', fontSize: '0.88rem',
-              }}>Get Started ✓</button>
+              }}>Get Started âœ“</button>
             )}
           </div>
         </div>
@@ -243,10 +243,10 @@ const CARD_ACCENTS = ['#0d9488','#0ea5e9','#8b5cf6','#f59e0b','#10b981','#ef4444
 
 function mapCaregiver(c) {
   const tags = [];
-  if (c.experience_years) tags.push({ label: `${c.experience_years} Exp.`, icon: '🗓' });
-  if (c.certification)    tags.push({ label: c.certification, icon: '🏅' });
-  if (c.license_id)       tags.push({ label: `Lic. ${c.license_id}`, icon: '📋' });
-  if (c.languages)        tags.push({ label: c.languages, icon: '🌐' });
+  if (c.experience_years) tags.push({ label: `${c.experience_years} Exp.`, icon: 'ðŸ—“' });
+  if (c.certification)    tags.push({ label: c.certification, icon: 'ðŸ…' });
+  if (c.license_id)       tags.push({ label: `Lic. ${c.license_id}`, icon: 'ðŸ“‹' });
+  if (c.languages)        tags.push({ label: c.languages, icon: 'ðŸŒ' });
 
   const imgIdx = AVATAR_POOL[(c.id - 1) % AVATAR_POOL.length];
   return {
@@ -272,7 +272,7 @@ function StarRating({ value }) {
     <span className="cg-stars">
       {[1,2,3,4,5].map(i => (
         <span key={i} style={{ color: i <= full ? '#f59e0b' : (i === full + 1 && half ? '#f59e0b' : '#e2e8f0') }}>
-          {i <= full ? '★' : (i === full + 1 && half ? '⯨' : '★')}
+          {i <= full ? 'â˜…' : (i === full + 1 && half ? 'â¯¨' : 'â˜…')}
         </span>
       ))}
     </span>
@@ -291,7 +291,53 @@ const Caregivers = () => {
   useEffect(() => {
     fetch(`${API_BASE}/caregivers/public`)
       .then(res => { if (!res.ok) throw new Error('Failed to load caregivers'); return res.json(); })
-      .then(data => { setCaregivers(data.map(mapCaregiver)); setLoading(false); })
+            .then(data => {
+        if (data && data.length > 0) {
+          setCaregivers(data.map(mapCaregiver));
+        } else {
+          // Mock data fallback if DB is empty
+          const mockData = [
+            {
+              id: 'mock-1',
+              name: 'Elena Rodriguez',
+              specialization: 'Dementia Care, Palliative Care, CNA Certified',
+              hourly_rate: 32.00,
+              rating: 4.9,
+              total_reviews: 128,
+              bio: 'Specialized in elderly dementia support with 8 years of certified nursing assistance experience.',
+              avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Elena',
+              is_available: 1,
+              location: 'In-home & Facility'
+            },
+            {
+              id: 'mock-2',
+              name: 'Marcus Thorne',
+              specialization: 'Mobility Support, Physical Therapy, Rehab',
+              hourly_rate: 45.00,
+              rating: 4.8,
+              total_reviews: 94,
+              bio: 'PT assistant focusing on senior mobility enhancement and post-injury rehabilitation.',
+              avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus',
+              is_available: 1,
+              location: 'In-home Care'
+            },
+            {
+              id: 'mock-3',
+              name: 'Sarah Jenkins',
+              specialization: 'Meal Prep, Medication Mgmt, Companion Care',
+              hourly_rate: 28.00,
+              rating: 5.0,
+              total_reviews: 215,
+              bio: 'Compassionate caregiver specializing in daily nutrition logs, scheduling, and medication tracking.',
+              avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
+              is_available: 1,
+              location: 'Facility'
+            }
+          ];
+          setCaregivers(mockData.map(mapCaregiver));
+        }
+        setLoading(false);
+      })
       .catch(err => { setError(err.message); setLoading(false); });
   }, []);
 
@@ -382,7 +428,7 @@ const Caregivers = () => {
         <div className="caregivers-grid">
           {loading && (
             <p style={{ gridColumn: '1/-1', textAlign: 'center', color: '#718096', padding: '2rem' }}>
-              Loading caregivers…
+              Loading caregiversâ€¦
             </p>
           )}
           {error && (
@@ -431,19 +477,19 @@ const Caregivers = () => {
               <div className="cg-body">
                 <div className="cg-name-row">
                   <h3 className="cg-name">{cg.name}</h3>
-                  <span className="cg-verified-pill">✓ Verified</span>
+                  <span className="cg-verified-pill">âœ“ Verified</span>
                 </div>
                 <p className="cg-specialty" style={{ color: cg.accent }}>{cg.title}</p>
 
                 {/* Info grid */}
                 <div className="cg-info-grid">
                   <div className="cg-info-item">
-                    <span className="cg-info-icon">📍</span>
+                    <span className="cg-info-icon">ðŸ“</span>
                     <span>{cg.location}</span>
                   </div>
                   {cg.available !== undefined && (
                     <div className="cg-info-item">
-                      <span className="cg-info-icon">{cg.available ? '✅' : '🕐'}</span>
+                      <span className="cg-info-icon">{cg.available ? 'âœ…' : 'ðŸ•'}</span>
                       <span style={{ color: cg.available ? '#10b981' : '#f59e0b', fontWeight: 600 }}>
                         {cg.available ? 'Available Now' : 'On Request'}
                       </span>
@@ -463,7 +509,7 @@ const Caregivers = () => {
                 {/* Bio */}
                 {cg.bio && (
                   <p className="cg-bio">
-                    &ldquo;{cg.bio.length > 130 ? cg.bio.slice(0, 130) + '…' : cg.bio}&rdquo;
+                    &ldquo;{cg.bio.length > 130 ? cg.bio.slice(0, 130) + 'â€¦' : cg.bio}&rdquo;
                   </p>
                 )}
 
@@ -501,3 +547,4 @@ const Caregivers = () => {
 };
 
 export default Caregivers;
+
