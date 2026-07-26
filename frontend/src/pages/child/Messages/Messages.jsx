@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { 
   Search, Video, Phone, MoreVertical, Paperclip, Smile, Send,
   PhoneCall, User, Calendar, Heart, ShieldAlert, Plus, Sparkles, AlertCircle
@@ -112,8 +112,22 @@ const contactsData = [
 ];
 
 const Messages = () => {
+  const [searchParams] = useSearchParams();
+  const recipientId = searchParams.get('recipient');
+
   const [contacts, setContacts] = useState(contactsData);
   const [activeContactId, setActiveContactId] = useState('Sarah');
+  
+  useEffect(() => {
+    if (recipientId) {
+      // For now, if the caregiver isn't in our mock list, we just default to the first one,
+      // but ideally we'd add them to the contacts list if they're new.
+      const match = contacts.find(c => String(c.user_id) === recipientId || String(c.id) === recipientId);
+      if (match) {
+        setActiveContactId(match.id);
+      }
+    }
+  }, [recipientId, contacts]);
   const [searchQuery, setSearchQuery] = useState('');
   const [typedMessage, setTypedMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -298,7 +312,7 @@ const Messages = () => {
                 <div>
                   <h4 className="mc-header-name">{activeContact.name}</h4>
                   <p className="mc-header-status">
-                    Related to <span className="bold">{activeContact.relation}</span> • 
+                    Related to <span className="bold">{activeContact.relation}</span> â€¢ 
                     <span className={`mc-status-indicator ${activeContact.status.toLowerCase()}`}>
                       {activeContact.status}
                     </span>
@@ -458,3 +472,4 @@ const Messages = () => {
 };
 
 export default Messages;
+
