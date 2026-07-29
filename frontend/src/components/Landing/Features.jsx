@@ -129,7 +129,7 @@ const Features = () => {
 
         <div
           ref={gridRef}
-          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}
+          className="lnd-features-grid"
         >
           {features.map((f, i) => (
             <div
@@ -202,6 +202,18 @@ const Features = () => {
           transition:width 0.8s cubic-bezier(0.34,1.56,0.64,1);
         }
         .lnd-reveal--in .lnd-section-title::after { width:60px; }
+
+        .lnd-features-grid {
+          display:grid;
+          grid-template-columns: 1fr;
+          gap:2rem;
+        }
+        @media(min-width:640px){
+          .lnd-features-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media(min-width:1024px){
+          .lnd-features-grid { grid-template-columns: repeat(4, 1fr); }
+        }
 
         @media(max-width:640px){
           #features { padding:64px 0 !important; }

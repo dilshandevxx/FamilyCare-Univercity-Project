@@ -87,25 +87,26 @@ const getContacts = async (req, res) => {
       contacts = rows;
     }
 
-    // Deduplicate: same user may appear once per elder assignment
+    // Always include anyone this user has an actual message history with —
+    // e.g. someone started via the "New Message" composer who isn't tied to
+    // an elder assignment. Without this, those conversations would vanish
+    // from the sidebar the moment structured contacts exist.
+    const [messagedRows] = await pool.query(
+      `SELECT DISTINCT u.id, u.name, u.email, u.role,
+              NULL AS elder_name, NULL AS elder_id
+       FROM users u
+       JOIN messages m
+         ON (m.sender_id = u.id   AND m.receiver_id = ?)
+         OR (m.receiver_id = u.id AND m.sender_id   = ?)
+       WHERE u.id != ?`,
+      [userId, userId, userId]
+    );
+    contacts = contacts.concat(messagedRows);
+
+    // Deduplicate: same user may appear once per elder assignment and/or via message history
     const seenIds = new Map();
     contacts.forEach((c) => { if (!seenIds.has(c.id)) seenIds.set(c.id, c); });
     contacts = Array.from(seenIds.values());
-
-    // If no structured contacts, fall back to anyone this user has messaged
-    if (contacts.length === 0) {
-      const [rows] = await pool.query(
-        `SELECT DISTINCT u.id, u.name, u.email, u.role,
-                NULL AS elder_name, NULL AS elder_id
-         FROM users u
-         JOIN messages m
-           ON (m.sender_id = u.id   AND m.receiver_id = ?)
-           OR (m.receiver_id = u.id AND m.sender_id   = ?)
-         WHERE u.id != ?`,
-        [userId, userId, userId]
-      );
-      contacts = rows;
-    }
 
     // Enrich each contact with last message preview and unread count
     const enriched = await Promise.all(

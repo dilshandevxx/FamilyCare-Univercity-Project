@@ -70,30 +70,35 @@ const Login = () => {
       <div className="login-form-panel">
         <div className="login-form-inner">
 
-          {/* Brand */}
-          <div className="login-brand">
+          {/* Brand — click to go home */}
+          <Link to="/" className="login-brand">
             <div className="login-brand-icon">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
               </svg>
             </div>
             <span className="login-brand-name">FamilyCare</span>
-          </div>
+          </Link>
 
           {/* Heading */}
           <div className="login-heading">
             <h1>Sign in to your account</h1>
-            <p>Welcome back! Please enter your details below.</p>
+            <p>
+              {selectedRole === 'family'
+                ? 'Welcome back! Sign in to your family account.'
+                : 'Welcome back! Sign in to your caregiver account.'}
+            </p>
           </div>
 
-          {/* Role Toggle */}
-          <div className="login-role-toggle">
+          {/* Role Switcher — animated sliding pill */}
+          <div className={`login-role-switcher ${selectedRole}`}>
+            <div className={`login-role-pill${selectedRole === 'caregiver' ? ' right' : ''}`} />
             <button
               type="button"
-              className={`login-role-btn ${selectedRole === 'family' ? 'active' : ''}`}
+              className={`login-role-opt${selectedRole === 'family' ? ' selected' : ''}`}
               onClick={() => setSelectedRole('family')}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
               </svg>
@@ -101,15 +106,20 @@ const Login = () => {
             </button>
             <button
               type="button"
-              className={`login-role-btn ${selectedRole === 'caregiver' ? 'active' : ''}`}
+              className={`login-role-opt${selectedRole === 'caregiver' ? ' selected' : ''}`}
               onClick={() => setSelectedRole('caregiver')}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
               </svg>
               Caregiver
             </button>
           </div>
+          <p className="login-role-tagline">
+            {selectedRole === 'family'
+              ? 'Monitor care, track health & stay connected'
+              : 'Manage residents, log health data & communicate'}
+          </p>
 
           {/* Error */}
           {error && (
@@ -240,7 +250,7 @@ const Login = () => {
 
           <div className="login-hero-badge">
             <span className="badge-dot"></span>
-            Trusted by 10,000+ families
+            Trusted by 100+ families
           </div>
 
           <h2 className="login-hero-title">
@@ -254,12 +264,12 @@ const Login = () => {
 
           <div className="login-stats">
             <div className="login-stat">
-              <strong>10k+</strong>
+              <strong>100+</strong>
               <span>Families</span>
             </div>
             <div className="login-stat-divider"></div>
             <div className="login-stat">
-              <strong>3k+</strong>
+              <strong>100+</strong>
               <span>Caregivers</span>
             </div>
             <div className="login-stat-divider"></div>
