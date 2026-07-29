@@ -357,6 +357,35 @@ const Dashboard = () => {
               </div>
             </div>
 
+            {/* Assigned Caregivers */}
+            <div className="cd-card">
+              <h3 className="cd-card-title">Assigned Caregivers</h3>
+              {loading ? (
+                <div className="cd-skeleton cd-skeleton-box" style={{ height: '80px' }}></div>
+              ) : !dashboardData?.assignedCaregivers || dashboardData.assignedCaregivers.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '1rem 0', color: '#64748b', fontSize: '0.82rem' }}>
+                  No caregivers currently assigned.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {dashboardData.assignedCaregivers.map((cg, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <img src={cg.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cg.name)}`} alt={cg.name} style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#e2e8f0' }} />
+                        <div>
+                          <p style={{ margin: 0, fontWeight: '600', color: '#0f172a', fontSize: '0.9rem' }}>{cg.name}</p>
+                          <p style={{ margin: 0, color: '#64748b', fontSize: '0.75rem' }}>{cg.specialization || 'Caregiver'} • For: {cg.parent_name}</p>
+                        </div>
+                      </div>
+                      <Link to={`/messages?recipient=${cg.user_id}`} style={{ padding: '6px 12px', background: '#00a896', color: '#fff', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '500', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#008a7b'} onMouseOut={e => e.currentTarget.style.background = '#00a896'}>
+                        Chat
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
 
 
 

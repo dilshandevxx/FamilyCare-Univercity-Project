@@ -178,7 +178,7 @@ const AssignedElders = () => {
                       <div>
                         <h3 className="elder-name">{elder.name}</h3>
                         <p className="elder-meta">
-                          {elder.age} years old
+                          {elder.age ? `${elder.age} years old` : 'Age unknown'}
                           {elder.room_number && <span className="desktop-id"> • Room {elder.room_number}</span>}
                           <span className="mobile-condition">{elder.medical_conditions}</span>
                         </p>
