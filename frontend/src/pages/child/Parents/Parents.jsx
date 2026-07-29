@@ -1,8 +1,8 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Plus, User, HeartPulse, ShieldAlert, Phone, MapPin, 
-  UserSearch, Sparkles, Heart, Activity, Thermometer, Trash2, Edit2, X
+  UserSearch, Sparkles, Heart, Activity, Thermometer, Trash2, Edit2, X, MessageSquare
 } from 'lucide-react';
 import ChildLayout from '../../../layouts/ChildLayout';
 import api from '../../../services/api';
@@ -173,10 +173,20 @@ const Parents = () => {
                     </div>
                   </div>
 
-                  <div className="pm-card-actions">
-                    <Link to={"/health-feed?parent_id=" + parent.id} className="pm-card-btn primary">
+                  <div className="pm-card-actions" style={{ display: 'flex', gap: '8px' }}>
+                    <Link to={"/health-feed?parent_id=" + parent.id} className="pm-card-btn primary" style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
                       <Activity size={14} /> Health Feed
                     </Link>
+                    {parent.caregiver_user_id && (
+                      <Link 
+                        to={`/messages?recipient=${parent.caregiver_user_id}&regardingName=${encodeURIComponent(parent.name)}`} 
+                        className="pm-card-btn primary" 
+                        style={{ flex: 1, background: '#0ea5e9', display: 'flex', justifyContent: 'center' }}
+                        title={`Chat with ${parent.caregiver_name}`}
+                      >
+                        <MessageSquare size={14} style={{ marginRight: '6px' }} /> Chat with {parent.caregiver_name.split(' ')[0]}
+                      </Link>
+                    )}
                   </div>
                 </div>
               );
