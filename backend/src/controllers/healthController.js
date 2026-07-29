@@ -397,11 +397,59 @@ const getAnalytics = async (req, res) => {
     const totalLogs = stats.totalLogs || 0;
     const criticalAlerts = alerts.criticalAlerts || 0;
 
+    // Fetch chart data (last 7 days)
+    const [chartLogs] = await pool.query(
+      `SELECT 
+         DATE_FORMAT(logged_at, '%w') as day_idx,
+         AVG(SUBSTRING_INDEX(blood_pressure, '/', 1)) as sys,
+         AVG(SUBSTRING_INDEX(blood_pressure, '/', -1)) as dia
+       FROM health_logs 
+       WHERE parent_id = ? AND logged_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+       GROUP BY day_idx`,
+      [parent_id]
+    );
+
+    const bpChartData = {
+      Systolic: [0, 0, 0, 0, 0, 0, 0],
+      Diastolic: [0, 0, 0, 0, 0, 0, 0]
+    };
+
+    chartLogs.forEach(row => {
+      const idx = parseInt(row.day_idx); // 0 = Sun
+      const mappedIdx = idx === 0 ? 6 : idx - 1; // Mon = 0 ... Sun = 6
+      bpChartData.Systolic[mappedIdx] = Math.round(row.sys) || 0;
+      bpChartData.Diastolic[mappedIdx] = Math.round(row.dia) || 0;
+    });
+
+    // Fetch nutrition data
+    const [[nutrition]] = await pool.query(
+      `SELECT 
+         SUM(CASE WHEN breakfast_status = 'Completed' THEN 1 ELSE 0 END) as breakfast_comp,
+         SUM(CASE WHEN breakfast_status IN ('Completed','Skipped') THEN 1 ELSE 0 END) as breakfast_total,
+         SUM(CASE WHEN lunch_status = 'Completed' THEN 1 ELSE 0 END) as lunch_comp,
+         SUM(CASE WHEN lunch_status IN ('Completed','Skipped') THEN 1 ELSE 0 END) as lunch_total,
+         SUM(CASE WHEN dinner_status = 'Completed' THEN 1 ELSE 0 END) as dinner_comp,
+         SUM(CASE WHEN dinner_status IN ('Completed','Skipped') THEN 1 ELSE 0 END) as dinner_total
+       FROM health_logs 
+       WHERE parent_id = ? AND logged_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)`,
+      [parent_id]
+    );
+
+    const calcPercent = (comp, total) => total > 0 ? Math.round((comp / total) * 100) : 0;
+
+    const nutritionData = [
+      { label: 'Breakfast', percent: calcPercent(nutrition.breakfast_comp, nutrition.breakfast_total), color: '#00A896' },
+      { label: 'Lunch', percent: calcPercent(nutrition.lunch_comp, nutrition.lunch_total), color: '#00c4af' },
+      { label: 'Dinner', percent: calcPercent(nutrition.dinner_comp, nutrition.dinner_total), color: '#5eead4' }
+    ];
+
     res.json({
       avgBp,
       avgTemp,
       totalLogs,
-      criticalAlerts
+      criticalAlerts,
+      bpChartData,
+      nutritionData
     });
   } catch (err) {
     console.error('Error fetching analytics:', err);
