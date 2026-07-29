@@ -604,10 +604,10 @@ const getChildDashboardStats = async (req, res) => {
       [child_id]
     );
 
-    // Build 7-day array (mock fallback if no data to keep UI looking good)
+    // Build 7-day array (zeros by default)
     const hasChartData = chartData.length > 0;
-    const bpTrend = hasChartData ? [0,0,0,0,0,0,0] : [118, 122, 115, 128, 120, 116, 119];
-    const tempTrend = hasChartData ? [0,0,0,0,0,0,0] : [98.2, 98.4, 98.6, 98.1, 98.5, 98.3, 98.6];
+    const bpTrend = [0,0,0,0,0,0,0];
+    const tempTrend = [0,0,0,0,0,0,0];
     
     if (hasChartData) {
       chartData.forEach(row => {
@@ -642,12 +642,7 @@ const getChildDashboardStats = async (req, res) => {
 
     let feed = [...vitals, ...activities].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
 
-    if (feed.length === 0) {
-       const d = new Date();
-       feed = [{
-         id: 'mock-1', type: 'vitals', title: 'System Setup', description: 'Dashboard initialized successfully. Awaiting first health logs.', logged_by: 'System', timestamp: d.toISOString(), parent_name: 'System'
-       }];
-    }
+    // No mock feed if empty.
 
     // 5. Assigned Caregivers
     const [assignedCaregivers] = await pool.query(
