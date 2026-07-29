@@ -9,8 +9,10 @@ import FeaturesPage from './pages/public/Features/Features';
 import Caregivers        from './pages/public/Caregivers/Caregivers';
 import CaregiverProfile  from './pages/public/Caregivers/CaregiverProfile';
 import About      from './pages/public/About/About';
-import Login      from './pages/public/Login/Login';
-import Register      from './pages/public/Register/Register';
+import Login          from './pages/public/Login/Login';
+import Register        from './pages/public/Register/Register';
+import ForgotPassword  from './pages/public/ForgotPassword/ForgotPassword';
+import ResetPassword   from './pages/public/ResetPassword/ResetPassword';
 import OAuthCallback from './pages/public/OAuthCallback/OAuthCallback';
 import Careers      from './pages/public/Careers/Careers';
 import Blog         from './pages/public/Blog/Blog';
@@ -87,9 +89,11 @@ const AppContent = () => {
         <Route path="/caregivers"     element={<Caregivers />} />
         <Route path="/caregivers/:id" element={<CaregiverProfile />} />
         <Route path="/about"     element={<About />} />
-        <Route path="/login"     element={<Login />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/register"       element={<Register />} />
+        <Route path="/login"           element={<Login />} />
+        <Route path="/admin/login"     element={<AdminLogin />} />
+        <Route path="/register"        element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password"  element={<ResetPassword />} />
         <Route path="/oauth/callback" element={<OAuthCallback />} />
         <Route path="/careers"        element={<Careers />} />
         <Route path="/blog"           element={<Blog />} />

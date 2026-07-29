@@ -47,13 +47,34 @@
   width: 100%;
 }
 
-/* ── Brand ── */
+/* ── Brand (clickable home link) ── */
 .reg-brand {
   display: flex;
   align-items: center;
   gap: 9px;
   margin-bottom: 2rem;
+  text-decoration: none;
+  width: fit-content;
+  border-radius: 8px;
+  transition: opacity 0.18s ease;
 }
+
+.reg-brand:hover { opacity: 0.75; }
+
+/* ── Back to Home link (form panel) ── */
+.reg-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #64748b;
+  text-decoration: none;
+  margin-bottom: 1.25rem;
+  transition: color 0.15s ease;
+}
+
+.reg-home-link:hover { color: #0f172a; }
 
 .reg-brand-icon {
   width: 34px;

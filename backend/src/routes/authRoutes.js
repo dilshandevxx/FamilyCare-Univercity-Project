@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, validate2FA } = require('../controllers/authController');
+const { register, login, validate2FA, forgotPassword, resetPassword } = require('../controllers/authController');
 const { passport, generateToken } = require('../config/passport');
 const rateLimit = require('express-rate-limit');
 
@@ -18,6 +18,8 @@ const authLimiter = rateLimit({
 router.post('/register', register);
 router.post('/login', authLimiter, login);
 router.post('/2fa/validate', authLimiter, validate2FA);
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password', resetPassword);
 
 // ── Google OAuth ──────────────────────────────────────────────
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
