@@ -239,7 +239,7 @@ const CaregiverDashboard = () => {
                         <div>
                           <h4 className="resident-name">{r.name}</h4>
                           <p className="resident-meta">
-                            {r.age} Years{r.room_number ? ` • Room ${r.room_number}` : ''}
+                            {r.age ? `${r.age} Years` : 'Age unknown'}{r.room_number ? ` • Room ${r.room_number}` : ''}
                           </p>
                           <span className={careStatusClass(r.care_status)}>
                             {(r.care_status || 'STABLE').toUpperCase()}

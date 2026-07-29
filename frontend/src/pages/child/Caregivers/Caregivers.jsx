@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Search, SlidersHorizontal, CheckCircle, HelpCircle, 
@@ -385,6 +385,15 @@ const CaregiversList = () => {
                         )}
 
                         <div className="cg-card-actions">
+                          {assignedParents.length > 0 && (
+                            <Link 
+                              to={`/messages?recipient=${cg.user_id}`}
+                              className="cg-action-btn"
+                              style={{ background: '#0ea5e9', color: '#fff', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}
+                            >
+                              Chat
+                            </Link>
+                          )}
                           <button className="cg-action-btn secondary">
                             View Profile
                           </button>

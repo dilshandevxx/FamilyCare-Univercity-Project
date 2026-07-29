@@ -65,7 +65,7 @@ const getParents = async (req, res) => {
 
   try {
     const [rows] = await pool.query(
-      `SELECT parents.*, caregivers.name AS caregiver_name 
+      `SELECT parents.*, caregivers.name AS caregiver_name, caregivers.user_id AS caregiver_user_id 
        FROM parents 
        LEFT JOIN caregivers ON parents.assigned_caregiver_id = caregivers.id 
        WHERE parents.child_id = ?

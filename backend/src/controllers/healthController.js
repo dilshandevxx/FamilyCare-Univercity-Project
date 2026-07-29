@@ -63,14 +63,13 @@ const addLog = async (req, res) => {
 
     const [result] = await pool.query(
       `INSERT INTO health_logs
-         (parent_id, blood_pressure, heart_rate, temperature, meal_status, notes, logged_by${loggedAtValue ? ', logged_at' : ''})
-       VALUES (?,?,?,?,?,?,?${loggedAtValue ? ',?' : ''})`,
+         (parent_id, blood_pressure, heart_rate, temperature, notes, logged_by${loggedAtValue ? ', logged_at' : ''})
+       VALUES (?,?,?,?,?,?${loggedAtValue ? ',?' : ''})`,
       [
         parent_id,
         blood_pressure || null,
         heart_rate     || null,
         temperature    || null,
-        meal_status    || null,
         notes          || clinical_notes || null,
         req.user.id,
         ...(loggedAtValue ? [loggedAtValue] : []),
@@ -650,6 +649,16 @@ const getChildDashboardStats = async (req, res) => {
        }];
     }
 
+    // 5. Assigned Caregivers
+    const [assignedCaregivers] = await pool.query(
+      `SELECT DISTINCT c.id as caregiver_id, c.name, c.specialization, u.id as user_id, u.avatar_url, p.name as parent_name
+       FROM parents p
+       JOIN caregivers c ON p.assigned_caregiver_id = c.id
+       JOIN users u ON c.user_id = u.id
+       WHERE p.child_id = ?`,
+      [child_id]
+    );
+
     res.json({
       topStats: {
         totalParents: parentsStat.total_parents || 0,
@@ -669,7 +678,8 @@ const getChildDashboardStats = async (req, res) => {
         bpTrend,
         tempTrend
       },
-      feed
+      feed,
+      assignedCaregivers
     });
   } catch (err) {
     console.error('Child Dashboard Error:', err);

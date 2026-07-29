@@ -378,7 +378,7 @@ const getMyResidents = async (req, res) => {
     const [rows] = await pool.query(
       `SELECT
          p.id, p.name, p.age, p.medical_conditions, p.room_number, p.care_status,
-         hl.blood_pressure, hl.heart_rate, hl.temperature, hl.meal_status,
+         hl.blood_pressure, hl.heart_rate, hl.temperature,
          hl.notes        AS last_notes,
          hl.logged_at    AS last_update
        FROM parents p
