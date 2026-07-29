@@ -50,10 +50,10 @@
 
 .admin-stat-card {
   background: #ffffff;
-  border-radius: 14px;
+  border-radius: 20px;
   padding: 20px;
-  border: 1px solid #f1f5f9;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  border: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
 }
 
 .admin-stat-top {
@@ -102,7 +102,7 @@
   flex-shrink: 0;
 }
 
-.admin-stat-icon.teal { background: #f0fdfa; color: #14b8a6; }
+.admin-stat-icon.teal { background: #e6f7f5; color: #00a896; }
 .admin-stat-icon.blue { background: #eff6ff; color: #3b82f6; }
 .admin-stat-icon.rose { background: #fff1f2; color: #f43f5e; }
 
@@ -117,7 +117,7 @@
 
 .admin-stat-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #14b8a6, #0d9488);
+  background: linear-gradient(90deg, #00a896, #028090);
   border-radius: 999px;
 }
 
@@ -137,10 +137,10 @@
 /* Chart */
 .admin-chart-card {
   background: #ffffff;
-  border-radius: 14px;
+  border-radius: 20px;
   padding: 24px;
-  border: 1px solid #f1f5f9;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  border: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
 }
 
 .admin-chart-header {
@@ -194,12 +194,12 @@
 
 .admin-chart-btn.filled {
   border: none;
-  background: #14b8a6;
+  background: #00a896;
   color: #fff;
 }
 
 .admin-chart-btn.filled:hover {
-  background: #0d9488;
+  background: #028090;
 }
 
 /* Chart area */
@@ -248,7 +248,7 @@
 
 .admin-chart-bar {
   width: 100%;
-  background: linear-gradient(180deg, #14b8a6 0%, #0d9488 100%);
+  background: linear-gradient(180deg, #00a896 0%, #028090 100%);
   border-radius: 6px 6px 0 0;
   transition: opacity 0.2s;
   cursor: pointer;
@@ -281,8 +281,8 @@
 
 .admin-qa-btn {
   background: #ffffff;
-  border: 1px solid #f1f5f9;
-  border-radius: 14px;
+  border: none;
+  border-radius: 20px;
   padding: 20px 12px;
   display: flex;
   flex-direction: column;
@@ -293,19 +293,19 @@
   font-weight: 600;
   color: #374151;
   transition: all 0.2s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
 }
 
 .admin-qa-btn:hover {
-  border-color: #14b8a6;
-  background: #f0fdfa;
+  border-color: #00a896;
+  background: #e6f7f5;
   transform: translateY(-1px);
 }
 
 .admin-qa-icon {
   width: 46px;
   height: 46px;
-  background: #f0fdfa;
+  background: #e6f7f5;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -315,7 +315,7 @@
 /* Right panel — Alert Overview */
 .admin-alert-overview {
   background: #0f172a;
-  border-radius: 14px;
+  border-radius: 20px;
   padding: 20px;
   color: #fff;
 }
@@ -376,17 +376,17 @@
 }
 
 .admin-view-alerts-btn:hover {
-  border-color: #14b8a6;
-  color: #14b8a6;
+  border-color: #00a896;
+  color: #00a896;
 }
 
 /* Recent Activity */
 .admin-activity-card {
   background: #ffffff;
-  border-radius: 14px;
+  border-radius: 20px;
   padding: 18px;
-  border: 1px solid #f1f5f9;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  border: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
 }
 
 .admin-activity-header {
@@ -399,7 +399,7 @@
 .admin-view-all-btn {
   font-size: 12px;
   font-weight: 600;
-  color: #14b8a6;
+  color: #00a896;
   background: none;
   border: none;
   cursor: pointer;
@@ -460,10 +460,10 @@
 /* On Duty Spotlight */
 .admin-spotlight-card {
   background: #ffffff;
-  border-radius: 14px;
+  border-radius: 20px;
   padding: 18px;
-  border: 1px solid #f1f5f9;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  border: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
 }
 
 .admin-spotlight-label {
@@ -486,7 +486,7 @@
   border-radius: 50%;
   overflow: hidden;
   background: #f1f5f9;
-  border: 2px solid #14b8a6;
+  border: 2px solid #00a896;
   flex-shrink: 0;
 }
 
@@ -511,8 +511,8 @@
 
 .admin-spotlight-badge {
   display: inline-block;
-  background: #f0fdfa;
-  color: #0d9488;
+  background: #e6f7f5;
+  color: #028090;
   font-size: 10px;
   font-weight: 700;
   padding: 2px 10px;
