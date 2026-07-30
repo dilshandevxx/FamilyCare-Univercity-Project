@@ -196,7 +196,7 @@ const FeaturesPage = () => {
               </ul>
             </div>
             <div className="feat-split-visual">
-              <img src="https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=800&auto=format&fit=crop" alt="Family using app" className="feat-image" loading="lazy" />
+              <img src="/assets/family_photo.png" alt="Family using app" className="feat-image" loading="lazy" />
             </div>
           </div>
 
@@ -218,7 +218,7 @@ const FeaturesPage = () => {
               </ul>
             </div>
             <div className="feat-split-visual">
-              <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=800&auto=format&fit=crop" alt="Caregiver checking app" className="feat-image" loading="lazy" />
+              <img src="/assets/caregiver_photo.png" alt="Caregiver checking app" className="feat-image" loading="lazy" />
             </div>
           </div>
 
