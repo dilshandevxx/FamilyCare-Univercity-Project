@@ -238,7 +238,7 @@ const Navbar = () => {
           gap: 0.5rem;
           background: rgba(255, 255, 255, 0.6);
           padding: 0.4rem;
-          border-radius: 100px;
+          border-radius: 4px;
           backdrop-filter: blur(10px);
           border: 1px solid rgba(255,255,255,0.8);
           box-shadow: 0 2px 15px rgba(0,0,0,0.02);
@@ -255,7 +255,7 @@ const Navbar = () => {
           font-weight: 500;
           font-size: 0.95rem;
           padding: 0.6rem 1.2rem;
-          border-radius: 100px;
+          border-radius: 4px;
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
           position: relative;
         }
@@ -276,7 +276,7 @@ const Navbar = () => {
           gap: 0.75rem;
           background: rgba(255, 255, 255, 0.4);
           padding: 0.35rem 0.35rem 0.35rem 0.75rem;
-          border-radius: 100px;
+          border-radius: 4px;
           border: 1px solid rgba(255, 255, 255, 0.7);
           box-shadow: 0 2px 10px rgba(0,0,0,0.02);
           backdrop-filter: blur(10px);
@@ -292,7 +292,7 @@ const Navbar = () => {
           font-weight: 600;
           font-size: 0.95rem;
           padding: 0.5rem 1rem;
-          border-radius: 100px;
+          border-radius: 4px;
           transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .nav-link-login:hover, .nav-link-dashboard:hover {
@@ -307,7 +307,7 @@ const Navbar = () => {
           font-size: 0.95rem;
           font-weight: 700;
           padding: 0.6rem 1.4rem;
-          border-radius: 100px;
+          border-radius: 4px;
           text-decoration: none;
           transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
           cursor: pointer;
