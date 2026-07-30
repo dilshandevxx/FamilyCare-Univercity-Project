@@ -78,7 +78,7 @@ const Testimonials = () => {
             whileHover={{ y: -8, transition: { duration: 0.2 } }}
           >
             <Quote size={40} color="rgba(16,185,129,0.2)" style={{ marginBottom: '20px' }} />
-            <p style={{ fontSize: '1.1rem', lineHeight: 1.7, color: '#f8fafc', fontStyle: 'italic' }}>
+            <p style={{ fontSize: '1.1rem', lineHeight: 1.7, color: '#0f172a', fontStyle: 'italic' }}>
               "{test.quote}"
             </p>
             <div className="client-info">
@@ -86,8 +86,8 @@ const Testimonials = () => {
                 {test.initial}
               </div>
               <div>
-                <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '700' }}>{test.name}</h4>
-                <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#94a3b8' }}>{test.role}</p>
+                <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: '700', color: '#0f172a' }}>{test.name}</h4>
+                <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#64748b' }}>{test.role}</p>
               </div>
             </div>
           </motion.div>

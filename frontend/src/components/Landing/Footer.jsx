@@ -9,7 +9,7 @@ const Toast = ({ message, onDone }) => {
   return (
     <div style={{
       position: 'fixed', bottom: '2rem', left: '50%', transform: 'translateX(-50%)',
-      background: '#1a202c', color: 'white', padding: '0.75rem 1.5rem',
+      background: '#0f172a', color: 'white', padding: '0.75rem 1.5rem',
       borderRadius: '50px', fontSize: '0.88rem', fontWeight: '500',
       boxShadow: '0 8px 24px rgba(0,0,0,0.2)', zIndex: 9999,
       display: 'flex', alignItems: 'center', gap: '0.6rem',
@@ -81,7 +81,7 @@ const Footer = () => {
               </div>
               FamilyCare
             </h4>
-            <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.6' }}>
+            <p style={{ color: '#64748b', fontSize: '0.95rem', lineHeight: '1.6' }}>
               Building the future of eldercare management for families abroad. Because distance shouldn't mean disconnected.
             </p>
             <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
@@ -91,11 +91,11 @@ const Footer = () => {
                   onClick={() => soon('Social Media')}
                   style={{
                     width: '36px', height: '36px', borderRadius: '50%',
-                    background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    cursor: 'pointer', color: '#94a3b8', transition: 'background 0.2s', fontSize: '0.9rem'
+                    background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', color: '#64748b', transition: 'background 0.2s', fontSize: '0.9rem'
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                  onMouseEnter={(e) => e.currentTarget.style.background = '#e2e8f0'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = '#f1f5f9'}
                 >
                   {icon}
                 </div>
@@ -126,13 +126,13 @@ const Footer = () => {
 
         </div>
 
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-          <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0 }}>
+        <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <p style={{ color: '#64748b', fontSize: '0.85rem', margin: 0 }}>
             © {new Date().getFullYear()} FamilyCare Inc. All rights reserved.
           </p>
           <div style={{ display: 'flex', gap: '1.5rem' }}>
-            <span onClick={() => navigate('/terms')} style={{ fontSize: '0.85rem', color: '#94a3b8', cursor: 'pointer' }}>Terms of Service</span>
-            <span onClick={() => navigate('/privacy-policy')} style={{ fontSize: '0.85rem', color: '#94a3b8', cursor: 'pointer' }}>Privacy</span>
+            <span onClick={() => navigate('/terms')} style={{ fontSize: '0.85rem', color: '#64748b', cursor: 'pointer' }}>Terms of Service</span>
+            <span onClick={() => navigate('/privacy-policy')} style={{ fontSize: '0.85rem', color: '#64748b', cursor: 'pointer' }}>Privacy</span>
           </div>
         </div>
       </div>

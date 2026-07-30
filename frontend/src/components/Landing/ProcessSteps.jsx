@@ -72,10 +72,10 @@ const ProcessSteps = () => {
             <div className="step-number">
               <step.icon size={36} strokeWidth={2} />
             </div>
-            <h3 style={{ fontSize: '1.4rem', fontWeight: '700', marginBottom: '16px' }}>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: '700', marginBottom: '16px', color: '#0f172a' }}>
               {step.title}
             </h3>
-            <p style={{ color: '#94a3b8', lineHeight: 1.6, fontSize: '1rem', margin: 0 }}>
+            <p style={{ color: '#64748b', lineHeight: 1.6, fontSize: '1rem', margin: 0 }}>
               {step.description}
             </p>
           </motion.div>

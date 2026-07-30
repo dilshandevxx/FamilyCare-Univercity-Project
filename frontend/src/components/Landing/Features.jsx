@@ -82,8 +82,8 @@ const Features = () => {
             <div className="feature-icon-wrapper">
               <feature.icon size={28} strokeWidth={2} />
             </div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: '700', margin: '0' }}>{feature.title}</h3>
-            <p style={{ color: '#94a3b8', lineHeight: 1.6, margin: 0, fontSize: '0.95rem' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: '700', margin: '0', color: '#0f172a' }}>{feature.title}</h3>
+            <p style={{ color: '#64748b', lineHeight: 1.6, margin: 0, fontSize: '0.95rem' }}>
               {feature.description}
             </p>
           </motion.div>
