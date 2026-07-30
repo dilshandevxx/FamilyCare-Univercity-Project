@@ -9,7 +9,7 @@
 /* ── HERO ─────────────────────────────────────────────────── */
 .about-hero {
   padding: 130px 6% 90px;
-  background: #f0fdfa;
+  background: linear-gradient(135deg, #f0fdfa 0%, #f8fafc 60%, #fff7ed 100%);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -99,7 +99,7 @@
 
 .about-hero-badge-float span {
   font-size: 0.78rem;
-  color: #64748b; /* was 94a3b8 */
+  color: #94a3b8;
   margin-top: 3px;
   display: block;
 }
@@ -164,10 +164,10 @@
 
 .about-vision-card {
   flex: 1 1 420px;
-  background: #0a4f3e;
+  background: linear-gradient(140deg, #0a4f3e 0%, #0d6b55 100%);
   padding: 44px 40px;
   border-radius: 28px;
-  color: #0f172a; /* was white */
+  color: white;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -192,7 +192,7 @@
 .about-stat-value {
   font-size: 2.2rem;
   font-weight: 800;
-  color: #0f172a; /* was white */
+  color: white;
   line-height: 1;
 }
 
@@ -419,7 +419,7 @@
 .about-team-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(13, 148, 136, 0.7);
+  background: linear-gradient(to top, rgba(13, 148, 136, 0.7) 0%, transparent 50%);
   opacity: 0;
   transition: opacity 0.3s;
   display: flex;
@@ -431,7 +431,7 @@
 
 .about-team-overlay-tag {
   background: rgba(255,255,255,0.2);
-  color: #0f172a; /* was white */
+  color: white;
   font-size: 0.72rem;
   font-weight: 700;
   padding: 4px 10px;
@@ -468,11 +468,11 @@
 .about-cta-section { padding: 0 6% 110px; }
 
 .about-cta-box {
-  background: #f8fafc; border: 1px solid #e2e8f0; /* was 0f172a */
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
   border-radius: 36px;
   padding: 80px 60px;
   text-align: center;
-  color: #0f172a; /* was white */
+  color: white;
   position: relative;
   overflow: hidden;
   animation: abFadeUp 0.8s ease-out both;
@@ -523,14 +523,14 @@
 .about-cta-title {
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 800;
-  color: #0f172a; /* was white */
+  color: white;
   margin: 0 0 18px;
   line-height: 1.15;
 }
 
 .about-cta-desc {
   font-size: 1.05rem;
-  color: #64748b; /* was 94a3b8 */
+  color: #94a3b8;
   max-width: 500px;
   margin: 0 auto 44px;
   line-height: 1.7;
@@ -545,7 +545,7 @@
 
 .about-cta-btn-primary {
   background: #0d9488;
-  color: #0f172a; /* was white */
+  color: white;
   padding: 15px 36px;
   border-radius: 100px;
   font-weight: 700;
@@ -563,8 +563,8 @@
 
 .about-cta-btn-secondary {
   background: transparent;
-  color: #0f172a; /* was white */
-  border: 1.5px solid rgba(15, 23, 42, 0.25);
+  color: white;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
   padding: 15px 36px;
   border-radius: 100px;
   font-weight: 600;
@@ -575,8 +575,8 @@
 }
 
 .about-cta-btn-secondary:hover {
-  border-color: rgba(15,23,42,0.6);
-  background: rgba(15,23,42,0.07);
+  border-color: rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.07);
   transform: translateY(-2px);
 }
 

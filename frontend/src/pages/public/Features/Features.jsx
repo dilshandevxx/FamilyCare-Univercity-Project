@@ -483,19 +483,19 @@ const FeaturesPage = () => {
         }
         .fp-hero__blob--1 {
           width: 600px; height: 600px;
-          background: rgba(0,168,150,0.04);
+          background: radial-gradient(circle, rgba(0,168,150,0.08) 0%, transparent 70%);
           top: -200px; right: -150px;
           animation: fp-blob-1 12s ease-in-out infinite;
         }
         .fp-hero__blob--2 {
           width: 400px; height: 400px;
-          background: rgba(0,168,150,0.03);
+          background: radial-gradient(circle, rgba(0,168,150,0.05) 0%, transparent 70%);
           bottom: -100px; left: -100px;
           animation: fp-blob-2 15s ease-in-out infinite;
         }
         .fp-hero__blob--3 {
           width: 250px; height: 250px;
-          background: rgba(37,99,235,0.03);
+          background: radial-gradient(circle, rgba(37,99,235,0.05) 0%, transparent 70%);
           top: 40%; left: 40%;
           animation: fp-blob-3 10s ease-in-out infinite;
         }
@@ -548,7 +548,7 @@ const FeaturesPage = () => {
         /* ---- Animated "Smarter" text ---- */
         .fp-teal { color: #00A896; }
         .fp-teal--anim {
-          background: #00A896;
+          background: linear-gradient(90deg, #00A896, #00d4bf, #00A896);
           background-size: 200% auto;
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
@@ -591,7 +591,7 @@ const FeaturesPage = () => {
         /* ─── Hero Visual Card ─── */
         .fp-hero__visual { display: flex; justify-content: center; }
         .fp-hero__card {
-          background: #ffffff; /* was 1A202C */
+          background: #1A202C;
           border-radius: 20px;
           padding: 1.5rem;
           width: 300px;
@@ -599,7 +599,7 @@ const FeaturesPage = () => {
           transition: box-shadow 0.3s ease;
           animation: fpFloat 6s ease-in-out infinite;
         }
-        .fp-hero__card--main { background: #f8fafc; /* was 1E2A38 */ }
+        .fp-hero__card--main { background: #1E2A38; }
         .fp-hero__card--float { animation: fp-float 5s ease-in-out infinite; }
         .fp-hero__card:hover {
           box-shadow: 0 35px 80px rgba(0,168,150,0.18);
@@ -613,7 +613,7 @@ const FeaturesPage = () => {
         .fp-hero__avatar {
           width: 36px; height: 36px;
           border-radius: 50%;
-          background: #00A896;
+          background: linear-gradient(135deg, #00A896, #00d4bf);
           flex-shrink: 0;
         }
         .fp-hero__avatar--pulse { animation: fp-pulse-ring 2.5s ease-in-out infinite; }
@@ -637,7 +637,7 @@ const FeaturesPage = () => {
         }
         .fp-bar {
           flex: 1;
-          background: #00A896;
+          background: linear-gradient(to top, #00A896, #00d4bf40);
           border-radius: 3px 3px 0 0;
           height: var(--bar-h);
         }
@@ -661,7 +661,7 @@ const FeaturesPage = () => {
 
         /* ─── Skeleton shimmer ─── */
         .fp-skeleton {
-          background: #e2e8f0; /* was 2D3748 */
+          background: #2D3748;
           border-radius: 4px;
           position: relative;
           overflow: hidden;
@@ -674,7 +674,7 @@ const FeaturesPage = () => {
           top: 0; left: -80%;
           width: 60%;
           height: 100%;
-          background: rgba(255,255,255,0.08);
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
           animation: fp-shine-sweep 1.8s ease-in-out infinite;
         }
 
@@ -702,7 +702,7 @@ const FeaturesPage = () => {
           top: 0; left: -80%;
           width: 60%;
           height: 100%;
-          background: rgba(255,255,255,0.22);
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
           transition: none;
         }
         .fp-btn:hover::after { animation: fp-shine-sweep 0.55s ease forwards; }
@@ -794,7 +794,7 @@ const FeaturesPage = () => {
           transform: translateX(-50%);
           height: 4px;
           width: 60px;
-          background: #00A896;
+          background: linear-gradient(90deg, #00A896, #00d4bf);
           border-radius: 2px;
           animation: fp-underline-grow 0.8s 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
         }
@@ -939,8 +939,8 @@ const FeaturesPage = () => {
           box-shadow: 0 20px 50px rgba(0,0,0,0.1);
           transition: box-shadow 0.35s ease, transform 0.35s ease;
         }
-        .fp-mockup--teal { background: #e0f2f1; animation: fpFloat 5s ease-in-out infinite; }
-        .fp-mockup--blue { background: #eff6ff; animation: fpFloatAlt 5.5s ease-in-out infinite; }
+        .fp-mockup--teal { background: linear-gradient(145deg, #e0f2f1, #b2dfdb); animation: fpFloat 5s ease-in-out infinite; }
+        .fp-mockup--blue { background: linear-gradient(145deg, #eff6ff, #bfdbfe); animation: fpFloatAlt 5.5s ease-in-out infinite; }
         .fp-mockup--float { animation: fp-float-alt 4.5s ease-in-out infinite; }
         .fp-mockup:hover {
           transform: scale(1.03) translateY(-4px);
@@ -996,7 +996,7 @@ const FeaturesPage = () => {
         .fp-mockup__family-avatar { margin-top: 1rem; }
         .fp-family-img {
           width: 100%; height: 80px;
-          background: #00A89640;
+          background: linear-gradient(135deg, #00A89640, #00A89620);
           border-radius: 10px;
           transition: opacity 0.3s;
         }
@@ -1004,7 +1004,7 @@ const FeaturesPage = () => {
         .fp-caregiver-img {
           width: 64px; height: 64px;
           border-radius: 50%;
-          background: #2563eb40;
+          background: linear-gradient(135deg, #2563eb40, #2563eb20);
           transition: transform 0.3s ease;
         }
         .fp-mockup:hover .fp-caregiver-img { transform: scale(1.07); }
@@ -1026,7 +1026,7 @@ const FeaturesPage = () => {
         ====================================================== */
         .fp-cta {
           padding: 90px 0;
-          background: #00A896;
+          background: linear-gradient(135deg, #00A896 0%, #00796b 100%);
           position: relative;
           overflow: hidden;
           opacity: 0;
