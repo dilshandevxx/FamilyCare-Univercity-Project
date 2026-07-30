@@ -196,7 +196,7 @@ const FeaturesPage = () => {
               </ul>
             </div>
             <div className="feat-split-visual">
-              <img src="/assets/family_dashboard.png" alt="Family using app" className="feat-image" loading="lazy" />
+              <img src="/assets/family_photo.png" alt="Family using app" className="feat-image" loading="lazy" />
             </div>
           </div>
 
@@ -218,7 +218,7 @@ const FeaturesPage = () => {
               </ul>
             </div>
             <div className="feat-split-visual">
-              <img src="/assets/caregiver_app.png" alt="Caregiver checking app" className="feat-image" loading="lazy" />
+              <img src="/assets/caregiver_photo.png" alt="Caregiver checking app" className="feat-image" loading="lazy" />
             </div>
           </div>
 
