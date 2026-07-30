@@ -74,10 +74,10 @@ const Navbar = () => {
           <div className="navbar__auth">
             {user ? (
               <>
-                <Link to={user.role === 'admin' ? '/admin/dashboard' : user.role === 'caregiver' ? '/caregiver/dashboard' : '/dashboard'} className="nav-link-dashboard">
+                <Link to={user.role === 'admin' ? '/admin/dashboard' : user.role === 'caregiver' ? '/caregiver/dashboard' : '/dashboard'} className="btn-modern btn-modern-dashboard">
                   Dashboard
                 </Link>
-                <button onClick={handleLogout} className="btn-modern btn-modern-outline">
+                <button onClick={handleLogout} className="btn-modern btn-modern-logout">
                   Logout
                 </button>
               </>
@@ -147,12 +147,12 @@ const Navbar = () => {
             <>
               <Link
                 to={user.role === 'admin' ? '/admin/dashboard' : user.role === 'caregiver' ? '/caregiver/dashboard' : '/dashboard'}
-                className="btn-modern btn-modern-primary w-full justify-center mb-3"
+                className="btn-modern btn-modern-dashboard w-full justify-center mb-3"
                 onClick={() => setMenuOpen(false)}
               >
                 Dashboard
               </Link>
-              <button onClick={handleLogout} className="btn-modern btn-modern-outline w-full justify-center">Logout</button>
+              <button onClick={handleLogout} className="btn-modern btn-modern-logout w-full justify-center">Logout</button>
             </>
           ) : (
             <>
@@ -364,6 +364,31 @@ const Navbar = () => {
           color: #0D9488;
           transform: translateY(-1px);
           box-shadow: 0 4px 12px rgba(13, 148, 136, 0.1);
+        }
+        
+        .btn-modern-dashboard {
+          background: #ebf8f6;
+          color: #0D9488;
+          box-shadow: 0 2px 10px rgba(13, 148, 136, 0.1);
+        }
+        .btn-modern-dashboard:hover {
+          background: #0D9488;
+          color: white;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(13, 148, 136, 0.25);
+        }
+
+        .btn-modern-logout {
+          background: #fef2f2;
+          color: #ef4444;
+          border: 1.5px solid #fecaca;
+        }
+        .btn-modern-logout:hover {
+          background: #ef4444;
+          color: white;
+          border-color: #ef4444;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
         }
         
         .w-full { width: 100%; }
