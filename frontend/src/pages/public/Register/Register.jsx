@@ -214,14 +214,14 @@ const Register = () => {
         {/* ══ LEFT: Hero Panel ══════════════════════════════════════════════ */}
         <div className="reg-hero-panel">
           <div className="reg-hero-content">
-            <div className="reg-brand">
+            <Link to="/" className="reg-brand">
               <div className="reg-brand-icon">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                 </svg>
               </div>
               <span className="reg-brand-name">FamilyCare</span>
-            </div>
+            </Link>
 
             <h2 className="reg-hero-title">
               Everything you need<br/>
@@ -260,6 +260,14 @@ const Register = () => {
         {/* ══ RIGHT: Form Panel ════════════════════════════════════════════ */}
         <div className="reg-form-panel">
           <div className="reg-form-inner">
+
+            {/* Back to home */}
+            <Link to="/" className="reg-home-link">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6"/>
+              </svg>
+              Back to Home
+            </Link>
 
             {/* Header */}
             <div className="reg-form-header">
