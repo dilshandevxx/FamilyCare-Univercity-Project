@@ -33,13 +33,7 @@ const formatDate = (iso) => {
 const residentAvatar = (name) =>
   `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name || 'elder')}`;
 
-// ── Activity Feed (static for now, real logs to come) ─────────────
-
-const ACTIVITY = [
-  { id: 1, icon: 'teal',   Icon: CheckCircle,    title: 'Morning Medication Administered', desc: 'Logged by You',       time: '10:45 AM' },
-  { id: 2, icon: 'orange', Icon: AlertTriangle,  title: 'Elevated Heart Rate Detected',     desc: 'Auto-monitored',      time: '09:12 AM' },
-  { id: 3, icon: 'slate',  Icon: FileText,       title: 'Breakfast Log Entry',              desc: 'Full meal consumed',  time: '08:00 AM' },
-];
+// ── Activity Feed (dynamic, fed by recentActivity state) ─────────────
 
 // ── Toast ─────────────────────────────────────────────────────────
 
@@ -68,7 +62,7 @@ const CaregiverDashboard = () => {
   const navigate = useNavigate();
 
   // ── state ──────────────────────────────────────────────
-  const [stats, setStats]           = useState({ total_residents: 0, logs_today: 0, pending_tasks: 0, urgent_count: 0 });
+  const [stats, setStats]           = useState({ total_residents: 0, logs_today: 0, pending_tasks: 0, urgent_count: 0, pendingTasksList: [], recentActivity: [] });
   const [residents, setResidents]   = useState([]);
   const [loading, setLoading]       = useState(true);
   const [toast, setToast]           = useState(null);
@@ -81,13 +75,8 @@ const CaregiverDashboard = () => {
   const [notes, setNotes]           = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  // Tasks (static demo — swap for real API when appointments are seeded)
-  const [tasks, setTasks] = useState([
-    { id: 1, title: 'Blood Pressure Check (Eleanor)', time: 'Completed at 09:00 AM', done: true },
-    { id: 2, title: 'Insulin Shot (Clara)',            time: 'Scheduled for 12:30 PM', done: false, urgent: true },
-    { id: 3, title: 'Physical Therapy Assist (Robert)',time: 'Scheduled for 02:00 PM', done: false },
-    { id: 4, title: 'Daily Hygiene Check (All)',       time: 'Self-paced task',        done: false },
-  ]);
+  const [tasks, setTasks] = useState([]);
+  const [recentActivity, setRecentActivity] = useState([]);
 
   // ── Load on mount ──────────────────────────────────────
   useEffect(() => {
@@ -100,6 +89,18 @@ const CaregiverDashboard = () => {
         setStats(statsData);
         setResidents(residentsData);
         if (residentsData.length > 0) setSelectedParent(String(residentsData[0].id));
+        
+        if (statsData.pendingTasksList) {
+          setTasks(statsData.pendingTasksList.map(p => ({
+            id: p.id,
+            title: `Log health for ${p.name}`,
+            time: 'Required Today',
+            done: false
+          })));
+        }
+        if (statsData.recentActivity) {
+          setRecentActivity(statsData.recentActivity);
+        }
       } catch (err) {
         showToast('error', 'Could not load dashboard data');
       } finally {
@@ -142,6 +143,17 @@ const CaregiverDashboard = () => {
       ]);
       setStats(s);
       setResidents(r);
+      if (s.pendingTasksList) {
+        setTasks(s.pendingTasksList.map(p => ({
+          id: p.id,
+          title: `Log health for ${p.name}`,
+          time: 'Required Today',
+          done: false
+        })));
+      }
+      if (s.recentActivity) {
+        setRecentActivity(s.recentActivity);
+      }
     } catch (err) {
       showToast('error', err?.response?.data?.error || 'Failed to submit log');
     } finally {
@@ -285,19 +297,25 @@ const CaregiverDashboard = () => {
             <section className="activity-feed">
               <h3 className="section-title" style={{ marginBottom: 24 }}>Recent Activity Feed</h3>
               <div className="activity-list">
-                {ACTIVITY.map((item, idx) => (
+                {recentActivity.length === 0 ? (
+                  <p style={{ color: '#64748b', fontSize: '13px' }}>No recent activity.</p>
+                ) : recentActivity.map((item, idx) => (
                   <div key={item.id} className="activity-item">
-                    <div className={`activity-icon ${item.icon}`}>
-                      <item.Icon size={14} />
+                    <div className="activity-icon teal">
+                      <FileText size={14} />
                     </div>
                     <div className="activity-content">
                       <div className="activity-header">
-                        <h5 className="activity-title">{item.title}</h5>
-                        <span className="activity-time">{item.time}</span>
+                        <h5 className="activity-title">Health Log: {item.elder_name}</h5>
+                        <span className="activity-time">{formatDate(item.logged_at)}</span>
                       </div>
-                      <p className="activity-desc">{item.desc}</p>
+                      <p className="activity-desc">
+                        {item.overall_condition} 
+                        {item.blood_pressure && ` • BP: ${item.blood_pressure}`}
+                        {item.temperature && ` • Temp: ${item.temperature}`}
+                      </p>
                     </div>
-                    {idx < ACTIVITY.length - 1 && <div className="activity-line" />}
+                    {idx < recentActivity.length - 1 && <div className="activity-line" />}
                   </div>
                 ))}
               </div>

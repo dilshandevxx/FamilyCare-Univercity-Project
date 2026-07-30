@@ -428,8 +428,8 @@ const getDashboardStats = async (req, res) => {
     );
 
     // Pending tasks = residents with no log today
-    const [[{ pending_tasks }]] = await pool.query(
-      `SELECT COUNT(*) AS pending_tasks FROM parents p
+    const [pendingTasksList] = await pool.query(
+      `SELECT id, name FROM parents p
        WHERE p.assigned_caregiver_id = ?
          AND p.id NOT IN (
            SELECT DISTINCT parent_id FROM health_logs
@@ -437,8 +437,19 @@ const getDashboardStats = async (req, res) => {
          )`,
       [caregiverId || 0]
     );
+    const pending_tasks = pendingTasksList.length;
 
-    res.json({ total_residents, logs_today, pending_tasks, urgent_count });
+    // Recent activity (health logs for my residents)
+    const [recentActivity] = await pool.query(
+      `SELECT hl.id, hl.logged_at, hl.overall_condition, hl.blood_pressure, hl.temperature, hl.meal_status, p.name as elder_name
+       FROM health_logs hl
+       JOIN parents p ON p.id = hl.parent_id
+       WHERE p.assigned_caregiver_id = ?
+       ORDER BY hl.logged_at DESC LIMIT 5`,
+      [caregiverId || 0]
+    );
+
+    res.json({ total_residents, logs_today, pending_tasks, urgent_count, pendingTasksList, recentActivity });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
