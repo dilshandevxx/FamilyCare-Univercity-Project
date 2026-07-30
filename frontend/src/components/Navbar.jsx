@@ -273,59 +273,98 @@ const Navbar = () => {
         .navbar__auth {
           display: flex;
           align-items: center;
-          gap: 1rem;
+          gap: 0.75rem;
+          background: rgba(255, 255, 255, 0.4);
+          padding: 0.35rem 0.35rem 0.35rem 0.75rem;
+          border-radius: 100px;
+          border: 1px solid rgba(255, 255, 255, 0.7);
+          box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+          backdrop-filter: blur(10px);
+          transition: all 0.3s ease;
+        }
+        .navbar--scrolled .navbar__auth {
+          background: rgba(248, 250, 252, 0.6);
         }
         
         .nav-link-login, .nav-link-dashboard {
           text-decoration: none;
-          color: #475569;
+          color: #334155;
           font-weight: 600;
           font-size: 0.95rem;
-          transition: color 0.2s;
+          padding: 0.5rem 1rem;
+          border-radius: 100px;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .nav-link-login:hover, .nav-link-dashboard:hover {
-          color: #0D9488;
+          color: #0f172a;
+          background: rgba(15, 23, 42, 0.05);
         }
 
         .btn-modern {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
+          gap: 6px;
           font-size: 0.95rem;
-          font-weight: 600;
-          padding: 0.7rem 1.4rem;
+          font-weight: 700;
+          padding: 0.6rem 1.4rem;
           border-radius: 100px;
           text-decoration: none;
-          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
           cursor: pointer;
           border: none;
+          position: relative;
+          overflow: hidden;
+          z-index: 1;
         }
         .btn-modern-primary {
-          background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+          background: #0f172a;
           color: white;
-          box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
+          box-shadow: 0 4px 14px rgba(15, 23, 42, 0.15);
         }
+        .btn-modern-primary::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+          opacity: 1;
+          z-index: -1;
+          transition: opacity 0.4s ease;
+        }
+        .btn-modern-primary::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+          transform: translateX(-100%);
+          z-index: -1;
+          transition: transform 0.6s ease;
+        }
+        
         .btn-modern-primary:hover {
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(13, 148, 136, 0.4);
+          box-shadow: 0 8px 25px rgba(13, 148, 136, 0.35);
+        }
+        .btn-modern-primary:hover::after {
+          transform: translateX(100%);
         }
         .btn-modern-primary .btn-icon {
           transition: transform 0.3s ease;
         }
         .btn-modern-primary:hover .btn-icon {
-          transform: translateX(3px);
+          transform: translateX(4px);
         }
         
         .btn-modern-outline {
           background: white;
           color: #0f172a;
-          border: 1px solid #e2e8f0;
+          border: 1.5px solid #e2e8f0;
           box-shadow: 0 2px 8px rgba(0,0,0,0.02);
         }
         .btn-modern-outline:hover {
-          border-color: #cbd5e1;
-          background: #f8fafc;
+          border-color: #0D9488;
+          color: #0D9488;
           transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(13, 148, 136, 0.1);
         }
         
         .w-full { width: 100%; }
