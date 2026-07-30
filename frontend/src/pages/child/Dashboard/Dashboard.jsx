@@ -230,8 +230,8 @@ const Dashboard = () => {
                         <p className="cd-alert-title">{alert.title}</p>
                         <p className="cd-alert-desc">{alert.description}</p>
                         <div className="cd-alert-actions">
-                          <button className={`cd-alert-btn-primary ${alert.type || 'info'}`}>VIEW DETAILS</button>
-                          <button className="cd-alert-btn-ghost">DISMISS</button>
+                          <Link to="/alerts" className={`cd-alert-btn-primary ${alert.type || 'info'}`} style={{ textDecoration: 'none' }}>VIEW DETAILS</Link>
+                          <button className="cd-alert-btn-ghost" onClick={() => setAlerts(alerts.filter(a => a.id !== alert.id))}>DISMISS</button>
                         </div>
                       </div>
                     </div>
