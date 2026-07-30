@@ -15,31 +15,22 @@ const Toast = ({ message, onDone }) => {
       display: 'flex', alignItems: 'center', gap: '0.6rem',
       animation: 'toastIn 0.3s ease',
     }}>
-      <span style={{ color: 'var(--color-primary)', fontSize: '1rem' }}>🚧</span>
+      <span style={{ color: '#10b981', fontSize: '1rem' }}>🚧</span>
       {message}
     </div>
   );
 };
 
 const FooterLink = ({ label, to, onClick }) => {
-  const [hovered, setHovered] = useState(false);
   return (
-    <span
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        cursor: 'pointer',
-        color: hovered ? 'var(--color-primary)' : 'var(--color-text-muted)',
-        fontSize: '0.9rem',
-        transition: 'color 0.2s ease',
-        display: 'flex', alignItems: 'center', gap: '0.3rem',
-        userSelect: 'none',
-      }}
-    >
-      {label}
-      {hovered && <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>→</span>}
-    </span>
+    <li>
+      <a href={to || "#"} onClick={(e) => {
+        e.preventDefault();
+        onClick();
+      }}>
+        {label}
+      </a>
+    </li>
   );
 };
 
@@ -66,75 +57,83 @@ const Footer = () => {
   ];
 
   return (
-    <footer style={{ padding: '80px 0', backgroundColor: '#fff', borderTop: '1px solid #edf2f7' }}>
+    <footer className="landing-footer">
       <style>{`
         @keyframes toastIn {
           from { opacity: 0; transform: translateX(-50%) translateY(12px); }
           to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-        @media (max-width: 768px) {
-          .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 2rem !important; }
-        }
-        @media (max-width: 480px) {
-          .footer-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
-          footer { padding: 48px 0 !important; }
         }
       `}</style>
 
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
 
       <div className="container">
-        <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: '4rem' }}>
+        <div className="footer-grid">
 
           <div>
             <h4
               onClick={() => navigate('/')}
-              style={{ color: 'var(--color-primary)', fontSize: '1.5rem', marginBottom: '1.5rem', cursor: 'pointer', display: 'inline-block' }}
+              className="footer-logo"
+              style={{ cursor: 'pointer' }}
             >
+              <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
+                FC
+              </div>
               FamilyCare
             </h4>
-            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', lineHeight: '1.6' }}>
+            <p style={{ color: '#94a3b8', fontSize: '0.95rem', lineHeight: '1.6' }}>
               Building the future of eldercare management for families abroad. Because distance shouldn't mean disconnected.
             </p>
             <div style={{ display: 'flex', gap: '0.75rem', marginTop: '1.5rem' }}>
               {['𝕏', 'in', 'f'].map((icon, i) => (
-                <button key={i} onClick={() => soon('Social media')} style={{
-                  width: '36px', height: '36px', borderRadius: '50%',
-                  border: '1.5px solid #e2e8f0', background: 'none',
-                  cursor: 'pointer', fontSize: '0.8rem', fontWeight: '700',
-                  color: '#718096', transition: 'border-color 0.2s, color 0.2s',
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--color-primary)'; e.currentTarget.style.color = 'var(--color-primary)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = '#e2e8f0'; e.currentTarget.style.color = '#718096'; }}
-                >{icon}</button>
+                <div
+                  key={i}
+                  onClick={() => soon('Social Media')}
+                  style={{
+                    width: '36px', height: '36px', borderRadius: '50%',
+                    background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    cursor: 'pointer', color: '#94a3b8', transition: 'background 0.2s', fontSize: '0.9rem'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                >
+                  {icon}
+                </div>
               ))}
             </div>
           </div>
 
           <div>
-            <h5 style={{ marginBottom: '1.5rem', fontSize: '1rem' }}>Platform</h5>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {platform.map(l => <FooterLink key={l.label} label={l.label} onClick={l.action} />)}
-            </div>
+            <h5 className="footer-heading">Platform</h5>
+            <ul className="footer-links">
+              {platform.map((item, i) => <FooterLink key={i} label={item.label} onClick={item.action} />)}
+            </ul>
           </div>
 
           <div>
-            <h5 style={{ marginBottom: '1.5rem', fontSize: '1rem' }}>Company</h5>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {company.map(l => <FooterLink key={l.label} label={l.label} onClick={l.action} />)}
-            </div>
+            <h5 className="footer-heading">Company</h5>
+            <ul className="footer-links">
+              {company.map((item, i) => <FooterLink key={i} label={item.label} onClick={item.action} />)}
+            </ul>
           </div>
 
           <div>
-            <h5 style={{ marginBottom: '1.5rem', fontSize: '1rem' }}>Support</h5>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {support.map(l => <FooterLink key={l.label} label={l.label} onClick={l.action} />)}
-            </div>
+            <h5 className="footer-heading">Support</h5>
+            <ul className="footer-links">
+              {support.map((item, i) => <FooterLink key={i} label={item.label} onClick={item.action} />)}
+            </ul>
           </div>
+
         </div>
 
-        <div style={{ marginTop: '5rem', paddingTop: '2rem', borderTop: '1px solid #edf2f7', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.85rem' }}>
-          © 2026 FamilyCare Team. All rights reserved. Registered under Universal Project Guidelines.
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0 }}>
+            © {new Date().getFullYear()} FamilyCare Inc. All rights reserved.
+          </p>
+          <div style={{ display: 'flex', gap: '1.5rem' }}>
+            <span onClick={() => navigate('/terms')} style={{ fontSize: '0.85rem', color: '#94a3b8', cursor: 'pointer' }}>Terms of Service</span>
+            <span onClick={() => navigate('/privacy-policy')} style={{ fontSize: '0.85rem', color: '#94a3b8', cursor: 'pointer' }}>Privacy</span>
+          </div>
         </div>
       </div>
     </footer>
