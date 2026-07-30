@@ -367,28 +367,27 @@ const Navbar = () => {
         }
         
         .btn-modern-dashboard {
-          background: #ebf8f6;
-          color: #0D9488;
-          box-shadow: 0 2px 10px rgba(13, 148, 136, 0.1);
-        }
-        .btn-modern-dashboard:hover {
           background: #0D9488;
           color: white;
+          box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
+        }
+        .btn-modern-dashboard:hover {
+          background: #0F766E;
+          color: white;
           transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(13, 148, 136, 0.25);
+          box-shadow: 0 6px 20px rgba(13, 148, 136, 0.35);
         }
 
         .btn-modern-logout {
-          background: #fef2f2;
-          color: #ef4444;
-          border: 1.5px solid #fecaca;
-        }
-        .btn-modern-logout:hover {
           background: #ef4444;
           color: white;
-          border-color: #ef4444;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+          box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25);
+        }
+        .btn-modern-logout:hover {
+          background: #dc2626;
+          color: white;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(239, 68, 68, 0.35);
         }
         
         .w-full { width: 100%; }
