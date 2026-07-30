@@ -5,7 +5,7 @@ import ProcessSteps from '../../../components/Landing/ProcessSteps';
 import Testimonials from '../../../components/Landing/Testimonials';
 import CallToAction from '../../../components/Landing/CallToAction';
 import Footer from '../../../components/Landing/Footer';
-import '../../../components/Landing/Landing.css';
+import './Landing.css';
 const Landing = () => {
   return (
     <div className="landing-page">
