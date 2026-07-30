@@ -59,6 +59,15 @@ const AdminDashboardV2 = () => {
     fetchActivity();
   }, [fetchStats, fetchActivity]);
 
+  const traffic = stats.trafficChartData || [0, 0, 0, 0, 0, 0, 0];
+  const maxTraffic = Math.max(...traffic, 10);
+  const chartPoints = traffic.map((val, i) => {
+    const x = 25 + i * 75;
+    const y = 180 - (val / maxTraffic) * 140;
+    return { x, y, val };
+  });
+  const chartPath = chartPoints.map((p, i) => (i === 0 ? `M ${p.x} ${p.y}` : `L ${p.x} ${p.y}`)).join(' ');
+
   return (
     <AdminLayoutV2 title="Overview Dashboard">
       <div className="v2-dash-container">
@@ -177,19 +186,15 @@ const AdminDashboardV2 = () => {
                 <line x1="20" y1="180" x2="480" y2="180" stroke="#cbd5e1" strokeWidth="1.5" />
 
                 {/* Shaded Area Under Path */}
-                <path d="M 25 150 Q 100 70, 175 110 T 325 50 T 475 75 L 475 180 L 25 180 Z" fill="url(#glowTeal)" />
+                <path d={`${chartPath} L 475 180 L 25 180 Z`} fill="url(#glowTeal)" />
 
                 {/* Primary Trend Line */}
-                <path d="M 25 150 Q 100 70, 175 110 T 325 50 T 475 75" fill="none" stroke="#00A896" strokeWidth="3" strokeLinecap="round" />
+                <path d={chartPath} fill="none" stroke="#00A896" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
 
                 {/* Interaction Glow Circles */}
-                <circle cx="25" cy="150" r="5" fill="#00A896" stroke="white" strokeWidth="2" />
-                <circle cx="100" cy="85" r="5" fill="#00A896" stroke="white" strokeWidth="2" />
-                <circle cx="175" cy="110" r="5" fill="#00A896" stroke="white" strokeWidth="2" />
-                <circle cx="250" cy="78" r="5" fill="#00A896" stroke="white" strokeWidth="2" />
-                <circle cx="325" cy="50" r="5" fill="#00A896" stroke="white" strokeWidth="2" />
-                <circle cx="400" cy="62" r="5" fill="#00A896" stroke="white" strokeWidth="2" />
-                <circle cx="475" cy="75" r="5" fill="#00A896" stroke="white" strokeWidth="2" />
+                {chartPoints.map((p, i) => (
+                  <circle key={i} cx={p.x} cy={p.y} r="5" fill="#00A896" stroke="white" strokeWidth="2" />
+                ))}
               </svg>
               
               <div className="v2-chart-x-labels">

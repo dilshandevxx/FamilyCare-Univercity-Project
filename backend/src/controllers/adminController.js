@@ -147,6 +147,23 @@ const getAdminStats = async (req, res) => {
       "SELECT COUNT(*) AS pending_approvals FROM caregivers WHERE status = 'pending'"
     );
 
+    // Fetch traffic chart data (health logs over last 7 days)
+    const [trafficRows] = await pool.query(`
+      SELECT 
+        DATE_FORMAT(logged_at, '%w') as day_idx,
+        COUNT(*) as count
+      FROM health_logs
+      WHERE logged_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+      GROUP BY day_idx
+    `);
+
+    const trafficChartData = [0, 0, 0, 0, 0, 0, 0];
+    trafficRows.forEach(row => {
+      const idx = parseInt(row.day_idx); // 0 = Sun
+      const mappedIdx = idx === 0 ? 6 : idx - 1; // Mon = 0 ... Sun = 6
+      trafficChartData[mappedIdx] = row.count;
+    });
+
     res.json({
       total_users,
       total_caregivers,
@@ -155,6 +172,7 @@ const getAdminStats = async (req, res) => {
       active_alerts,
       critical_alerts,
       pending_approvals,
+      trafficChartData
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
