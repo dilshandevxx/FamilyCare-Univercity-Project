@@ -196,25 +196,7 @@ const FeaturesPage = () => {
               </ul>
             </div>
             <div className="feat-split-visual">
-              <div className="feat-mockup-card">
-                <div className="feat-mockup-header">
-                  <div className="feat-mockup-avatar" />
-                  <div className="feat-mockup-info">
-                    <div className="feat-mockup-line w-24" />
-                    <div className="feat-mockup-line w-16 opacity-50" />
-                  </div>
-                  <div className="feat-mockup-status">Active</div>
-                </div>
-                <div className="feat-mockup-chart">
-                  {[40, 70, 50, 90, 65, 80, 55].map((h, i) => (
-                    <div key={i} className="feat-mockup-bar" style={{ height: `${h}%` }} />
-                  ))}
-                </div>
-                <div className="feat-mockup-footer">
-                  <div className="feat-mockup-chip"><Heart size={14} className="text-teal" /> 72 bpm</div>
-                  <div className="feat-mockup-chip"><Activity size={14} className="text-blue" /> Normal</div>
-                </div>
-              </div>
+              <img src="https://images.unsplash.com/photo-1576765608535-5f04d1e3f289?q=80&w=800&auto=format&fit=crop" alt="Family using app" className="feat-image" loading="lazy" />
             </div>
           </div>
 
@@ -236,23 +218,7 @@ const FeaturesPage = () => {
               </ul>
             </div>
             <div className="feat-split-visual">
-              <div className="feat-mockup-card feat-mockup-card--blue">
-                <div className="feat-mockup-header">
-                  <div className="feat-mockup-avatar feat-mockup-avatar--square" />
-                  <div className="feat-mockup-info">
-                    <div className="feat-mockup-line w-32" />
-                    <div className="feat-mockup-line w-20 opacity-50" />
-                  </div>
-                </div>
-                <div className="feat-mockup-tasks">
-                  {[1, 2, 3].map((_, i) => (
-                    <div key={i} className="feat-mockup-task-item">
-                      <div className="feat-mockup-checkbox" />
-                      <div className="feat-mockup-line w-full" />
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?q=80&w=800&auto=format&fit=crop" alt="Caregiver checking app" className="feat-image" loading="lazy" />
             </div>
           </div>
 
@@ -806,11 +772,18 @@ const FeaturesPage = () => {
             grid-template-columns: 1fr;
             text-align: center;
           }
-          .feat-split-row--reverse .feat-split-content {
+          .feat-split-content {
+            order: 2;
+          }
+          .feat-split-visual {
             order: 1;
+            margin-bottom: 1.5rem;
+          }
+          .feat-split-row--reverse .feat-split-content {
+            order: 2;
           }
           .feat-split-row--reverse .feat-split-visual {
-            order: 2;
+            order: 1;
           }
           .feat-check-item { justify-content: center; }
           .feat-cta-card { padding: 3rem 1.5rem; }
