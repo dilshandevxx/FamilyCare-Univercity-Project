@@ -206,7 +206,6 @@ const Navbar = () => {
           gap: 10px;
           text-decoration: none;
           z-index: 1001;
-          group;
         }
         .logo-icon {
           width: 36px; height: 36px;

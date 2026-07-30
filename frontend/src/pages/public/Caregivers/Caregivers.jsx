@@ -1,8 +1,10 @@
-﻿import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Search, ChevronDown, Check, X, Star, Calendar, Shield, Award, Clock } from 'lucide-react';
+import Footer from '../../../components/Landing/Footer';
 import './Caregivers.css';
 
-/* â”€â”€ Talk to a Specialist modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── Talk to a Specialist Modal ─── */
 const TalkModal = ({ onClose }) => {
   const [form, setForm] = useState({ name: '', email: '', phone: '', time: '', message: '' });
   const [sent, setSent] = useState(false);
@@ -17,217 +19,99 @@ const TalkModal = ({ onClose }) => {
     setSent(true);
   };
 
-  const inputStyle = {
-    width: '100%', padding: '0.7rem 1rem', borderRadius: '10px',
-    border: '1.5px solid #e2e8f0', fontSize: '0.9rem', outline: 'none',
-    boxSizing: 'border-box', fontFamily: 'inherit', transition: 'border-color 0.2s',
-  };
-  const labelStyle = { display: 'block', fontSize: '0.82rem', fontWeight: '600', marginBottom: '0.4rem', color: '#4a5568' };
-  const focus = e => e.target.style.borderColor = 'var(--color-primary)';
-  const blur  = e => e.target.style.borderColor = '#e2e8f0';
-
   return (
-    <div onClick={onClose} style={{
-      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      zIndex: 1000, padding: '1rem',
-    }}>
-      <div onClick={e => e.stopPropagation()} style={{
-        background: 'white', borderRadius: '20px', padding: '2.5rem',
-        width: '100%', maxWidth: '480px', position: 'relative',
-        boxShadow: '0 25px 60px rgba(0,0,0,0.2)', maxHeight: '90vh', overflowY: 'auto',
-      }}>
-        <button onClick={onClose} style={{
-          position: 'absolute', top: '1.2rem', right: '1.2rem', background: 'none',
-          border: 'none', fontSize: '1.4rem', cursor: 'pointer', color: '#718096',
-        }}>×</button>
-
+    <div className="cg-modal-overlay" onClick={onClose}>
+      <div className="cg-modal-content" onClick={e => e.stopPropagation()}>
+        <button className="cg-modal-close" onClick={onClose}><X size={20} /></button>
         {sent ? (
-          <div style={{ textAlign: 'center', padding: '1.5rem 0' }}>
-            <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🎉</div>
-            <h3 style={{ color: 'var(--color-primary)', marginBottom: '0.75rem' }}>Request Sent!</h3>
-            <p style={{ color: '#718096', fontSize: '0.9rem', lineHeight: 1.6 }}>
-              Your email client should open shortly. A Family Concierge specialist will reach out within 24 hours.
-            </p>
-            <button onClick={onClose} style={{
-              marginTop: '1.5rem', background: 'var(--color-primary)', color: 'white',
-              border: 'none', borderRadius: '12px', padding: '0.8rem 2rem',
-              fontWeight: '600', cursor: 'pointer', width: '100%', fontSize: '0.95rem',
-            }}>Done</button>
+          <div className="cg-modal-success">
+            <div className="cg-modal-success-icon">🎉</div>
+            <h3>Request Sent!</h3>
+            <p>Your email client should open shortly. A Family Concierge specialist will reach out within 24 hours.</p>
+            <button onClick={onClose} className="cg-btn cg-btn-primary w-full mt-4">Done</button>
           </div>
         ) : (
-          <>
-            <div style={{ marginBottom: '1.75rem' }}>
-              <h3 style={{ fontSize: '1.45rem', color: '#1a202c', marginBottom: '0.4rem' }}>Talk to a Specialist</h3>
-              <p style={{ color: '#718096', fontSize: '0.88rem' }}>Our Family Concierge team will help you find the perfect caregiver match.</p>
-            </div>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                <div>
-                  <label style={labelStyle}>Full Name</label>
-                  <input type="text" required placeholder="Jane Smith" style={inputStyle}
-                    value={form.name} onChange={e => setForm({ ...form, name: e.target.value })}
-                    onFocus={focus} onBlur={blur} />
+          <div className="cg-modal-form-wrap">
+            <h3 className="cg-modal-title">Talk to a Specialist</h3>
+            <p className="cg-modal-desc">Our Family Concierge team will help you find the perfect caregiver match.</p>
+            <form onSubmit={handleSubmit} className="cg-form">
+              <div className="cg-form-row">
+                <div className="cg-form-group">
+                  <label>Full Name</label>
+                  <input type="text" required placeholder="Jane Smith" value={form.name} onChange={e => setForm({...form, name: e.target.value})} />
                 </div>
-                <div>
-                  <label style={labelStyle}>Phone (optional)</label>
-                  <input type="tel" placeholder="+1 234 567 8900" style={inputStyle}
-                    value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })}
-                    onFocus={focus} onBlur={blur} />
+                <div className="cg-form-group">
+                  <label>Phone (optional)</label>
+                  <input type="tel" placeholder="+1 234 567 8900" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
                 </div>
               </div>
-              <div>
-                <label style={labelStyle}>Email Address</label>
-                <input type="email" required placeholder="your@email.com" style={inputStyle}
-                  value={form.email} onChange={e => setForm({ ...form, email: e.target.value })}
-                  onFocus={focus} onBlur={blur} />
+              <div className="cg-form-group">
+                <label>Email Address</label>
+                <input type="email" required placeholder="your@email.com" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
               </div>
-              <div>
-                <label style={labelStyle}>Preferred Contact Time</label>
-                <select style={{ ...inputStyle, background: 'white', cursor: 'pointer' }}
-                  value={form.time} onChange={e => setForm({ ...form, time: e.target.value })}
-                  onFocus={focus} onBlur={blur}>
-                  <option value="">Select a time window…</option>
-                  <option>Morning (8am – 12pm)</option>
-                  <option>Afternoon (12pm – 5pm)</option>
-                  <option>Evening (5pm – 8pm)</option>
-                  <option>Any time</option>
-                </select>
+              <div className="cg-form-group">
+                <label>Preferred Contact Time</label>
+                <div className="cg-select-wrapper">
+                  <select value={form.time} onChange={e => setForm({...form, time: e.target.value})}>
+                    <option value="">Select a time window…</option>
+                    <option>Morning (8am – 12pm)</option>
+                    <option>Afternoon (12pm – 5pm)</option>
+                    <option>Evening (5pm – 8pm)</option>
+                    <option>Any time</option>
+                  </select>
+                  <ChevronDown className="cg-select-icon" size={16} />
+                </div>
               </div>
-              <div>
-                <label style={labelStyle}>Tell us about your needs</label>
-                <textarea required rows={3} placeholder="E.g. looking for a nurse for my mother, 3 days a week…"
-                  style={{ ...inputStyle, resize: 'vertical' }}
-                  value={form.message} onChange={e => setForm({ ...form, message: e.target.value })}
-                  onFocus={focus} onBlur={blur} />
+              <div className="cg-form-group">
+                <label>Tell us about your needs</label>
+                <textarea required rows={3} placeholder="E.g. looking for a nurse for my mother, 3 days a week…" value={form.message} onChange={e => setForm({...form, message: e.target.value})} />
               </div>
-              <button type="submit" style={{
-                background: 'var(--color-primary)', color: 'white', border: 'none',
-                borderRadius: '12px', padding: '0.85rem', fontWeight: '700',
-                cursor: 'pointer', fontSize: '0.95rem', marginTop: '0.25rem',
-                transition: 'opacity 0.2s',
-              }}
-                onMouseEnter={e => e.currentTarget.style.opacity = '0.88'}
-                onMouseLeave={e => e.currentTarget.style.opacity = '1'}>
-                Send Request
-              </button>
+              <button type="submit" className="cg-btn cg-btn-primary w-full mt-2">Send Request</button>
             </form>
-          </>
+          </div>
         )}
       </div>
     </div>
   );
 };
 
-/* â”€â”€ How it Works modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ─── How it Works Modal ─── */
 const HowItWorksModal = ({ onClose }) => {
   const [active, setActive] = useState(0);
   const steps = [
-    {
-      icon: '🔍',
-      title: 'Browse & Filter',
-      desc: 'Explore our pool of verified, background-checked caregivers. Use filters like specialty, experience, price, and rating to narrow down the best candidates for your loved one.',
-      detail: 'Every caregiver on FamilyCare is identity-verified, reference-checked, and holds valid certifications for their listed specialties.',
-    },
-    {
-      icon: '📋',
-      title: 'Review Profiles',
-      desc: 'Read detailed profiles including qualifications, patient reviews, specialties, and personal care philosophy — so you know exactly who you\'re trusting with your family.',
-      detail: 'Profiles include video introductions, verified credentials, response time, and availability calendars.',
-    },
-    {
-      icon: '🤝',
-      title: 'Schedule a Match Call',
-      desc: 'Not sure who to choose? Our Family Concierge team will schedule a free consultation to understand your needs and personally recommend the best matches.',
-      detail: 'Consultations are free, no-commitment, and typically last 20–30 minutes.',
-    },
-    {
-      icon: '💚',
-      title: 'Start Care',
-      desc: 'Once you\'ve chosen, we handle the contracts, scheduling, and ongoing check-ins. Your dedicated care manager monitors health logs and keeps you updated in real time.',
-      detail: 'Cancel or reschedule anytime. Our platform tracks health logs, visit history, and sends alerts directly to your phone.',
-    },
+    { icon: <Search size={24}/>, title: 'Browse & Filter', desc: 'Explore our pool of verified, background-checked caregivers. Use filters like specialty, experience, price, and rating to narrow down the best candidates.' },
+    { icon: <Shield size={24}/>, title: 'Review Profiles', desc: 'Read detailed profiles including qualifications, patient reviews, specialties, and personal care philosophy — so you know exactly who you\'re trusting.' },
+    { icon: <Calendar size={24}/>, title: 'Schedule a Match', desc: 'Not sure who to choose? Our Family Concierge team will schedule a free consultation to understand your needs and personally recommend the best matches.' },
+    { icon: <Check size={24}/>, title: 'Start Care', desc: 'Once you\'ve chosen, we handle the contracts, scheduling, and ongoing check-ins. Your dedicated care manager monitors health logs in real time.' },
   ];
 
   return (
-    <div onClick={onClose} style={{
-      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-      zIndex: 1000, padding: '1rem',
-    }}>
-      <div onClick={e => e.stopPropagation()} style={{
-        background: 'white', borderRadius: '24px', width: '100%', maxWidth: '580px',
-        boxShadow: '0 25px 60px rgba(0,0,0,0.22)', overflow: 'hidden', maxHeight: '90vh',
-      }}>
-        {/* Header */}
-        <div style={{
-          background: 'var(--color-primary)', padding: '2rem 2.5rem',
-          color: 'white', position: 'relative',
-        }}>
-          <button onClick={onClose} style={{
-            position: 'absolute', top: '1.2rem', right: '1.2rem', background: 'rgba(255,255,255,0.15)',
-            border: 'none', borderRadius: '50%', width: '32px', height: '32px',
-            fontSize: '1.1rem', cursor: 'pointer', color: 'white', lineHeight: '32px',
-          }}>×</button>
-          <h3 style={{ fontSize: '1.5rem', marginBottom: '0.4rem' }}>How FamilyCare Works</h3>
-          <p style={{ opacity: 0.85, fontSize: '0.9rem' }}>Four simple steps to the right care.</p>
+    <div className="cg-modal-overlay" onClick={onClose}>
+      <div className="cg-modal-content cg-modal-content--large" onClick={e => e.stopPropagation()}>
+        <button className="cg-modal-close" onClick={onClose}><X size={20} /></button>
+        <div className="cg-how-header">
+          <h3>How FamilyCare Works</h3>
+          <p>Four simple steps to finding the perfect care.</p>
         </div>
-
-        {/* Step tabs */}
-        <div style={{ display: 'flex', borderBottom: '1px solid #edf2f7' }}>
+        
+        <div className="cg-how-tabs">
           {steps.map((s, i) => (
-            <button key={i} onClick={() => setActive(i)} style={{
-              flex: 1, padding: '0.85rem 0.5rem', border: 'none', background: 'none',
-              cursor: 'pointer', fontSize: '1.4rem',
-              borderBottom: active === i ? '3px solid var(--color-primary)' : '3px solid transparent',
-              transition: 'border-color 0.2s',
-            }} title={s.title}>{s.icon}</button>
+            <button key={i} className={`cg-how-tab ${active === i ? 'active' : ''}`} onClick={() => setActive(i)}>
+              <div className="cg-how-tab-icon">{s.icon}</div>
+              <span>Step {i + 1}</span>
+            </button>
           ))}
         </div>
 
-        {/* Step content */}
-        <div style={{ padding: '2rem 2.5rem', overflowY: 'auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-            <div style={{
-              width: '36px', height: '36px', borderRadius: '50%',
-              background: 'var(--color-primary)', color: 'white',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontWeight: '700', fontSize: '0.9rem', flexShrink: 0,
-            }}>{active + 1}</div>
-            <h4 style={{ fontSize: '1.15rem', color: '#1a202c', margin: 0 }}>{steps[active].title}</h4>
-          </div>
-          <p style={{ color: '#4a5568', lineHeight: 1.7, marginBottom: '1rem', fontSize: '0.95rem' }}>
-            {steps[active].desc}
-          </p>
-          <div style={{
-            background: '#f0faf8', borderLeft: '3px solid var(--color-primary)',
-            padding: '0.9rem 1.1rem', borderRadius: '0 10px 10px 0',
-            fontSize: '0.85rem', color: '#2d6a63', lineHeight: 1.6,
-          }}>
-            {steps[active].detail}
-          </div>
-
-          {/* Step navigation */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', alignItems: 'center' }}>
-            <button onClick={() => setActive(p => Math.max(0, p - 1))} disabled={active === 0}
-              style={{
-                padding: '0.6rem 1.2rem', borderRadius: '10px', border: '1.5px solid #e2e8f0',
-                background: 'none', cursor: active === 0 ? 'not-allowed' : 'pointer',
-                color: active === 0 ? '#cbd5e0' : '#4a5568', fontWeight: '600', fontSize: '0.88rem',
-              }}>← Previous</button>
-            <span style={{ color: '#a0aec0', fontSize: '0.82rem' }}>Step {active + 1} of {steps.length}</span>
+        <div className="cg-how-body">
+          <h4>{steps[active].title}</h4>
+          <p>{steps[active].desc}</p>
+          <div className="cg-how-nav">
+            <button onClick={() => setActive(p => Math.max(0, p - 1))} disabled={active === 0} className="cg-btn cg-btn-outline">Previous</button>
             {active < steps.length - 1 ? (
-              <button onClick={() => setActive(p => p + 1)} style={{
-                padding: '0.6rem 1.2rem', borderRadius: '10px', border: 'none',
-                background: 'var(--color-primary)', color: 'white',
-                cursor: 'pointer', fontWeight: '600', fontSize: '0.88rem',
-              }}>Next →</button>
+              <button onClick={() => setActive(p => p + 1)} className="cg-btn cg-btn-primary">Next Step</button>
             ) : (
-              <button onClick={onClose} style={{
-                padding: '0.6rem 1.2rem', borderRadius: '10px', border: 'none',
-                background: 'var(--color-primary)', color: 'white',
-                cursor: 'pointer', fontWeight: '600', fontSize: '0.88rem',
-              }}>Get Started ✓</button>
+              <button onClick={onClose} className="cg-btn cg-btn-primary">Get Started</button>
             )}
           </div>
         </div>
@@ -236,51 +120,35 @@ const HowItWorksModal = ({ onClose }) => {
   );
 };
 
+/* ─── API & Data Mapping ─── */
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-
 const AVATAR_POOL = [32, 44, 5, 11, 26, 68, 47, 57, 33, 16, 21, 43, 65, 23, 53, 36, 12, 51, 70, 3];
-const CARD_ACCENTS = ['#0d9488','#0ea5e9','#8b5cf6','#f59e0b','#10b981','#ef4444','#3b82f6','#ec4899'];
 
 function mapCaregiver(c) {
   const tags = [];
-  if (c.experience_years) tags.push({ label: `${c.experience_years} Exp.`, icon: '🗓' });
-  if (c.certification)    tags.push({ label: c.certification, icon: '🏅' });
-  if (c.license_id)       tags.push({ label: `Lic. ${c.license_id}`, icon: '📋' });
-  if (c.languages)        tags.push({ label: c.languages, icon: '🌐' });
+  if (c.experience_years) tags.push({ label: `${c.experience_years} Years Exp.` });
+  if (c.certification)    tags.push({ label: c.certification });
+  if (c.languages)        tags.push({ label: c.languages });
 
-  const imgIdx = AVATAR_POOL[(c.id - 1) % AVATAR_POOL.length];
+  const imgIdx = AVATAR_POOL[(c.id - 1) % AVATAR_POOL.length] || 1;
   return {
     id:           c.id,
     name:         c.name,
-    title:        c.specialization ? c.specialization.toUpperCase() : 'CAREGIVER',
+    title:        c.specialization ? c.specialization : 'Caregiver',
     price:        c.hourly_rate ? `$${Number(c.hourly_rate).toFixed(0)}` : null,
     hourlyRate:   c.hourly_rate != null ? Number(c.hourly_rate) : null,
     rating:       c.rating ? Number(c.rating).toFixed(1) : null,
     reviews:      c.total_reviews || 0,
-    experienceYears: c.experience_years ? parseInt(c.experience_years, 10) : null,
+    experienceYears: c.experience_years ? parseInt(c.experience_years, 10) : 0,
     tags,
     bio:          c.bio || '',
     image:        c.avatar_url || `https://i.pravatar.cc/300?img=${imgIdx}`,
     available:    c.is_available,
     location:     c.location || 'In-home & Facility',
-    accent:       CARD_ACCENTS[(c.id - 1) % CARD_ACCENTS.length],
   };
 }
 
-function StarRating({ value }) {
-  const full  = Math.floor(value);
-  const half  = value - full >= 0.5;
-  return (
-    <span className="cg-stars">
-      {[1,2,3,4,5].map(i => (
-        <span key={i} style={{ color: i <= full ? '#f59e0b' : (i === full + 1 && half ? '#f59e0b' : '#e2e8f0') }}>
-          {i <= full ? '★' : (i === full + 1 && half ? '⯨' : '★')}
-        </span>
-      ))}
-    </span>
-  );
-}
-
+/* ─── Main Component ─── */
 const Caregivers = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
@@ -291,279 +159,167 @@ const Caregivers = () => {
   const [showHowModal, setShowHowModal] = useState(false);
   const [caregivers, setCaregivers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetch(`${API_BASE}/caregivers/public`)
-      .then(res => { if (!res.ok) throw new Error('Failed to load caregivers'); return res.json(); })
-            .then(data => {
+      .then(res => { if (!res.ok) throw new Error('Failed to load'); return res.json(); })
+      .then(data => {
         if (data && data.length > 0) {
           setCaregivers(data.map(mapCaregiver));
         } else {
-          // Mock data fallback if DB is empty
+          // Fallback mock data
           const mockData = [
-            {
-              id: 'mock-1',
-              name: 'Elena Rodriguez',
-              specialization: 'Dementia Care, Palliative Care, CNA Certified',
-              hourly_rate: 32.00,
-              rating: 4.9,
-              total_reviews: 128,
-              bio: 'Specialized in elderly dementia support with 8 years of certified nursing assistance experience.',
-              avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Elena',
-              is_available: 1,
-              location: 'In-home & Facility'
-            },
-            {
-              id: 'mock-2',
-              name: 'Marcus Thorne',
-              specialization: 'Mobility Support, Physical Therapy, Rehab',
-              hourly_rate: 45.00,
-              rating: 4.8,
-              total_reviews: 94,
-              bio: 'PT assistant focusing on senior mobility enhancement and post-injury rehabilitation.',
-              avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus',
-              is_available: 1,
-              location: 'In-home Care'
-            },
-            {
-              id: 'mock-3',
-              name: 'Sarah Jenkins',
-              specialization: 'Meal Prep, Medication Mgmt, Companion Care',
-              hourly_rate: 28.00,
-              rating: 5.0,
-              total_reviews: 215,
-              bio: 'Compassionate caregiver specializing in daily nutrition logs, scheduling, and medication tracking.',
-              avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
-              is_available: 1,
-              location: 'Facility'
-            }
+            { id: 1, name: 'Elena Rodriguez', specialization: 'Dementia Care, Palliative Care', hourly_rate: 32, rating: 4.9, total_reviews: 128, bio: 'Specialized in elderly dementia support with 8 years of certified nursing assistance experience.', is_available: 1, experience_years: 8, certification: 'CNA Certified' },
+            { id: 2, name: 'Marcus Thorne', specialization: 'Mobility Support, Physical Therapy', hourly_rate: 45, rating: 4.8, total_reviews: 94, bio: 'PT assistant focusing on senior mobility enhancement and post-injury rehabilitation.', is_available: 1, experience_years: 12, certification: 'Licensed PT' },
+            { id: 3, name: 'Sarah Jenkins', specialization: 'Meal Prep, Medication Mgmt', hourly_rate: 28, rating: 5.0, total_reviews: 215, bio: 'Compassionate caregiver specializing in daily nutrition logs, scheduling, and medication tracking.', is_available: 1, experience_years: 5, certification: 'CPR Certified' },
+            { id: 4, name: 'David Chen', specialization: 'Companion Care, Transportation', hourly_rate: 25, rating: 4.7, total_reviews: 82, bio: 'Friendly companion offering safe transportation, errand running, and light housekeeping.', is_available: 1, experience_years: 3, certification: 'First Aid' },
           ];
           setCaregivers(mockData.map(mapCaregiver));
         }
         setLoading(false);
       })
-      .catch(err => { setError(err.message); setLoading(false); });
+      .catch(() => setLoading(false));
   }, []);
 
   const filtered = caregivers.filter(c => {
-    if (searchQuery &&
-        !c.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !c.title.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-
+    if (searchQuery && !c.name.toLowerCase().includes(searchQuery.toLowerCase()) && !c.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     if (ratingFilter === '4.5 & up' && !(c.rating && Number(c.rating) >= 4.5)) return false;
     if (ratingFilter === '4.0 & up' && !(c.rating && Number(c.rating) >= 4.0)) return false;
-
     if (experienceFilter === '5+ Years'  && !(c.experienceYears >= 5))  return false;
     if (experienceFilter === '10+ Years' && !(c.experienceYears >= 10)) return false;
-
     if (priceFilter === 'Under $30/hr' && !(c.hourlyRate != null && c.hourlyRate < 30)) return false;
     if (priceFilter === '$30 - $50/hr' && !(c.hourlyRate != null && c.hourlyRate >= 30 && c.hourlyRate <= 50)) return false;
     if (priceFilter === '$50+/hr'      && !(c.hourlyRate != null && c.hourlyRate > 50)) return false;
-
     return true;
   });
 
   return (
-    <div className="caregivers-page">
+    <div className="cg-page">
       {showTalkModal && <TalkModal onClose={() => setShowTalkModal(false)} />}
-      {showHowModal  && <HowItWorksModal onClose={() => setShowHowModal(false)} />}
-      <div className="container">
-        {/* Header Section */}
-        <div className="caregivers-header">
-          <h1>Find Your <span className="text-teal">Caregiver</span></h1>
-          <p className="caregivers-subtitle">
-            We believe every family deserves a sanctuary of support. Connect with verified
-            specialists who bring expertise, empathy, and warmth to your home.
+      {showHowModal && <HowItWorksModal onClose={() => setShowHowModal(false)} />}
+      
+      {/* ── Hero ── */}
+      <header className="cg-hero">
+        <div className="container">
+          <h1 className="cg-hero-title">Find Your <span className="text-teal">Caregiver</span></h1>
+          <p className="cg-hero-subtitle">
+            Connect with verified specialists who bring expertise, empathy, and warmth to your home. We believe every family deserves a sanctuary of support.
           </p>
         </div>
+      </header>
 
-        {/* Filter Section Desktop */}
-        <div className="filters-container desktop-filters">
-          <div className="search-input-wrapper">
-            <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input 
-              type="text" 
-              placeholder="Search by name, specialty, or keywords..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+      <main className="container cg-main">
+        {/* ── Filters ── */}
+        <div className="cg-filters-wrapper">
+          <div className="cg-search-box">
+            <Search className="cg-search-icon" size={20} />
+            <input type="text" placeholder="Search by name, specialty, or keywords..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
           </div>
-          <div className="dropdowns-group">
-            <select className="filter-select" value={ratingFilter} onChange={e => setRatingFilter(e.target.value)}>
-              <option>Rating: Any</option>
-              <option>4.5 &amp; up</option>
-              <option>4.0 &amp; up</option>
-            </select>
-            <select className="filter-select" value={experienceFilter} onChange={e => setExperienceFilter(e.target.value)}>
-              <option>Experience</option>
-              <option>5+ Years</option>
-              <option>10+ Years</option>
-            </select>
-            <select className="filter-select" value={priceFilter} onChange={e => setPriceFilter(e.target.value)}>
-              <option>Price Range</option>
-              <option>Under $30/hr</option>
-              <option>$30 - $50/hr</option>
-              <option>$50+/hr</option>
-            </select>
-            <button className="btn btn-primary update-btn">Update Results</button>
-          </div>
-        </div>
-
-        {/* Filter Section Mobile */}
-        <div className="filters-container mobile-filters">
-           <div className="mobile-search-row">
-             <div className="search-input-wrapper">
-              <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-              </svg>
-              <input 
-                type="text" 
-                placeholder="Search by name or specialty..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+          <div className="cg-filters-dropdowns">
+            <div className="cg-select-wrapper">
+              <select value={ratingFilter} onChange={e => setRatingFilter(e.target.value)}>
+                <option>Rating: Any</option>
+                <option>4.5 &amp; up</option>
+                <option>4.0 &amp; up</option>
+              </select>
+              <ChevronDown className="cg-select-icon" size={16} />
             </div>
-            <button className="btn-icon-filter">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-              </svg>
-            </button>
-           </div>
-           <div className="mobile-pills">
-             <button className="pill active">Top Rated</button>
-             <button className="pill">Near Me</button>
-             <button className="pill">Registered Nurse</button>
-           </div>
+            <div className="cg-select-wrapper">
+              <select value={experienceFilter} onChange={e => setExperienceFilter(e.target.value)}>
+                <option>Experience</option>
+                <option>5+ Years</option>
+                <option>10+ Years</option>
+              </select>
+              <ChevronDown className="cg-select-icon" size={16} />
+            </div>
+            <div className="cg-select-wrapper">
+              <select value={priceFilter} onChange={e => setPriceFilter(e.target.value)}>
+                <option>Price Range</option>
+                <option>Under $30/hr</option>
+                <option>$30 - $50/hr</option>
+                <option>$50+/hr</option>
+              </select>
+              <ChevronDown className="cg-select-icon" size={16} />
+            </div>
+          </div>
         </div>
 
-        {/* Caregiver Grid */}
-        <div className="caregivers-grid">
-          {loading && (
-            <p style={{ gridColumn: '1/-1', textAlign: 'center', color: '#718096', padding: '2rem' }}>
-              Loading caregivers…
-            </p>
-          )}
-          {error && (
-            <p style={{ gridColumn: '1/-1', textAlign: 'center', color: '#e53e3e', padding: '2rem' }}>
-              {error}
-            </p>
-          )}
-          {!loading && !error && filtered.length === 0 && (
-            <p style={{ gridColumn: '1/-1', textAlign: 'center', color: '#718096', padding: '2rem' }}>
-              No caregivers found.
-            </p>
-          )}
-          {filtered.map((cg) => (
-            <div className="caregiver-card cg-card-v2" key={cg.id}>
+        {/* ── Actions Row ── */}
+        <div className="cg-actions-row">
+          <span className="cg-results-count">{filtered.length} caregivers available</span>
+          <div className="cg-actions-btns">
+            <button className="cg-btn cg-btn-outline" onClick={() => setShowHowModal(true)}>How it works</button>
+            <button className="cg-btn cg-btn-primary" onClick={() => setShowTalkModal(true)}>Talk to a Specialist</button>
+          </div>
+        </div>
 
-              {/* Accent header strip */}
-              <div className="cg-accent-strip" style={{ background: cg.accent }} />
-
-              {/* Top row: avatar + price/rating */}
-              <div className="cg-top-row">
-                <div className="cg-avatar-wrap">
-                  <img src={cg.image} alt={cg.name} className="cg-avatar" onError={e => { e.target.src = `https://i.pravatar.cc/300?img=${cg.id + 10}`; }} />
-                  <span className="cg-verified-dot" title="Verified">
-                    <svg viewBox="0 0 24 24" fill="white" width="10" height="10"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                  </span>
-                </div>
-
-                <div className="cg-price-block">
-                  {cg.price
-                    ? <><span className="cg-price">{cg.price}</span><span className="cg-unit"> /hr</span></>
-                    : <span className="cg-price-na">Contact</span>
-                  }
-                  {cg.rating ? (
-                    <div className="cg-rating-row">
-                      <StarRating value={Number(cg.rating)} />
-                      <span className="cg-rating-num">{cg.rating}</span>
-                      {cg.reviews > 0 && <span className="cg-reviews">({cg.reviews})</span>}
-                    </div>
-                  ) : (
-                    <span className="cg-new-badge">New</span>
-                  )}
-                </div>
-              </div>
-
-              {/* Name + title */}
-              <div className="cg-body">
-                <div className="cg-name-row">
-                  <h3 className="cg-name">{cg.name}</h3>
-                  <span className="cg-verified-pill">✓ Verified</span>
-                </div>
-                <p className="cg-specialty" style={{ color: cg.accent }}>{cg.title}</p>
-
-                {/* Info grid */}
-                <div className="cg-info-grid">
-                  <div className="cg-info-item">
-                    <span className="cg-info-icon">📍</span>
-                    <span>{cg.location}</span>
+        {/* ── Grid ── */}
+        {loading ? (
+          <div className="cg-loading">
+            <div className="cg-spinner"></div>
+            <p>Finding perfect matches...</p>
+          </div>
+        ) : (
+          <div className="cg-grid">
+            {filtered.map((c, idx) => (
+              <div key={c.id} className="cg-card" style={{ animationDelay: `${idx * 0.05}s` }}>
+                <div className="cg-card-header">
+                  <img src={c.image} alt={c.name} className="cg-avatar" loading="lazy" />
+                  <div className="cg-card-price">
+                    <span className="cg-price-val">{c.price}</span><span className="cg-price-unit">/hr</span>
                   </div>
-                  {cg.available !== undefined && (
-                    <div className="cg-info-item">
-                      <span className="cg-info-icon">{cg.available ? '✅' : '🕐'}</span>
-                      <span style={{ color: cg.available ? '#10b981' : '#f59e0b', fontWeight: 600 }}>
-                        {cg.available ? 'Available Now' : 'On Request'}
-                      </span>
-                    </div>
-                  )}
                 </div>
+                
+                <div className="cg-card-body">
+                  <div className="cg-card-title-row">
+                    <h3 className="cg-card-name">{c.name}</h3>
+                    {c.available && <span className="cg-status-badge">Available</span>}
+                  </div>
+                  <p className="cg-card-specialty">{c.title}</p>
+                  
+                  <div className="cg-card-stats">
+                    <div className="cg-stat">
+                      <Star size={16} className="text-yellow" fill="currentColor" />
+                      <span><strong>{c.rating}</strong> ({c.reviews})</span>
+                    </div>
+                    <div className="cg-stat">
+                      <Clock size={16} className="text-gray" />
+                      <span>{c.experienceYears} Years Exp.</span>
+                    </div>
+                  </div>
 
-                {/* Tags */}
-                {cg.tags.length > 0 && (
-                  <div className="cg-tags">
-                    {cg.tags.map((t, i) => (
-                      <span className="cg-tag" key={i}>{t.icon} {t.label}</span>
+                  <p className="cg-card-bio">{c.bio}</p>
+
+                  <div className="cg-card-tags">
+                    {c.tags.slice(0,3).map((tag, i) => (
+                      <span key={i} className="cg-tag">{tag.label}</span>
                     ))}
                   </div>
-                )}
+                </div>
 
-                {/* Bio */}
-                {cg.bio && (
-                  <p className="cg-bio">
-                    &ldquo;{cg.bio.length > 130 ? cg.bio.slice(0, 130) + '…' : cg.bio}&rdquo;
-                  </p>
-                )}
-
-                {/* CTA */}
-                <button className="cg-btn-profile" style={{ '--accent': cg.accent }} onClick={() => navigate(`/caregivers/${cg.id}`)}>
-                  View Full Profile
-                </button>
+                <div className="cg-card-footer">
+                  <Link to={`/caregivers/${c.id}`} className="cg-btn cg-btn-outline w-full">View Profile</Link>
+                </div>
               </div>
-            </div>
-          ))}
-
-          {/* Promotional Banner */}
-          <div className="promo-banner">
-            <div className="promo-content">
-              <h2>Need help choosing the right fit?</h2>
-              <p>Our Family Concierge team can help you navigate profiles, conduct interviews, and find the perfect specialist for your unique needs.</p>
-              <div className="promo-buttons">
-                <button className="btn btn-primary btn-talk" onClick={() => setShowTalkModal(true)}>Talk to a Specialist</button>
-                <button className="btn btn-outline-white" onClick={() => setShowHowModal(true)}>How it Works</button>
+            ))}
+            
+            {filtered.length === 0 && (
+              <div className="cg-no-results">
+                <Search size={48} className="text-gray-light mb-4" />
+                <h3>No caregivers found</h3>
+                <p>Try adjusting your filters or search terms.</p>
+                <button className="cg-btn cg-btn-outline mt-4" onClick={() => {
+                  setSearchQuery(''); setRatingFilter('Rating: Any'); setExperienceFilter('Experience'); setPriceFilter('Price Range');
+                }}>Clear all filters</button>
               </div>
-            </div>
-            <div className="promo-graphic">
-               <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="background-hands">
-                  <path d="M20.5 9.5L12 18l-8.5-8.5a5.5 5.5 0 0 1 7.78-7.78L12 2.83l.72-.71a5.5 5.5 0 0 1 7.78 7.78z"></path>
-               </svg>
-            </div>
+            )}
           </div>
-        </div>
-
-       
-
-      </div>
+        )}
+      </main>
+      
+      <Footer />
     </div>
   );
 };
 
 export default Caregivers;
-
