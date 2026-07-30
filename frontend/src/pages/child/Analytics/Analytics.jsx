@@ -29,6 +29,17 @@ const Analytics = () => {
     alertStatus: 'Needs Review'
   });
 
+  const [bpChartData, setBpChartData] = useState({
+    Systolic: [0, 0, 0, 0, 0, 0, 0],
+    Diastolic: [0, 0, 0, 0, 0, 0, 0]
+  });
+
+  const [nutritionData, setNutritionData] = useState([
+    { label: 'Breakfast', percent: 0, color: '#00A896' },
+    { label: 'Lunch', percent: 0, color: '#00c4af' },
+    { label: 'Dinner', percent: 0, color: '#5eead4' }
+  ]);
+
   // Mobile navigation/sub-tabs state: 'vitals', 'insights'
   const [mobileTab, setMobileTab] = useState('vitals');
 
@@ -82,6 +93,13 @@ const Analytics = () => {
           criticalAlerts: data.criticalAlerts,
           alertStatus
         });
+        
+        if (data.bpChartData) {
+          setBpChartData(data.bpChartData);
+        }
+        if (data.nutritionData) {
+          setNutritionData(data.nutritionData);
+        }
       } catch (err) {
         console.error('Error fetching analytics:', err);
       } finally {
@@ -108,18 +126,7 @@ const Analytics = () => {
     }, 1500);
   };
 
-  // Mock Trend Chart Data (Last 7 Days)
-  const bpChartData = {
-    Systolic: [118, 122, 120, 126, 121, 119, 120],
-    Diastolic: [76, 82, 80, 84, 79, 78, 80]
-  };
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-  const nutritionData = [
-    { label: 'Breakfast', percent: 100, color: '#00A896' },
-    { label: 'Lunch', percent: 85, color: '#00c4af' },
-    { label: 'Dinner', percent: 90, color: '#5eead4' }
-  ];
 
   return (
     <ChildLayout title="Analytics">

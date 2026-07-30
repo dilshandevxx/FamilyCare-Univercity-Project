@@ -4,7 +4,7 @@ import {
   Users, UserPlus, Bell, ThumbsUp,
   Activity, Thermometer, UserSearch,
   Calendar, AlertTriangle, CheckCircle,
-  Plus, Heart
+  Plus, Heart, MessageSquare
 } from 'lucide-react';
 import ChildLayout from '../../../layouts/ChildLayout';
 import { useAuth } from '../../../context/AuthContext';
@@ -191,7 +191,7 @@ const Dashboard = () => {
                           </div>
                         </div>
                         <div className="cd-family-btns">
-                          <button className="cd-fbtn">Vitals</button>
+                          <Link to={`/health-feed?parent_id=${p.id}`} className="cd-fbtn" style={{ textAlign: 'center', textDecoration: 'none' }}>Vitals</Link>
                           <Link to="/parents" className="cd-fbtn" style={{ textAlign: 'center', textDecoration: 'none' }}>Details</Link>
                         </div>
                       </div>
@@ -230,8 +230,8 @@ const Dashboard = () => {
                         <p className="cd-alert-title">{alert.title}</p>
                         <p className="cd-alert-desc">{alert.description}</p>
                         <div className="cd-alert-actions">
-                          <button className={`cd-alert-btn-primary ${alert.type || 'info'}`}>VIEW DETAILS</button>
-                          <button className="cd-alert-btn-ghost">DISMISS</button>
+                          <Link to="/alerts" className={`cd-alert-btn-primary ${alert.type || 'info'}`} style={{ textDecoration: 'none' }}>VIEW DETAILS</Link>
+                          <button className="cd-alert-btn-ghost" onClick={() => setAlerts(alerts.filter(a => a.id !== alert.id))}>DISMISS</button>
                         </div>
                       </div>
                     </div>
@@ -346,10 +346,10 @@ const Dashboard = () => {
                   <UserSearch size={20} className="cd-qa-icon" />
                   <span>Find Carer</span>
                 </Link>
-                <button className="cd-qa-btn">
-                  <Calendar size={20} className="cd-qa-icon" />
-                  <span>Schedule</span>
-                </button>
+                <Link to="/messages" className="cd-qa-btn">
+                  <MessageSquare size={20} className="cd-qa-icon" />
+                  <span>Messages</span>
+                </Link>
                 <button className="cd-qa-btn emergency" onClick={() => setShowEmergency(true)}>
                   <AlertTriangle size={20} />
                   <span>Emergency</span>
@@ -405,8 +405,8 @@ const Dashboard = () => {
                 Please select a service or primary caregiver to contact immediately.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <button style={{ padding: '12px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Call 911</button>
-                <button style={{ padding: '12px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Call Primary Nurse</button>
+                <button onClick={() => { alert('Emergency dispatch simulated.'); setShowEmergency(false); }} style={{ padding: '12px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Call 911</button>
+                <button onClick={() => { alert('Primary Nurse notified.'); setShowEmergency(false); }} style={{ padding: '12px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Call Primary Nurse</button>
                 <button onClick={() => setShowEmergency(false)} style={{ padding: '12px', background: 'transparent', color: '#64748b', border: '1px solid #e2e8f0', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px' }}>Cancel</button>
               </div>
             </div>
