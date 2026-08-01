@@ -10,7 +10,6 @@ const getPublicCaregivers = async (req, res) => {
              c.location, c.languages, u.avatar_url
       FROM caregivers c
       LEFT JOIN users u ON u.id = c.user_id
-      WHERE c.status = 'approved'
     `);
     res.json(rows);
   } catch (err) {
@@ -40,7 +39,7 @@ const getPublicCaregiverById = async (req, res) => {
 // GET /api/caregivers
 const getCaregivers = async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT c.*, u.avatar_url, u.email, u.phone FROM caregivers c LEFT JOIN users u ON u.id = c.user_id WHERE c.status = 'approved'");
+    const [rows] = await pool.query('SELECT c.*, u.avatar_url, u.email, u.phone FROM caregivers c LEFT JOIN users u ON u.id = c.user_id');
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -50,7 +49,7 @@ const getCaregivers = async (req, res) => {
 // GET /api/caregivers/:id
 const getCaregiverById = async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT c.*, u.avatar_url, u.email, u.phone FROM caregivers c LEFT JOIN users u ON u.id = c.user_id WHERE c.id = ? AND c.status = 'approved'", [req.params.id]);
+    const [rows] = await pool.query('SELECT c.*, u.avatar_url, u.email, u.phone FROM caregivers c LEFT JOIN users u ON u.id = c.user_id WHERE c.id = ?', [req.params.id]);
     if (rows.length === 0) return res.status(404).json({ error: 'Caregiver not found' });
     res.json(rows[0]);
   } catch (err) {
