@@ -573,107 +573,21 @@ const FeaturesPage = () => {
           color: #0D9488;
         }
 
-        /* Mockup Cards */
-        .feat-mockup-card {
-          background: white;
-          border: 1px solid #e2e8f0;
-          border-radius: 24px;
-          padding: 2rem;
-          box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+        /* ── Split Rows Visuals ── */
+        .feat-split-visual {
           position: relative;
         }
-        .feat-mockup-card::before {
-          content: '';
-          position: absolute;
-          inset: -20px;
-          background: radial-gradient(circle at center, rgba(13,148,136,0.1) 0%, transparent 70%);
-          z-index: -1;
-          border-radius: 40px;
+        .feat-image {
+          width: 100%;
+          height: auto;
+          aspect-ratio: 4/3;
+          object-fit: cover;
+          border-radius: 24px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+          transition: transform 0.4s ease;
         }
-        .feat-mockup-card--blue::before {
-          background: radial-gradient(circle at center, rgba(37,99,235,0.08) 0%, transparent 70%);
-        }
-        
-        .feat-mockup-header {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          margin-bottom: 2rem;
-        }
-        .feat-mockup-avatar {
-          width: 48px; height: 48px;
-          border-radius: 50%;
-          background: #f1f5f9;
-        }
-        .feat-mockup-avatar--square {
-          border-radius: 12px;
-        }
-        .feat-mockup-line {
-          height: 10px;
-          background: #f1f5f9;
-          border-radius: 10px;
-          margin-bottom: 6px;
-        }
-        .feat-mockup-line:last-child { margin-bottom: 0; }
-        .feat-mockup-status {
-          margin-left: auto;
-          background: #dcfce7;
-          color: #16a34a;
-          padding: 4px 12px;
-          border-radius: 100px;
-          font-size: 0.75rem;
-          font-weight: 700;
-        }
-        
-        .feat-mockup-chart {
-          display: flex;
-          align-items: flex-end;
-          gap: 12px;
-          height: 120px;
-          margin-bottom: 2rem;
-        }
-        .feat-mockup-bar {
-          flex: 1;
-          background: #e2e8f0;
-          border-radius: 4px;
-          transition: background 0.3s;
-        }
-        .feat-split-row.in-view .feat-mockup-bar:nth-child(4) {
-          background: #0D9488;
-        }
-        
-        .feat-mockup-footer {
-          display: flex;
-          gap: 1rem;
-        }
-        .feat-mockup-chip {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          padding: 8px 16px;
-          background: #f8fafc;
-          border-radius: 12px;
-          font-size: 0.9rem;
-          font-weight: 600;
-        }
-
-        .feat-mockup-tasks {
-          display: flex;
-          flex-direction: column;
-          gap: 1rem;
-        }
-        .feat-mockup-task-item {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 12px;
-          border: 1px solid #f1f5f9;
-          border-radius: 12px;
-        }
-        .feat-mockup-checkbox {
-          width: 20px; height: 20px;
-          border-radius: 6px;
-          border: 2px solid #e2e8f0;
+        .feat-image:hover {
+          transform: translateY(-4px);
         }
 
         /* ── CTA Section ── */
@@ -769,21 +683,10 @@ const FeaturesPage = () => {
             grid-column: span 1;
           }
           .feat-split-row {
-            grid-template-columns: 1fr;
+            display: flex;
+            flex-direction: column-reverse;
             text-align: center;
-          }
-          .feat-split-content {
-            order: 2;
-          }
-          .feat-split-visual {
-            order: 1;
-            margin-bottom: 1.5rem;
-          }
-          .feat-split-row--reverse .feat-split-content {
-            order: 2;
-          }
-          .feat-split-row--reverse .feat-split-visual {
-            order: 1;
+            gap: 2rem;
           }
           .feat-check-item { justify-content: center; }
           .feat-cta-card { padding: 3rem 1.5rem; }
