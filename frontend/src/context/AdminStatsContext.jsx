@@ -49,7 +49,7 @@ export const AdminStatsProvider = ({ children }) => {
     pendingApprovals, // ← sourced from stats.pending_approvals
     activeAlerts,     // ← sourced from stats.active_alerts
     loading,
-    refresh: () => {},
+    refresh: fetchStats, // ← consumers can manually trigger a re-fetch
   };
 
   return (
@@ -58,5 +58,9 @@ export const AdminStatsProvider = ({ children }) => {
     </AdminStatsContext.Provider>
   );
 };
+
+// ── useAdminStats — convenience hook for consumers ───────────────
+// Usage: const { pendingApprovals, activeAlerts, refresh } = useAdminStats();
+export const useAdminStats = () => useContext(AdminStatsContext);
 
 export default AdminStatsContext;
