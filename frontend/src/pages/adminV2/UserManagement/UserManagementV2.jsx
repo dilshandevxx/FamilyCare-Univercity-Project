@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Search, UserPlus, Trash2, X, Mail, ShieldCheck, Users, CheckCircle, XCircle, Clock, FileText, AlertCircle, Loader2 } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
-import api from '../../../services/api';
+import adminService from '../../../services/adminService';
+import AdminErrorBoundary from '../../../components/common/AdminErrorBoundary';
 import './UserManagementV2.css';
 
-const UserManagementV2 = () => {
+const UserManagementV2Content = () => {
   const [users, setUsers] = useState([]);
   const [pendingUsers, setPendingUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,19 +22,19 @@ const UserManagementV2 = () => {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const { data } = await api.get('/admin/users');
+      const { data } = await adminService.getUsers({ search });
       setUsers(data.map(u => ({
         id: u.id,
         name: u.name,
         email: u.email,
         role: u.role,
         status: 'active',
-        joined: new Date(u.created_at || u.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+        joined: new Date(u.created_at || u.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
       })));
     } catch (error) {
       console.error('Failed to fetch users:', error);
     }
-  }, []);
+  }, [search]);
 
   const fetchPending = useCallback(async () => {
     try {
@@ -421,5 +422,11 @@ const UserManagementV2 = () => {
     </AdminLayoutV2>
   );
 };
+
+const UserManagementV2 = () => (
+  <AdminErrorBoundary title="User Management Error">
+    <UserManagementV2Content />
+  </AdminErrorBoundary>
+);
 
 export default UserManagementV2;
