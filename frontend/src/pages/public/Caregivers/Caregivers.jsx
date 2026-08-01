@@ -168,24 +168,24 @@ const Caregivers = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${API_BASE}/caregivers/public`)
-      .then(res => { if (!res.ok) throw new Error('Failed to load'); return res.json(); })
-      .then(data => {
-        if (data && data.length > 0) {
-          setCaregivers(data.map(mapCaregiver));
-        } else {
-          // Fallback mock data
-          const mockData = [
-            { id: 1, name: 'Elena Rodriguez', specialization: 'Dementia Care, Palliative Care', hourly_rate: 32, rating: 4.9, total_reviews: 128, bio: 'Specialized in elderly dementia support with 8 years of certified nursing assistance experience.', is_available: 1, experience_years: 8, certification: 'CNA Certified' },
-            { id: 2, name: 'Marcus Thorne', specialization: 'Mobility Support, Physical Therapy', hourly_rate: 45, rating: 4.8, total_reviews: 94, bio: 'PT assistant focusing on senior mobility enhancement and post-injury rehabilitation.', is_available: 1, experience_years: 12, certification: 'Licensed PT' },
-            { id: 3, name: 'Sarah Jenkins', specialization: 'Meal Prep, Medication Mgmt', hourly_rate: 28, rating: 5.0, total_reviews: 215, bio: 'Compassionate caregiver specializing in daily nutrition logs, scheduling, and medication tracking.', is_available: 1, experience_years: 5, certification: 'CPR Certified' },
-            { id: 4, name: 'David Chen', specialization: 'Companion Care, Transportation', hourly_rate: 25, rating: 4.7, total_reviews: 82, bio: 'Friendly companion offering safe transportation, errand running, and light housekeeping.', is_available: 1, experience_years: 3, certification: 'First Aid' },
-          ];
-          setCaregivers(mockData.map(mapCaregiver));
+    const loadCaregivers = async () => {
+      try {
+        let res = await fetch(`${API_BASE}/caregivers/public`);
+        if (!res.ok) {
+          res = await fetch('/api/caregivers/public');
         }
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          setCaregivers(data.map(mapCaregiver));
+        }
+      } catch (err) {
+        console.error('Error fetching public caregivers:', err);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }
+    };
+    loadCaregivers();
   }, []);
 
   const filtered = caregivers.filter(c => {

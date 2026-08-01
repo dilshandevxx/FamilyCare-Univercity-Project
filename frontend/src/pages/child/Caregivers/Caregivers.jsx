@@ -35,14 +35,35 @@ const CaregiversList = () => {
       try {
         setLoading(true);
         
-        // Fetch caregivers
-        const cgRes = await api.get('/caregivers');
-        let cgData = cgRes.data || [];
+        // Fetch caregivers (try auth first, then public endpoint)
+        let cgData = [];
+        try {
+          const cgRes = await api.get('/caregivers');
+          if (Array.isArray(cgRes.data) && cgRes.data.length > 0) {
+            cgData = cgRes.data;
+          }
+        } catch (authErr) {
+          console.warn('Could not load /caregivers via auth token, trying public:', authErr);
+        }
+
+        if (cgData.length === 0) {
+          try {
+            const pubRes = await api.get('/caregivers/public');
+            if (Array.isArray(pubRes.data) && pubRes.data.length > 0) {
+              cgData = pubRes.data;
+            }
+          } catch (pubErr) {
+            console.error('Error loading public caregivers:', pubErr);
+          }
+        }
         
         // Fetch parents
-        const parentRes = await api.get('/parents');
-        const parentData = parentRes.data || [];
-        setParents(parentData);
+        try {
+          const parentRes = await api.get('/parents');
+          setParents(parentRes.data || []);
+        } catch (pErr) {
+          console.warn('Error fetching parents in child Caregivers view:', pErr);
+        }
 
         // If DB has no caregivers, seed mock data matching the premium design for visual beauty
         if (cgData.length === 0) {
