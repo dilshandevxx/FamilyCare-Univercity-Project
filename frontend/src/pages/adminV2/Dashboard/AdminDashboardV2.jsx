@@ -82,11 +82,11 @@ const AdminDashboardV2 = () => {
             </p>
           </div>
           <div className="v2-hero-stats">
-            <div className="v2-hero-stat-pill" onClick={() => navigate('/admin-v2/alerts')} style={{ cursor: 'pointer' }}>
+            <div className="v2-hero-stat-pill" onClick={() => navigate('/admin/alerts')} style={{ cursor: 'pointer' }}>
               <span className={`dot ${stats.critical_alerts > 0 ? 'active' : ''}`} style={stats.critical_alerts === 0 ? {background: '#94A3B8', boxShadow: 'none'} : {}} />
               <span>{stats.critical_alerts !== '—' ? stats.critical_alerts : 0} Critical Alerts</span>
             </div>
-            <div className="v2-hero-stat-pill" onClick={() => navigate('/admin-v2/caregiver-approval')} style={{ cursor: 'pointer' }}>
+            <div className="v2-hero-stat-pill" onClick={() => navigate('/admin/caregiver-approval')} style={{ cursor: 'pointer' }}>
               <span className={`dot ${stats.pending_approvals > 0 ? 'pending' : ''}`} style={stats.pending_approvals === 0 ? {background: '#94A3B8', boxShadow: 'none'} : {}} />
               <span>{stats.pending_approvals !== '—' ? stats.pending_approvals : 0} Pending Audits</span>
             </div>
@@ -164,7 +164,7 @@ const AdminDashboardV2 = () => {
                 <h4>Weekly System Traffic Activity</h4>
                 <p>Track uploads of daily health records and active user registrations</p>
               </div>
-              <button className="v2-header-action-btn" onClick={() => navigate('/admin-v2/analytics')}>
+              <button className="v2-header-action-btn" onClick={() => navigate('/admin/analytics')}>
                 <ActivitySquare size={14} style={{ marginRight: '6px' }} />
                 Detailed Reports
               </button>
@@ -213,7 +213,7 @@ const AdminDashboardV2 = () => {
           <div className="v2-dashboard-panel feed-panel">
             <div className="v2-panel-header">
               <h4>Recent Event Logs</h4>
-              <button className="v2-header-link" onClick={() => navigate('/admin-v2/health-logs')}>View All Logs</button>
+              <button className="v2-header-link" onClick={() => navigate('/admin/health-logs')}>View All Logs</button>
             </div>
 
             <div className="v2-feed-list">
@@ -258,7 +258,7 @@ const AdminDashboardV2 = () => {
         <div className="v2-controls-panel">
           <h4>Platform Controls & Diagnostics</h4>
           <div className="v2-controls-grid">
-            <div className="v2-control-card" onClick={() => navigate('/admin-v2/caregiver-approval')}>
+            <div className="v2-control-card" onClick={() => navigate('/admin/caregiver-approval')}>
               <div className="v2-control-icon-circle bg-teal">
                 <UserCheck size={20} />
               </div>
@@ -269,7 +269,7 @@ const AdminDashboardV2 = () => {
               <ChevronRight size={18} className="v2-control-arrow" />
             </div>
 
-            <div className="v2-control-card" onClick={() => navigate('/admin-v2/alerts')}>
+            <div className="v2-control-card" onClick={() => navigate('/admin/alerts')}>
               <div className="v2-control-icon-circle bg-rose">
                 <Bell size={20} />
               </div>
@@ -280,7 +280,7 @@ const AdminDashboardV2 = () => {
               <ChevronRight size={18} className="v2-control-arrow" />
             </div>
 
-            <div className="v2-control-card" onClick={() => navigate('/admin-v2/users')}>
+            <div className="v2-control-card" onClick={() => navigate('/admin/users')}>
               <div className="v2-control-icon-circle bg-indigo">
                 <UserPlus size={20} />
               </div>
@@ -291,7 +291,7 @@ const AdminDashboardV2 = () => {
               <ChevronRight size={18} className="v2-control-arrow" />
             </div>
 
-            <div className="v2-control-card" onClick={() => navigate('/admin-v2/monitoring')}>
+            <div className="v2-control-card" onClick={() => navigate('/admin/monitoring')}>
               <div className="v2-control-icon-circle bg-orange">
                 <Server size={20} />
               </div>
