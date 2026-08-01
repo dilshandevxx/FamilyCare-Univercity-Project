@@ -264,7 +264,7 @@ const AdminDashboardV2 = () => {
               <ChevronRight size={18} className="v2-control-arrow" />
             </div>
 
-            <div className="v2-control-card" onClick={() => navigate('/admin-v2/alerts')}>
+            <div className="v2-control-card" onClick={() => navigate('/admin/alerts')}>
               <div className="v2-control-icon-circle bg-rose">
                 <Bell size={20} />
               </div>
@@ -275,7 +275,7 @@ const AdminDashboardV2 = () => {
               <ChevronRight size={18} className="v2-control-arrow" />
             </div>
 
-            <div className="v2-control-card" onClick={() => navigate('/admin-v2/users')}>
+            <div className="v2-control-card" onClick={() => navigate('/admin/users')}>
               <div className="v2-control-icon-circle bg-indigo">
                 <UserPlus size={20} />
               </div>
