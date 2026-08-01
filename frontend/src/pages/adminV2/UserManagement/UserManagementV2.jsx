@@ -110,9 +110,9 @@ const UserManagementV2Content = () => {
     if (!newName.trim() || !newEmail.trim()) return;
 
     try {
-      await api.post('/admin/users', {
-        name: newName,
-        email: newEmail,
+      await adminService.createUser({
+        name: newName.trim(),
+        email: newEmail.trim(),
         password: 'Password123!', 
         role: newRole
       });
@@ -122,7 +122,7 @@ const UserManagementV2Content = () => {
       setNewRole('child');
       fetchUsers();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to add user');
+      alert(err.response?.data?.error || err.response?.data?.message || 'Failed to add user');
     }
   };
 
