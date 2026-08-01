@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ShieldAlert, Bell, CheckCircle, Activity, X, Heart, Shield, Loader2 } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
 import api from '../../../services/api';
+import { useAdminStats } from '../../../context/AdminStatsContext';
 import './AdminAlertsV2.css';
 
 const formatTime = (iso) => {
@@ -21,6 +22,7 @@ const formatTime = (iso) => {
 };
 
 const AdminAlertsV2 = () => {
+  const { refresh: refreshAdminStats } = useAdminStats();
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [resolvedIds, setResolvedIds] = useState([]);
@@ -55,6 +57,12 @@ const AdminAlertsV2 = () => {
     setResolvedIds([...resolvedIds, id]);
     try {
       await api.put(`/admin/alerts/${id}/resolve`);
+
+      // Trigger immediate refresh of sidebar badge count
+      if (typeof refreshAdminStats === 'function') {
+        refreshAdminStats();
+      }
+
       setTimeout(() => {
         setAlerts(prev => prev.filter(a => a.id !== id));
         setResolvedIds(prev => prev.filter(x => x !== id));
