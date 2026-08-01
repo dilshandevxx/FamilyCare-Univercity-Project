@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
 import api from '../../../services/api';
+import { useAdminStats } from '../../../context/AdminStatsContext';
 import './AdminDashboardV2.css';
 
 const formatActivityTime = (ts) => {
@@ -24,10 +25,11 @@ const formatActivityTime = (ts) => {
 
 const AdminDashboardV2 = () => {
   const navigate = useNavigate();
+  const { pendingApprovals, activeAlerts, refresh: refreshAdminStats } = useAdminStats();
 
   const [stats, setStats] = useState({
     total_users: '—', total_caregivers: '—', total_elders: '—',
-    logs_today: '—', active_alerts: '—', critical_alerts: '—', pending_approvals: '—',
+    logs_today: '—', active_alerts: activeAlerts || '—', critical_alerts: '—', pending_approvals: pendingApprovals || '—',
   });
   const [recentActivity, setRecentActivity] = useState([]);
   const [loadingActivity, setLoadingActivity] = useState(true);
@@ -36,10 +38,13 @@ const AdminDashboardV2 = () => {
     try {
       const { data } = await api.get('/admin/stats');
       setStats(data);
+      if (typeof refreshAdminStats === 'function') {
+        refreshAdminStats();
+      }
     } catch (error) {
       console.error('Failed to fetch stats:', error);
     }
-  }, []);
+  }, [refreshAdminStats]);
 
   const fetchActivity = useCallback(async () => {
     setLoadingActivity(true);
