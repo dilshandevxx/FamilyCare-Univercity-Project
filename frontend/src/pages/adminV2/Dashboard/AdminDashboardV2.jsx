@@ -253,11 +253,12 @@ const AdminDashboardV2Content = () => {
               ) : recentActivity.length === 0 ? (
                 <p style={{ textAlign: 'center', color: '#94A3B8', fontSize: '0.9rem', padding: '1rem 0' }}>No recent activity found.</p>
               ) : (
-                recentActivity.slice(0, 5).map((act, i) => {
+                recentActivity.slice(0, 6).map((act, i) => {
                   let type = 'log';
-                  if (act.icon === 'UserPlus' || act.icon === 'UserCheck') type = 'approval';
-                  else if (act.icon === 'AlertTriangle' || act.icon === 'Bell') type = 'alert';
-                  else if (act.title.toLowerCase().includes('senior')) type = 'parent';
+                  const titleLower = (act.title || '').toLowerCase();
+                  if (act.icon === 'UserPlus' || act.icon === 'UserCheck' || titleLower.includes('caregiver') || titleLower.includes('registered')) type = 'approval';
+                  else if (act.icon === 'AlertTriangle' || act.icon === 'Bell' || titleLower.includes('alert') || titleLower.includes('critical')) type = 'alert';
+                  else if (titleLower.includes('senior') || titleLower.includes('resident') || titleLower.includes('elder')) type = 'parent';
 
                   return (
                     <div key={i} className="v2-feed-item">
@@ -269,10 +270,10 @@ const AdminDashboardV2Content = () => {
                       </div>
                       <div className="v2-feed-details">
                         <div className="v2-feed-title-time">
-                          <h5>{act.title}</h5>
+                          <h5>{act.title || 'System Event'}</h5>
                           <span>{formatActivityTime(act.ts)}</span>
                         </div>
-                        <p>{act.desc}</p>
+                        <p>{act.desc || 'System log recorded'}</p>
                       </div>
                     </div>
                   );
