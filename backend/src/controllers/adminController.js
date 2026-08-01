@@ -523,148 +523,52 @@ const getAdminActivity = async (req, res) => {
       WHERE c.status = 'approved'
       ORDER BY c.updated_at DESC LIMIT 3
     `);
-    approved.forEach(c => events.push({
-      type: 'caregiver_approved', icon: 'UserCheck',
+    approved.forEach(a => events.push({
+      type: 'caregiver_approved', icon: 'CheckCircle',
       title: 'Caregiver approved',
-      desc: `${c.name || 'Caregiver'} has been approved`,
-      ts: c.ts,
+      desc: `${a.name} is now an approved caregiver`,
+      ts: a.ts,
     }));
 
-    // Sort all events by timestamp desc, return top 10
-    events.sort((a, b) => new Date(b.ts) - new Date(a.ts));
-    res.json(events.slice(0, 10));
+    res.json(events);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// ── GET /api/admin/settings ──────────────────────────────────────
 const getAdminSettings = async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      "SELECT setting_key, setting_value FROM admin_settings"
-    );
-    const settings = {};
-    rows.forEach(r => { settings[r.setting_key] = r.setting_value; });
+    const [settings] = await pool.query('SELECT * FROM settings');
     res.json(settings);
   } catch (err) {
-    // Table may not exist yet — return defaults
-    res.json({});
+    res.status(500).json({ error: err.message });
   }
 };
 
-// ── PUT /api/admin/settings ──────────────────────────────────────
 const updateAdminSettings = async (req, res) => {
-  const entries = Object.entries(req.body);
-  if (!entries.length) return res.status(400).json({ error: 'No settings provided' });
   try {
-    // Ensure table exists
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS admin_settings (
-        setting_key   VARCHAR(100) PRIMARY KEY,
-        setting_value TEXT,
-        updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      )
-    `);
-    for (const [key, value] of entries) {
-      await pool.query(
-        `INSERT INTO admin_settings (setting_key, setting_value) VALUES (?, ?)
-         ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)`,
-        [key, String(value)]
-      );
-    }
-    res.json({ message: 'Settings saved' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-// ── GET /api/admin/system-status ──────────────────────────────────
-// Returns real backend infrastructure metrics, memory, CPU, DB pool health & live terminal audit logs
-const getSystemStatus = async (req, res) => {
-  const startTime = Date.now();
-  try {
-    // DB Ping
-    await pool.query('SELECT 1');
-    const latency = Date.now() - startTime;
-
-    // Memory calculation
-    const freeMem = os.freemem();
-    const totalMem = os.totalmem();
-    const usedMem = totalMem - freeMem;
-    const ramPct = Math.round((usedMem / totalMem) * 100);
-    const ramDetails = `${(usedMem / (1024 ** 3)).toFixed(1)} GB of ${(totalMem / (1024 ** 3)).toFixed(1)} GB assigned`;
-
-    // CPU estimation
-    const cpus = os.cpus();
-    let totalIdle = 0, totalTick = 0;
-    cpus.forEach(core => {
-      for (const type in core.times) {
-        totalTick += core.times[type];
-      }
-      totalIdle += core.times.idle;
-    });
-    const cpuUsage = Math.min(95, Math.max(12, Math.round(100 - (totalIdle / totalTick) * 100) || 24));
-
-    // Dynamic recent terminal logs from DB & system status
-    const [recentUsers] = await pool.query('SELECT name, created_at FROM users ORDER BY created_at DESC LIMIT 2');
-    const [recentLogs] = await pool.query('SELECT logged_at FROM health_logs ORDER BY logged_at DESC LIMIT 2');
-
-    const logs = [
-      { time: new Date().toTimeString().split(' ')[0], event: 'Database connection pool verified', type: 'info' },
-      { time: new Date(Date.now() - 30000).toTimeString().split(' ')[0], event: `GET /api/admin/system-status - 200 OK - ${latency}ms`, type: 'request' },
-    ];
-
-    if (recentUsers.length > 0) {
-      logs.push({
-        time: new Date(recentUsers[0].created_at).toTimeString().split(' ')[0],
-        event: `Session token verified for ${recentUsers[0].name}`,
-        type: 'info'
-      });
-    }
-
-    if (recentLogs.length > 0) {
-      logs.push({
-        time: new Date(recentLogs[0].logged_at).toTimeString().split(' ')[0],
-        event: 'POST /api/caregiver/health-logs - 200 OK',
-        type: 'request'
-      });
-    }
-
-    logs.push({
-      time: new Date().toTimeString().split(' ')[0],
-      event: 'Auto-migration checked - schema matches current version',
-      type: 'info'
-    });
-
-    res.json({
-      cpu: cpuUsage,
-      ram: ramPct,
-      ramDetails,
-      dbStatus: 'Healthy',
-      activeConnections: 4,
-      poolLimit: 10,
-      latencyMs: latency,
-      logs
-    });
+    const { key, value } = req.body;
+    await pool.query('INSERT INTO settings (k, v) VALUES (?, ?) ON DUPLICATE KEY UPDATE v = ?', [key, value, value]);
+    res.json({ message: 'Settings updated' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// ── POST /api/admin/broadcast ─────────────────────────────────────
-// Transmit system-wide emergency broadcast alert to all clients & caregivers
-const sendBroadcast = async (req, res) => {
-  const { message } = req.body;
-  if (!message || !message.trim()) {
-    return res.status(400).json({ error: 'Broadcast message content is required' });
-  }
-
+const getSystemStatus = async (req, res) => {
   try {
-    await pool.query(
-      `INSERT INTO alerts (title, description, type, created_at)
-       VALUES ('Emergency System Broadcast', ?, 'critical', NOW())`,
-      [message.trim()]
-    );
-    res.status(201).json({ message: 'Broadcast dispatched successfully' });
+    const [db] = await pool.query('SELECT 1');
+    res.json({ db: 'online', uptime: process.uptime() });
+  } catch (err) {
+    res.json({ db: 'offline' });
+  }
+};
+
+const sendBroadcast = async (req, res) => {
+  try {
+    const { message } = req.body;
+    await pool.query('INSERT INTO notifications (message, created_at) VALUES (?, NOW())', [message]);
+    res.json({ message: 'Broadcast sent' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
