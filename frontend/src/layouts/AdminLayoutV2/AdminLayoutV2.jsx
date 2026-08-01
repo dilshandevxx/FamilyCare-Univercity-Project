@@ -86,15 +86,15 @@ const AdminLayoutV2 = ({ children, title = 'Dashboard' }) => {
 
               <div className="admin-v2-profile-group">
                 <div className="admin-v2-profile-info">
-                  <p className="admin-v2-profile-name">{user?.name || 'Rithwik Sen'}</p>
+                  <p className="admin-v2-profile-name">{user?.name || 'Administrator'}</p>
                   <div className="admin-v2-profile-badge">
                     <Shield size={10} style={{ marginRight: '4px' }} />
-                    Super Admin
+                    {user?.role === 'admin' ? 'Super Admin' : 'Admin User'}
                   </div>
                 </div>
                 <div className="admin-v2-profile-avatar">
                   <img
-                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user?.name || 'AdminRithwik')}&backgroundColor=b6e3f4`}
+                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user?.email || user?.name || 'SystemAdmin')}&backgroundColor=b6e3f4`}
                     alt="Admin Avatar"
                   />
                 </div>
