@@ -5,23 +5,29 @@ import {
   Bell, BarChart2, Monitor, Settings, LogOut, Radio, X, AlertTriangle, Check
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useAdminStats } from '../../context/AdminStatsContext';
 import './AdminSidebarV2.css';
+
+import adminService from '../../services/adminService';
+import { dispatchAdminStatsUpdate } from '../../context/AdminStatsContext';
 
 const AdminSidebarV2 = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const { pendingApprovals, activeAlerts } = useAdminStats();
   const [showBroadcast, setShowBroadcast] = useState(false);
   const [broadcastText, setBroadcastText] = useState('');
   const [broadcastSent, setBroadcastSent] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
-  // V2 Navigation routes
+  // V2 Navigation routes with dynamic real-time badges
   const navItems = [
     { to: '/admin/dashboard',           icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/admin/users',               icon: Users,            label: 'User Management' },
-    { to: '/admin/caregiver-approval',  icon: UserCheck,        label: 'Caregiver Approval', badge: 3 },
+    { to: '/admin/caregiver-approval',  icon: UserCheck,        label: 'Caregiver Approval', badge: pendingApprovals },
     { to: '/admin/elders',              icon: Heart,            label: 'Elder Management' },
     { to: '/admin/health-logs',         icon: Activity,         label: 'Health Logs' },
-    { to: '/admin/alerts',              icon: Bell,             label: 'Alerts', badge: 2 },
+    { to: '/admin/alerts',              icon: Bell,             label: 'Alerts', badge: activeAlerts },
     { to: '/admin/analytics',           icon: BarChart2,        label: 'Analytics' },
     { to: '/admin/monitoring',          icon: Monitor,          label: 'System Monitor' },
     { to: '/admin/settings',            icon: Settings,         label: 'Settings' },
@@ -32,15 +38,24 @@ const AdminSidebarV2 = () => {
     navigate('/login');
   };
 
-  const handleSendBroadcast = (e) => {
+  const handleSendBroadcast = async (e) => {
     e.preventDefault();
     if (!broadcastText.trim()) return;
-    setBroadcastSent(true);
-    setTimeout(() => {
-      setBroadcastSent(false);
-      setBroadcastText('');
-      setShowBroadcast(false);
-    }, 2000);
+    setIsSending(true);
+    try {
+      await adminService.sendBroadcast(broadcastText);
+      dispatchAdminStatsUpdate();
+      setBroadcastSent(true);
+      setTimeout(() => {
+        setBroadcastSent(false);
+        setBroadcastText('');
+        setShowBroadcast(false);
+      }, 2000);
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to dispatch broadcast alert');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -65,7 +80,12 @@ const AdminSidebarV2 = () => {
             <Icon size={18} className="admin-v2-nav-icon" />
             <span className="admin-v2-nav-label">{label}</span>
             {badge !== undefined && badge > 0 && (
-              <span className="admin-v2-nav-badge">{badge}</span>
+              <span 
+                className="admin-v2-nav-badge" 
+                aria-label={`${badge} pending ${label.toLowerCase()}`}
+              >
+                {badge > 99 ? '99+' : badge}
+              </span>
             )}
           </NavLink>
         ))}
@@ -126,9 +146,9 @@ const AdminSidebarV2 = () => {
                   <button type="button" className="admin-v2-modal-cancel" onClick={() => setShowBroadcast(false)}>
                     Cancel
                   </button>
-                  <button type="submit" className="admin-v2-modal-send">
+                  <button type="submit" className="admin-v2-modal-send" disabled={isSending}>
                     <Radio size={14} />
-                    Send Broadcast
+                    {isSending ? 'Transmitting...' : 'Send Broadcast'}
                   </button>
                 </div>
               </form>

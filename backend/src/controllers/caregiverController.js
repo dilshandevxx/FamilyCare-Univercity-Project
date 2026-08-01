@@ -58,6 +58,7 @@ const getCaregivers = async (req, res) => {
   }
 };
 
+
 // GET /api/caregivers/:id
 const getCaregiverById = async (req, res) => {
   try {

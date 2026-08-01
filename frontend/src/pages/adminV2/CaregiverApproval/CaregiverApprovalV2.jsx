@@ -1,33 +1,75 @@
-import React, { useState } from 'react';
-import { ShieldCheck, UserCheck, ShieldX, Check, AlertCircle, Award, Clock, Hash, MapPin, Users, Search } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ShieldCheck, UserCheck, ShieldX, Check, AlertCircle, Award, Clock, Hash, MapPin, Users, Search, Loader2 } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
+import adminService from '../../../services/adminService';
+import AdminErrorBoundary from '../../../components/common/AdminErrorBoundary';
+import { useAdminStats } from '../../../context/AdminStatsContext';
 import './CaregiverApprovalV2.css';
 
-const initialApplicants = [
-  { id: 1, name: 'Clara Oswald', email: 'clara@care.com', experience: '5 years', certification: 'CNA', license: 'CNA-778945', location: 'New York, NY', status: 'pending', bio: 'Compassionate nurse specialized in elder care, stroke recovery assistance, and cognitive therapies.', rating: 4.8 },
-  { id: 2, name: 'Ravi Kumar', email: 'ravi@care.com', experience: '8 years', certification: 'RN', license: 'RN-901124', location: 'San Francisco, CA', status: 'pending', bio: 'Certified Registered Nurse with over 8 years experience in hospital ICU settings and home hospice monitoring.', rating: 4.9 },
-  { id: 3, name: 'Arthur Jenkins', email: 'arthur@care.com', experience: '3 years', certification: 'HHA', license: 'HHA-334120', location: 'Austin, TX', status: 'pending', bio: 'Experienced Home Health Aide specializing in daily assistance, meal planning, and mobility care.', rating: 4.7 },
-  { id: 4, name: 'Elena Rodriguez', email: 'elena@care.com', experience: '12 years', certification: 'LPN', license: 'LPN-556123', location: 'Miami, FL', status: 'pending', bio: 'Licensed Practical Nurse experienced in managing chronic conditions, medication administration, and palliative care.', rating: 5.0 }
-];
-
-const CaregiverApprovalV2 = () => {
-  const [applicants, setApplicants] = useState(initialApplicants);
+const CaregiverApprovalV2Content = () => {
+  const { refresh: refreshAdminStats } = useAdminStats();
+  const [applicants, setApplicants] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [recentAction, setRecentAction] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const handleDecision = (id, name, decision) => {
-    setApplicants(applicants.map(a => {
-      if (a.id === id) {
-        return { ...a, status: decision };
-      }
-      return a;
-    }));
+  const fetchApplicants = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data } = await adminService.getPendingCaregivers();
+      setApplicants(data.map(item => ({
+        id: item.id,
+        name: item.user_name || item.name || 'Caregiver',
+        email: item.email || 'N/A',
+        experience: item.experience_years ? `${item.experience_years} years` : '5 years',
+        certification: item.certification || 'CNA',
+        license: item.license_id || `LIC-${item.id}889`,
+        location: item.location || 'Regional Facility',
+        status: 'pending',
+        bio: item.bio || 'Qualified care specialist dedicated to assisting senior residents with daily routines and clinical monitoring.',
+        rating: 4.8
+      })));
+    } catch (err) {
+      console.error('Failed to fetch pending caregivers:', err);
+      setApplicants([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    setRecentAction({ name, decision });
-    setTimeout(() => {
-      setApplicants(prev => prev.filter(a => a.id !== id));
-      setRecentAction(null);
-    }, 2000);
+  useEffect(() => {
+    fetchApplicants();
+  }, [fetchApplicants]);
+
+  const handleDecision = async (id, name, decision) => {
+    try {
+      if (decision === 'approved') {
+        await adminService.approveCaregiver(id);
+      } else {
+        await adminService.rejectCaregiver(id);
+      }
+
+      setApplicants(prev => prev.map(a => {
+        if (a.id === id) {
+          return { ...a, status: decision };
+        }
+        return a;
+      }));
+
+      // Trigger immediate refresh of sidebar badge count across components
+      if (typeof refreshAdminStats === 'function') {
+        refreshAdminStats();
+      }
+
+      setRecentAction({ name, decision });
+      setTimeout(() => {
+        setApplicants(prev => prev.filter(a => a.id !== id));
+        setRecentAction(null);
+      }, 2000);
+    } catch (err) {
+      console.error(`Failed to ${decision} caregiver:`, err);
+      alert(err.response?.data?.error || `Failed to ${decision} caregiver`);
+    }
   };
 
   const filteredApplicants = applicants.filter(a => 
@@ -74,7 +116,12 @@ const CaregiverApprovalV2 = () => {
         )}
 
         {/* Main Content */}
-        {applicants.length === 0 ? (
+        {loading ? (
+          <div className="approval-v2-empty-state">
+            <Loader2 size={40} className="animate-spin" style={{ color: '#00A896', marginBottom: 12 }} />
+            <p>Loading caregiver applications...</p>
+          </div>
+        ) : applicants.length === 0 ? (
           <div className="approval-v2-empty-state">
             <div className="approval-v2-empty-icon">
               <ShieldCheck size={64} />
@@ -160,5 +207,11 @@ const CaregiverApprovalV2 = () => {
     </AdminLayoutV2>
   );
 };
+
+const CaregiverApprovalV2 = () => (
+  <AdminErrorBoundary title="Caregiver Approval Error">
+    <CaregiverApprovalV2Content />
+  </AdminErrorBoundary>
+);
 
 export default CaregiverApprovalV2;

@@ -249,7 +249,7 @@ const Register = () => {
                   <div key={i} className="reg-avatar" style={{ marginLeft: i > 0 ? '-10px' : 0 }}>{l}</div>
                 ))}
               </div>
-              <p><strong>10,000+</strong> families on FamilyCare</p>
+              <p><strong>Many</strong> families on FamilyCare</p>
             </div>
           </div>
           <div className="reg-circle reg-circle-1"></div>
