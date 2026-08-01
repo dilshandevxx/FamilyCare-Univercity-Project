@@ -6,7 +6,8 @@ import {
   HeartHandshake, ChevronRight, ActivitySquare, Server, AlertCircle, Loader2
 } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
-import api from '../../../services/api';
+import adminService from '../../../services/adminService';
+import AdminErrorBoundary from '../../../components/common/AdminErrorBoundary';
 import { useAdminStats } from '../../../context/AdminStatsContext';
 import './AdminDashboardV2.css';
 
@@ -23,7 +24,7 @@ const formatActivityTime = (ts) => {
   return `${diffD}d ago`;
 };
 
-const AdminDashboardV2 = () => {
+const AdminDashboardV2Content = () => {
   const navigate = useNavigate();
   const { pendingApprovals, activeAlerts, refresh: refreshAdminStats } = useAdminStats();
 
@@ -36,7 +37,7 @@ const AdminDashboardV2 = () => {
 
   const fetchStats = useCallback(async () => {
     try {
-      const { data } = await api.get('/admin/stats');
+      const { data } = await adminService.getStats();
       setStats(data);
       if (typeof refreshAdminStats === 'function') {
         refreshAdminStats();
@@ -49,7 +50,7 @@ const AdminDashboardV2 = () => {
   const fetchActivity = useCallback(async () => {
     setLoadingActivity(true);
     try {
-      const { data } = await api.get('/admin/activity');
+      const { data } = await adminService.getActivity();
       setRecentActivity(data);
     } catch (error) {
       console.error('Failed to fetch activity:', error);
@@ -308,5 +309,11 @@ const AdminDashboardV2 = () => {
     </AdminLayoutV2>
   );
 };
+
+const AdminDashboardV2 = () => (
+  <AdminErrorBoundary title="Dashboard Error">
+    <AdminDashboardV2Content />
+  </AdminErrorBoundary>
+);
 
 export default AdminDashboardV2;
