@@ -2,7 +2,12 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const speakeasy = require('speakeasy');
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
+let nodemailer;
+try {
+  nodemailer = require('nodemailer');
+} catch (e) {
+  // nodemailer is optional
+}
 const pool = require('../config/db');
 
 // Maps frontend role names to DB ENUM values
