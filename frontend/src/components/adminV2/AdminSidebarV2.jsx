@@ -5,23 +5,25 @@ import {
   Bell, BarChart2, Monitor, Settings, LogOut, Radio, X, AlertTriangle, Check
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useAdminStats } from '../../context/AdminStatsContext';
 import './AdminSidebarV2.css';
 
 const AdminSidebarV2 = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
+  const { pendingApprovals, activeAlerts } = useAdminStats();
   const [showBroadcast, setShowBroadcast] = useState(false);
   const [broadcastText, setBroadcastText] = useState('');
   const [broadcastSent, setBroadcastSent] = useState(false);
 
-  // V2 Navigation routes
+  // V2 Navigation routes with dynamic real-time badges
   const navItems = [
     { to: '/admin/dashboard',           icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/admin/users',               icon: Users,            label: 'User Management' },
-    { to: '/admin/caregiver-approval',  icon: UserCheck,        label: 'Caregiver Approval', badge: 3 },
+    { to: '/admin/caregiver-approval',  icon: UserCheck,        label: 'Caregiver Approval', badge: pendingApprovals },
     { to: '/admin/elders',              icon: Heart,            label: 'Elder Management' },
     { to: '/admin/health-logs',         icon: Activity,         label: 'Health Logs' },
-    { to: '/admin/alerts',              icon: Bell,             label: 'Alerts', badge: 2 },
+    { to: '/admin/alerts',              icon: Bell,             label: 'Alerts', badge: activeAlerts },
     { to: '/admin/analytics',           icon: BarChart2,        label: 'Analytics' },
     { to: '/admin/monitoring',          icon: Monitor,          label: 'System Monitor' },
     { to: '/admin/settings',            icon: Settings,         label: 'Settings' },
