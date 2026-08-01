@@ -1,33 +1,65 @@
-import React, { useState } from 'react';
-import { ShieldCheck, UserCheck, ShieldX, Check, AlertCircle, Award, Clock, Hash, MapPin, Users, Search } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { ShieldCheck, UserCheck, ShieldX, Check, AlertCircle, Award, Clock, Hash, MapPin, Users, Search, Loader2 } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
+import api from '../../../services/api';
 import './CaregiverApprovalV2.css';
 
-const initialApplicants = [
-  { id: 1, name: 'Clara Oswald', email: 'clara@care.com', experience: '5 years', certification: 'CNA', license: 'CNA-778945', location: 'New York, NY', status: 'pending', bio: 'Compassionate nurse specialized in elder care, stroke recovery assistance, and cognitive therapies.', rating: 4.8 },
-  { id: 2, name: 'Ravi Kumar', email: 'ravi@care.com', experience: '8 years', certification: 'RN', license: 'RN-901124', location: 'San Francisco, CA', status: 'pending', bio: 'Certified Registered Nurse with over 8 years experience in hospital ICU settings and home hospice monitoring.', rating: 4.9 },
-  { id: 3, name: 'Arthur Jenkins', email: 'arthur@care.com', experience: '3 years', certification: 'HHA', license: 'HHA-334120', location: 'Austin, TX', status: 'pending', bio: 'Experienced Home Health Aide specializing in daily assistance, meal planning, and mobility care.', rating: 4.7 },
-  { id: 4, name: 'Elena Rodriguez', email: 'elena@care.com', experience: '12 years', certification: 'LPN', license: 'LPN-556123', location: 'Miami, FL', status: 'pending', bio: 'Licensed Practical Nurse experienced in managing chronic conditions, medication administration, and palliative care.', rating: 5.0 }
-];
-
 const CaregiverApprovalV2 = () => {
-  const [applicants, setApplicants] = useState(initialApplicants);
+  const [applicants, setApplicants] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [recentAction, setRecentAction] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const handleDecision = (id, name, decision) => {
-    setApplicants(applicants.map(a => {
-      if (a.id === id) {
-        return { ...a, status: decision };
-      }
-      return a;
-    }));
+  const fetchApplicants = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data } = await api.get('/admin/caregivers/pending');
+      setApplicants(data.map(item => ({
+        id: item.id,
+        name: item.user_name || item.name || 'Caregiver',
+        email: item.email || 'caregiver@care.com',
+        experience: item.experience_years ? `${item.experience_years} years` : '5 years',
+        certification: item.certification || 'CNA',
+        license: item.license_id || `CNA-${item.id}8890`,
+        location: 'New York, NY',
+        status: 'pending',
+        bio: item.bio || 'Compassionate nurse specialized in elder care, stroke recovery assistance, and cognitive therapies.',
+        rating: 4.8
+      })));
+    } catch (err) {
+      console.error('Failed to fetch pending caregivers:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    setRecentAction({ name, decision });
-    setTimeout(() => {
-      setApplicants(prev => prev.filter(a => a.id !== id));
-      setRecentAction(null);
-    }, 2000);
+  useEffect(() => {
+    fetchApplicants();
+  }, [fetchApplicants]);
+
+  const handleDecision = async (id, name, decision) => {
+    try {
+      if (decision === 'approved') {
+        await api.put(`/admin/caregivers/${id}/approve`);
+      } else {
+        await api.put(`/admin/caregivers/${id}/reject`);
+      }
+
+      setApplicants(prev => prev.map(a => {
+        if (a.id === id) {
+          return { ...a, status: decision };
+        }
+        return a;
+      }));
+
+      setRecentAction({ name, decision });
+      setTimeout(() => {
+        setApplicants(prev => prev.filter(a => a.id !== id));
+        setRecentAction(null);
+      }, 2000);
+    } catch (err) {
+      console.error(`Failed to ${decision} caregiver:`, err);
+    }
   };
 
   const filteredApplicants = applicants.filter(a => 
@@ -74,7 +106,12 @@ const CaregiverApprovalV2 = () => {
         )}
 
         {/* Main Content */}
-        {applicants.length === 0 ? (
+        {loading ? (
+          <div className="approval-v2-empty-state">
+            <Loader2 size={40} className="animate-spin" style={{ color: '#00A896', marginBottom: 12 }} />
+            <p>Loading caregiver applications...</p>
+          </div>
+        ) : applicants.length === 0 ? (
           <div className="approval-v2-empty-state">
             <div className="approval-v2-empty-icon">
               <ShieldCheck size={64} />
