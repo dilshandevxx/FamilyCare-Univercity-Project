@@ -253,7 +253,7 @@ const AdminDashboardV2 = () => {
         <div className="v2-controls-panel">
           <h4>Platform Controls & Diagnostics</h4>
           <div className="v2-controls-grid">
-            <div className="v2-control-card" onClick={() => navigate('/admin-v2/caregiver-approval')}>
+            <div className="v2-control-card" onClick={() => navigate('/admin/caregiver-approval')}>
               <div className="v2-control-icon-circle bg-teal">
                 <UserCheck size={20} />
               </div>
