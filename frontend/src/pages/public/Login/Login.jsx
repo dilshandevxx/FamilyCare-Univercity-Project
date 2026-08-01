@@ -250,7 +250,7 @@ const Login = () => {
 
           <div className="login-hero-badge">
             <span className="badge-dot"></span>
-            Trusted by 100+ families
+            Trusted by many families
           </div>
 
           <h2 className="login-hero-title">
