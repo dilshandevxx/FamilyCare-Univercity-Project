@@ -37,9 +37,10 @@ export const AdminStatsProvider = ({ children }) => {
 
   // ── Build the context value ───────────────────────────────────────
   // pendingApprovals: caregivers with status='pending' from /admin/stats
+  // activeAlerts: unresolved alerts (is_resolved=0) from /admin/stats
   const contextValue = {
     pendingApprovals, // ← sourced from stats.pending_approvals
-    activeAlerts,
+    activeAlerts,     // ← sourced from stats.active_alerts
     loading,
     refresh: () => {},
   };
