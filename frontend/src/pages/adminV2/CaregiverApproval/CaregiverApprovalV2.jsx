@@ -44,9 +44,9 @@ const CaregiverApprovalV2Content = () => {
   const handleDecision = async (id, name, decision) => {
     try {
       if (decision === 'approved') {
-        await api.put(`/admin/caregivers/${id}/approve`);
+        await adminService.approveCaregiver(id);
       } else {
-        await api.put(`/admin/caregivers/${id}/reject`);
+        await adminService.rejectCaregiver(id);
       }
 
       setApplicants(prev => prev.map(a => {
@@ -56,7 +56,7 @@ const CaregiverApprovalV2Content = () => {
         return a;
       }));
 
-      // Trigger immediate refresh of sidebar badge count
+      // Trigger immediate refresh of sidebar badge count across components
       if (typeof refreshAdminStats === 'function') {
         refreshAdminStats();
       }
@@ -68,6 +68,7 @@ const CaregiverApprovalV2Content = () => {
       }, 2000);
     } catch (err) {
       console.error(`Failed to ${decision} caregiver:`, err);
+      alert(err.response?.data?.error || `Failed to ${decision} caregiver`);
     }
   };
 
