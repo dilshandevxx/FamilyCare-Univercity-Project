@@ -35,10 +35,17 @@ export const AdminStatsProvider = ({ children }) => {
     fetchStats();
   }, [fetchStats]);
 
+  // ── Build the context value ───────────────────────────────────────
+  // pendingApprovals: caregivers with status='pending' from /admin/stats
+  const contextValue = {
+    pendingApprovals, // ← sourced from stats.pending_approvals
+    activeAlerts,
+    loading,
+    refresh: () => {},
+  };
+
   return (
-    <AdminStatsContext.Provider
-      value={{ pendingApprovals, activeAlerts, loading, refresh: () => {} }}
-    >
+    <AdminStatsContext.Provider value={contextValue}>
       {children}
     </AdminStatsContext.Provider>
   );
