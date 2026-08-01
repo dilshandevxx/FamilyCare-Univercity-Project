@@ -24,13 +24,17 @@ const createParent = async (req, res) => {
     return res.status(400).json({ error: 'Parent name is required' });
   }
 
+  const parsedCaregiverId = assigned_caregiver_id ? parseInt(assigned_caregiver_id, 10) : null;
+  const assignmentStatus = parsedCaregiverId ? 'pending' : null;
+
   try {
     const [result] = await pool.query(
       `INSERT INTO parents (
         child_id, name, age, gender, relationship, phone, address,
         emergency_contact_name, emergency_contact_phone,
-        medical_conditions, allergies, current_medications, assigned_caregiver_id
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        medical_conditions, allergies, current_medications, assigned_caregiver_id,
+        assignment_status, rejection_reason
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)`,
       [
         child_id,
         name,
@@ -44,13 +48,16 @@ const createParent = async (req, res) => {
         medical_conditions || null,
         allergies || null,
         current_medications || null,
-        assigned_caregiver_id || null
+        parsedCaregiverId,
+        assignmentStatus
       ]
     );
 
     res.status(201).json({
       id: result.insertId,
-      message: 'Parent profile created successfully'
+      message: parsedCaregiverId
+        ? 'Parent profile created and care request sent to caregiver for approval.'
+        : 'Parent profile created successfully.'
     });
   } catch (err) {
     console.error('Error creating parent:', err);
@@ -70,6 +77,7 @@ const getParents = async (req, res) => {
               caregivers.user_id AS caregiver_user_id,
               caregivers.specialization AS caregiver_specialization,
               caregivers.hourly_rate AS caregiver_hourly_rate,
+              caregivers.max_capacity AS caregiver_max_capacity,
               u.avatar_url AS caregiver_avatar_url,
               u.phone AS caregiver_phone,
               u.email AS caregiver_email
@@ -100,6 +108,8 @@ const getParentById = async (req, res) => {
               COALESCE(caregivers.name, u.name) AS caregiver_name,
               caregivers.user_id AS caregiver_user_id,
               caregivers.specialization AS caregiver_specialization,
+              caregivers.hourly_rate AS caregiver_hourly_rate,
+              caregivers.max_capacity AS caregiver_max_capacity,
               u.phone AS caregiver_phone,
               u.email AS caregiver_email,
               u.avatar_url AS caregiver_avatar_url
@@ -170,11 +180,25 @@ const updateParent = async (req, res) => {
     let params;
 
     if (assigned_caregiver_id !== undefined) {
+      const parsedCaregiverId = assigned_caregiver_id ? parseInt(assigned_caregiver_id, 10) : null;
+      
+      // Check previous assigned caregiver to know if reassignment happened
+      const [[prevParent]] = await pool.query('SELECT assigned_caregiver_id, assignment_status FROM parents WHERE id = ? AND child_id = ?', [id, child_id]);
+      
+      let newAssignmentStatus = prevParent?.assignment_status || null;
+      if (parsedCaregiverId && parsedCaregiverId !== prevParent?.assigned_caregiver_id) {
+        newAssignmentStatus = 'pending';
+      } else if (!parsedCaregiverId) {
+        newAssignmentStatus = null;
+      }
+
       query = `UPDATE parents SET
         name = ?, age = ?, gender = ?, relationship = ?, phone = ?, address = ?,
         emergency_contact_name = ?, emergency_contact_phone = ?,
         medical_conditions = ?, allergies = ?, current_medications = ?,
-        assigned_caregiver_id = ?
+        assigned_caregiver_id = ?,
+        assignment_status = ?,
+        rejection_reason = CASE WHEN ? = 'pending' THEN NULL ELSE rejection_reason END
        WHERE id = ? AND child_id = ?`;
       params = [
         name,
@@ -188,7 +212,9 @@ const updateParent = async (req, res) => {
         medical_conditions || null,
         allergies || null,
         current_medications || null,
-        assigned_caregiver_id ? parseInt(assigned_caregiver_id, 10) : null,
+        parsedCaregiverId,
+        newAssignmentStatus,
+        newAssignmentStatus,
         id,
         child_id
       ];
@@ -227,6 +253,7 @@ const updateParent = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 // DELETE /api/parents/:id
 // Delete a parent profile (only if it belongs to the logged-in child)

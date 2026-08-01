@@ -368,7 +368,7 @@ const getOrCreateCaregiverId = async (userId) => {
 };
 
 // ── GET /api/users/my-residents ───────────────────────────────
-// Returns all parents (elders) assigned to the logged-in caregiver
+// Returns all parents (elders) assigned to the logged-in caregiver with 'accepted' status
 // with their latest health log data
 const getMyResidents = async (req, res) => {
   try {
@@ -378,6 +378,7 @@ const getMyResidents = async (req, res) => {
     const [rows] = await pool.query(
       `SELECT
          p.id, p.name, p.age, p.medical_conditions, p.room_number, p.care_status,
+         p.assignment_status, p.rejection_reason,
          hl.blood_pressure, hl.heart_rate, hl.temperature,
          hl.notes        AS last_notes,
          hl.logged_at    AS last_update
@@ -392,6 +393,7 @@ const getMyResidents = async (req, res) => {
          ) h2 ON h1.parent_id = h2.parent_id AND h1.logged_at = h2.max_logged
        ) hl ON p.id = hl.parent_id
        WHERE p.assigned_caregiver_id = ?
+         AND (p.assignment_status = 'accepted' OR p.assignment_status IS NULL)
        ORDER BY p.name`,
       [caregiverId]
     );
@@ -402,14 +404,29 @@ const getMyResidents = async (req, res) => {
 };
 
 // ── GET /api/users/dashboard-stats ───────────────────────────
-// Returns key counts for the dashboard stat cards
+// Returns key counts for the dashboard stat cards including workload capacity and pending care requests
 const getDashboardStats = async (req, res) => {
   try {
     const caregiverId = await getOrCreateCaregiverId(req.user.id);
 
-    // Total assigned residents
+    // Fetch caregiver max capacity
+    const [[cg]] = await pool.query(
+      'SELECT COALESCE(max_capacity, 4) AS max_capacity FROM caregivers WHERE id = ?',
+      [caregiverId || 0]
+    );
+    const max_capacity = cg?.max_capacity || 4;
+
+    // Total active/accepted assigned residents
     const [[{ total_residents }]] = await pool.query(
-      'SELECT COUNT(*) AS total_residents FROM parents WHERE assigned_caregiver_id = ?',
+      `SELECT COUNT(*) AS total_residents FROM parents 
+       WHERE assigned_caregiver_id = ? AND (assignment_status = 'accepted' OR assignment_status IS NULL)`,
+      [caregiverId || 0]
+    );
+
+    // Pending care requests awaiting this caregiver's approval
+    const [[{ pending_requests }]] = await pool.query(
+      `SELECT COUNT(*) AS pending_requests FROM parents 
+       WHERE assigned_caregiver_id = ? AND assignment_status = 'pending'`,
       [caregiverId || 0]
     );
 
@@ -420,17 +437,20 @@ const getDashboardStats = async (req, res) => {
       [req.user.id]
     );
 
-    // Critical / urgent residents
+    // Critical / urgent residents (only accepted)
     const [[{ urgent_count }]] = await pool.query(
       `SELECT COUNT(*) AS urgent_count FROM parents
-       WHERE assigned_caregiver_id = ? AND care_status IN ('CRITICAL','NEEDS ATTENTION')`,
+       WHERE assigned_caregiver_id = ? 
+         AND (assignment_status = 'accepted' OR assignment_status IS NULL)
+         AND care_status IN ('CRITICAL','NEEDS ATTENTION')`,
       [caregiverId || 0]
     );
 
-    // Pending tasks = residents with no log today
+    // Pending tasks = active residents with no log today
     const [pendingTasksList] = await pool.query(
       `SELECT id, name FROM parents p
        WHERE p.assigned_caregiver_id = ?
+         AND (p.assignment_status = 'accepted' OR p.assignment_status IS NULL)
          AND p.id NOT IN (
            SELECT DISTINCT parent_id FROM health_logs
            WHERE DATE(logged_at) = CURDATE()
@@ -439,21 +459,189 @@ const getDashboardStats = async (req, res) => {
     );
     const pending_tasks = pendingTasksList.length;
 
-    // Recent activity (health logs for my residents)
+    // Recent activity (health logs for my active residents)
     const [recentActivity] = await pool.query(
       `SELECT hl.id, hl.logged_at, hl.overall_condition, hl.blood_pressure, hl.temperature, hl.meal_status, p.name as elder_name
        FROM health_logs hl
        JOIN parents p ON p.id = hl.parent_id
        WHERE p.assigned_caregiver_id = ?
+         AND (p.assignment_status = 'accepted' OR p.assignment_status IS NULL)
        ORDER BY hl.logged_at DESC LIMIT 5`,
       [caregiverId || 0]
     );
 
-    res.json({ total_residents, logs_today, pending_tasks, urgent_count, pendingTasksList, recentActivity });
+    res.json({
+      total_residents,
+      max_capacity,
+      pending_requests,
+      logs_today,
+      pending_tasks,
+      urgent_count,
+      pendingTasksList,
+      recentActivity
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
+// ── GET /api/users/caregiver-requests ───────────────────────────
+// Returns all incoming pending parent care requests for the logged in caregiver
+const getCaregiverRequests = async (req, res) => {
+  try {
+    const caregiverId = await getOrCreateCaregiverId(req.user.id);
+    if (!caregiverId) return res.json([]);
+
+    const [rows] = await pool.query(
+      `SELECT 
+         p.id, p.name, p.age, p.gender, p.relationship, p.phone, p.address,
+         p.emergency_contact_name, p.emergency_contact_phone,
+         p.medical_conditions, p.allergies, p.current_medications,
+         p.assignment_status, p.created_at,
+         u.name  AS child_name,
+         u.email AS child_email,
+         u.phone AS child_phone,
+         u.avatar_url AS child_avatar_url
+       FROM parents p
+       JOIN users u ON u.id = p.child_id
+       WHERE p.assigned_caregiver_id = ? AND p.assignment_status = 'pending'
+       ORDER BY p.created_at DESC`,
+      [caregiverId]
+    );
+
+    // Also get caregiver's current capacity and load
+    const [[cg]] = await pool.query(
+      'SELECT COALESCE(max_capacity, 4) AS max_capacity FROM caregivers WHERE id = ?',
+      [caregiverId]
+    );
+    const [[{ active_count }]] = await pool.query(
+      `SELECT COUNT(*) AS active_count FROM parents 
+       WHERE assigned_caregiver_id = ? AND (assignment_status = 'accepted' OR assignment_status IS NULL)`,
+      [caregiverId]
+    );
+
+    res.json({
+      requests: rows,
+      max_capacity: cg?.max_capacity || 4,
+      active_count: active_count || 0,
+      is_at_capacity: (active_count || 0) >= (cg?.max_capacity || 4)
+    });
+  } catch (err) {
+    console.error('Error fetching caregiver requests:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// ── PUT /api/users/caregiver-requests/:parentId/accept ───────────
+// Caregiver accepts a parent care assignment
+const acceptCaregiverRequest = async (req, res) => {
+  const { parentId } = req.params;
+  try {
+    const caregiverId = await getOrCreateCaregiverId(req.user.id);
+    if (!caregiverId) {
+      return res.status(403).json({ error: 'Caregiver profile not found.' });
+    }
+
+    const [[parent]] = await pool.query(
+      'SELECT * FROM parents WHERE id = ? AND assigned_caregiver_id = ?',
+      [parentId, caregiverId]
+    );
+
+    if (!parent) {
+      return res.status(404).json({ error: 'Care request not found or not assigned to you.' });
+    }
+
+    await pool.query(
+      `UPDATE parents 
+       SET assignment_status = 'accepted', rejection_reason = NULL 
+       WHERE id = ? AND assigned_caregiver_id = ?`,
+      [parentId, caregiverId]
+    );
+
+    // Create an alert notification for the child
+    try {
+      const [[cgUser]] = await pool.query(
+        'SELECT name FROM users WHERE id = ?',
+        [req.user.id]
+      );
+      const cgName = cgUser?.name || 'Your caregiver';
+      await pool.query(
+        `INSERT INTO alerts (parent_id, title, description, type)
+         VALUES (?, ?, ?, 'info')`,
+        [
+          parentId,
+          'Caregiver Request Accepted',
+          `${cgName} has accepted the care assignment request for ${parent.name}.`
+        ]
+      );
+    } catch (alertErr) {
+      console.warn('Could not insert acceptance alert:', alertErr);
+    }
+
+    res.json({ message: `Successfully accepted care request for ${parent.name}.` });
+  } catch (err) {
+    console.error('Error accepting caregiver request:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// ── PUT /api/users/caregiver-requests/:parentId/reject ───────────
+// Caregiver declines/rejects a parent care assignment with reason
+const rejectCaregiverRequest = async (req, res) => {
+  const { parentId } = req.params;
+  const { reason } = req.body;
+
+  const rejectionReason = reason || 'Caregiver reached full capacity (4/4)';
+
+  try {
+    const caregiverId = await getOrCreateCaregiverId(req.user.id);
+    if (!caregiverId) {
+      return res.status(403).json({ error: 'Caregiver profile not found.' });
+    }
+
+    const [[parent]] = await pool.query(
+      'SELECT * FROM parents WHERE id = ? AND assigned_caregiver_id = ?',
+      [parentId, caregiverId]
+    );
+
+    if (!parent) {
+      return res.status(404).json({ error: 'Care request not found or not assigned to you.' });
+    }
+
+    await pool.query(
+      `UPDATE parents 
+       SET assignment_status = 'rejected', rejection_reason = ? 
+       WHERE id = ? AND assigned_caregiver_id = ?`,
+      [rejectionReason, parentId, caregiverId]
+    );
+
+    // Create an alert notification for the child
+    try {
+      const [[cgUser]] = await pool.query(
+        'SELECT name FROM users WHERE id = ?',
+        [req.user.id]
+      );
+      const cgName = cgUser?.name || 'The caregiver';
+      await pool.query(
+        `INSERT INTO alerts (parent_id, title, description, type)
+         VALUES (?, ?, ?, 'warning')`,
+        [
+          parentId,
+          'Caregiver Request Declined',
+          `${cgName} was unable to accept care request for ${parent.name}. Reason: ${rejectionReason}`
+        ]
+      );
+    } catch (alertErr) {
+      console.warn('Could not insert rejection alert:', alertErr);
+    }
+
+    res.json({ message: `Declined care request for ${parent.name}.` });
+  } catch (err) {
+    console.error('Error rejecting caregiver request:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 
 // PUT /api/users/notification-prefs
 // Save child notification preferences
@@ -613,6 +801,9 @@ module.exports = {
   disable2FA,
   getMyResidents,
   getDashboardStats,
+  getCaregiverRequests,
+  acceptCaregiverRequest,
+  rejectCaregiverRequest,
   updateNotificationPrefs,
   getNotificationPrefs,
   deleteAccount,

@@ -18,6 +18,9 @@ const {
   disable2FA,
   getMyResidents,
   getDashboardStats,
+  getCaregiverRequests,
+  acceptCaregiverRequest,
+  rejectCaregiverRequest,
   updateNotificationPrefs,
   getNotificationPrefs,
   deleteAccount,
@@ -57,6 +60,11 @@ router.post('/2fa/disable',protect, disable2FA);
 // Dashboard data
 router.get('/my-residents',    protect, getMyResidents);
 router.get('/dashboard-stats', protect, getDashboardStats);
+
+// Caregiver Care Requests (Accept / Reject)
+router.get('/caregiver-requests',                     protect, getCaregiverRequests);
+router.put('/caregiver-requests/:parentId/accept',    protect, acceptCaregiverRequest);
+router.put('/caregiver-requests/:parentId/reject',    protect, rejectCaregiverRequest);
 
 // Child dashboard stats
 router.get('/child-stats',     protect, getChildDashboardStats);

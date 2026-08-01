@@ -8,6 +8,9 @@ const getPublicCaregivers = async (req, res) => {
              c.certification, c.license_id, c.hourly_rate, c.bio,
              c.is_available, c.rating, c.total_reviews,
              c.location, c.languages, c.status,
+             COALESCE(c.max_capacity, 4) AS max_capacity,
+             (SELECT COUNT(*) FROM parents p WHERE p.assigned_caregiver_id = c.id AND (p.assignment_status = 'accepted' OR p.assignment_status IS NULL)) AS active_residents,
+             (SELECT COUNT(*) FROM parents p WHERE p.assigned_caregiver_id = c.id AND p.assignment_status = 'pending') AS pending_requests,
              u.avatar_url, u.email, u.phone
       FROM caregivers c
       LEFT JOIN users u ON u.id = c.user_id
@@ -27,6 +30,9 @@ const getPublicCaregiverById = async (req, res) => {
              c.certification, c.license_id, c.hourly_rate, c.bio,
              c.is_available, c.rating, c.total_reviews,
              c.location, c.languages, c.status,
+             COALESCE(c.max_capacity, 4) AS max_capacity,
+             (SELECT COUNT(*) FROM parents p WHERE p.assigned_caregiver_id = c.id AND (p.assignment_status = 'accepted' OR p.assignment_status IS NULL)) AS active_residents,
+             (SELECT COUNT(*) FROM parents p WHERE p.assigned_caregiver_id = c.id AND p.assignment_status = 'pending') AS pending_requests,
              u.avatar_url, u.email, u.phone
       FROM caregivers c
       LEFT JOIN users u ON u.id = c.user_id
@@ -47,6 +53,9 @@ const getCaregivers = async (req, res) => {
              c.certification, c.license_id, c.hourly_rate, c.bio,
              c.is_available, c.rating, c.total_reviews,
              c.location, c.languages, c.status,
+             COALESCE(c.max_capacity, 4) AS max_capacity,
+             (SELECT COUNT(*) FROM parents p WHERE p.assigned_caregiver_id = c.id AND (p.assignment_status = 'accepted' OR p.assignment_status IS NULL)) AS active_residents,
+             (SELECT COUNT(*) FROM parents p WHERE p.assigned_caregiver_id = c.id AND p.assignment_status = 'pending') AS pending_requests,
              u.avatar_url, u.email, u.phone
       FROM caregivers c
       LEFT JOIN users u ON u.id = c.user_id
