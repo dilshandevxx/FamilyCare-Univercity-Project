@@ -24,10 +24,14 @@ const {
   getAdminActivity,
   getAdminSettings,
   updateAdminSettings,
+  getSystemStatus,
 } = require('../controllers/adminController');
 
 // All admin routes require a valid JWT + admin role
 router.use(protect, adminOnly);
+
+// System Monitoring
+router.get('/system-status',                  getSystemStatus);
 
 // Dashboard stats
 router.get('/stats',                          getAdminStats);
