@@ -4,6 +4,7 @@ import CaregiverLayout from '../../../layouts/CaregiverLayout';
 import {
   Users, FileText, CheckCircle, AlertTriangle,
   ArrowRight, CheckSquare, Square, Loader2,
+  UserPlus, Check, X, Phone, Mail, Clock, AlertCircle, Sparkles
 } from 'lucide-react';
 import api from '../../../services/api';
 import './CaregiverDashboard.css';
@@ -33,8 +34,6 @@ const formatDate = (iso) => {
 const residentAvatar = (name) =>
   `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name || 'elder')}`;
 
-// ── Activity Feed (dynamic, fed by recentActivity state) ─────────────
-
 // ── Toast ─────────────────────────────────────────────────────────
 
 const Toast = ({ toast }) => {
@@ -62,10 +61,16 @@ const CaregiverDashboard = () => {
   const navigate = useNavigate();
 
   // ── state ──────────────────────────────────────────────
-  const [stats, setStats]           = useState({ total_residents: 0, logs_today: 0, pending_tasks: 0, urgent_count: 0, pendingTasksList: [], recentActivity: [] });
+  const [stats, setStats]           = useState({ total_residents: 0, max_capacity: 4, pending_requests: 0, logs_today: 0, pending_tasks: 0, urgent_count: 0, pendingTasksList: [], recentActivity: [] });
   const [residents, setResidents]   = useState([]);
+  const [requests, setRequests]     = useState([]);
   const [loading, setLoading]       = useState(true);
   const [toast, setToast]           = useState(null);
+
+  // Reject modal / inline state
+  const [rejectingId, setRejectingId] = useState(null);
+  const [rejectReason, setRejectReason] = useState('Reached maximum capacity (4/4 residents)');
+  const [actionLoading, setActionLoading] = useState(false);
 
   // Health-entry form state
   const [selectedParent, setSelectedParent] = useState('');
@@ -79,35 +84,38 @@ const CaregiverDashboard = () => {
   const [recentActivity, setRecentActivity] = useState([]);
 
   // ── Load on mount ──────────────────────────────────────
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const [{ data: statsData }, { data: residentsData }] = await Promise.all([
-          api.get('/users/dashboard-stats'),
-          api.get('/users/my-residents'),
-        ]);
-        setStats(statsData);
-        setResidents(residentsData);
-        if (residentsData.length > 0) setSelectedParent(String(residentsData[0].id));
-        
-        if (statsData.pendingTasksList) {
-          setTasks(statsData.pendingTasksList.map(p => ({
-            id: p.id,
-            title: `Log health for ${p.name}`,
-            time: 'Required Today',
-            done: false
-          })));
-        }
-        if (statsData.recentActivity) {
-          setRecentActivity(statsData.recentActivity);
-        }
-      } catch (err) {
-        showToast('error', 'Could not load dashboard data');
-      } finally {
-        setLoading(false);
+  const loadDashboard = async () => {
+    try {
+      const [{ data: statsData }, { data: residentsData }, { data: requestsData }] = await Promise.all([
+        api.get('/users/dashboard-stats'),
+        api.get('/users/my-residents'),
+        api.get('/users/caregiver-requests'),
+      ]);
+      setStats(statsData);
+      setResidents(residentsData);
+      setRequests(requestsData?.requests || []);
+      if (residentsData.length > 0 && !selectedParent) setSelectedParent(String(residentsData[0].id));
+      
+      if (statsData.pendingTasksList) {
+        setTasks(statsData.pendingTasksList.map(p => ({
+          id: p.id,
+          title: `Log health for ${p.name}`,
+          time: 'Required Today',
+          done: false
+        })));
       }
-    };
-    load();
+      if (statsData.recentActivity) {
+        setRecentActivity(statsData.recentActivity);
+      }
+    } catch (err) {
+      showToast('error', 'Could not load dashboard data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadDashboard();
   }, []);
 
   // ── Helpers ────────────────────────────────────────────
@@ -120,6 +128,37 @@ const CaregiverDashboard = () => {
     setTasks(prev => prev.map(t => t.id === id ? { ...t, done: !t.done } : t));
 
   const doneCount = tasks.filter(t => t.done).length;
+
+  // ── Handle Accept Care Request ─────────────────────────
+  const handleAcceptRequest = async (parentId, parentName) => {
+    setActionLoading(true);
+    try {
+      await api.put(`/users/caregiver-requests/${parentId}/accept`);
+      showToast('success', `Accepted care assignment for ${parentName}!`);
+      await loadDashboard();
+    } catch (err) {
+      showToast('error', err?.response?.data?.error || 'Failed to accept request');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // ── Handle Reject Care Request ─────────────────────────
+  const handleRejectRequest = async (parentId, parentName) => {
+    setActionLoading(true);
+    try {
+      await api.put(`/users/caregiver-requests/${parentId}/reject`, {
+        reason: rejectReason
+      });
+      showToast('success', `Declined request for ${parentName}`);
+      setRejectingId(null);
+      await loadDashboard();
+    } catch (err) {
+      showToast('error', err?.response?.data?.error || 'Failed to decline request');
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   // ── Submit Quick Health Entry ──────────────────────────
   const handleSubmit = async () => {
@@ -173,11 +212,19 @@ const CaregiverDashboard = () => {
           <div className="stat-card">
             <div className="stat-header">
               <div className="stat-icon teal"><Users size={20} /></div>
-              <span className="stat-label">Total</span>
+              <span className="stat-label">Capacity ({stats.total_residents}/{stats.max_capacity || 4})</span>
             </div>
             <div>
-              <h2 className="stat-value">{String(stats.total_residents).padStart(2, '0')}</h2>
-              <p className="stat-desc">Assigned<br />Elders</p>
+              <h2 className="stat-value">
+                {String(stats.total_residents).padStart(2, '0')}<span style={{ fontSize: '18px', color: '#94a3b8', fontWeight: 600 }}>/{stats.max_capacity || 4}</span>
+              </h2>
+              <p className="stat-desc">
+                {stats.total_residents >= (stats.max_capacity || 4) ? (
+                  <span style={{ color: '#ea580c', fontWeight: 700 }}>● Full Capacity</span>
+                ) : (
+                  <span style={{ color: '#0d9488', fontWeight: 700 }}>● {(stats.max_capacity || 4) - stats.total_residents} Spot{(stats.max_capacity || 4) - stats.total_residents > 1 ? 's' : ''} Open</span>
+                )}
+              </p>
             </div>
           </div>
 
@@ -203,17 +250,210 @@ const CaregiverDashboard = () => {
             </div>
           </div>
 
-          <div className="stat-card urgent">
+          <div className={`stat-card ${requests.length > 0 ? 'request-highlight' : 'urgent'}`}>
             <div className="stat-header">
-              <div className="stat-icon red"><AlertTriangle size={20} /></div>
-              <span className="stat-label red">Urgent</span>
+              <div className="stat-icon red">
+                {requests.length > 0 ? <UserPlus size={20} style={{ color: '#0284c7' }} /> : <AlertTriangle size={20} />}
+              </div>
+              <span className={`stat-label ${requests.length > 0 ? 'blue' : 'red'}`}>
+                {requests.length > 0 ? 'Incoming Requests' : 'Urgent'}
+              </span>
             </div>
             <div>
-              <h2 className="stat-value red">{String(stats.urgent_count).padStart(2, '0')}</h2>
-              <p className="stat-desc red">Active Alerts</p>
+              <h2 className={`stat-value ${requests.length > 0 ? 'blue' : 'red'}`}>
+                {requests.length > 0 ? String(requests.length).padStart(2, '0') : String(stats.urgent_count).padStart(2, '0')}
+              </h2>
+              <p className={`stat-desc ${requests.length > 0 ? 'blue' : 'red'}`}>
+                {requests.length > 0 ? 'Care Requests Awaiting Approval' : 'Active Alerts'}
+              </p>
             </div>
           </div>
         </div>
+
+        {/* ── Incoming Care Requests Banner / Section (if any) ── */}
+        {requests.length > 0 && (
+          <section className="care-requests-banner" style={{
+            background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%)',
+            border: '1px solid #bae6fd',
+            borderRadius: '20px',
+            padding: '24px',
+            marginBottom: '32px',
+            boxShadow: '0 4px 16px rgba(2, 132, 199, 0.08)'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{
+                  background: '#0284c7', color: 'white', padding: '8px', borderRadius: '12px', display: 'flex', alignItems: 'center'
+                }}>
+                  <UserPlus size={20} />
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800, color: '#0369a1', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    Incoming Care Assignment Requests
+                    <span style={{
+                      background: '#0284c7', color: 'white', fontSize: '0.72rem', padding: '2px 8px', borderRadius: '20px', fontWeight: 700
+                    }}>
+                      {requests.length} New
+                    </span>
+                  </h3>
+                  <p style={{ margin: '2px 0 0', fontSize: '0.82rem', color: '#0284c7' }}>
+                    Family members requested you to care for their elder. Please accept or decline based on your workload.
+                  </p>
+                </div>
+              </div>
+
+              {stats.total_residents >= (stats.max_capacity || 4) && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  background: '#fff7ed', border: '1px solid #fdba74', color: '#c2410c',
+                  padding: '6px 12px', borderRadius: '10px', fontSize: '0.8rem', fontWeight: 700
+                }}>
+                  <AlertCircle size={15} /> You are at full capacity ({stats.total_residents}/{stats.max_capacity || 4})
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+              {requests.map(req => (
+                <div key={req.id} style={{
+                  background: 'white',
+                  borderRadius: '16px',
+                  padding: '18px',
+                  border: '1px solid #e2e8f0',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between'
+                }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <img
+                          src={residentAvatar(req.name)}
+                          alt={req.name}
+                          style={{ width: '42px', height: '42px', borderRadius: '50%', background: '#f1f5f9' }}
+                        />
+                        <div>
+                          <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 800, color: '#0f172a' }}>{req.name}</h4>
+                          <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>
+                            {req.age ? `${req.age} yrs` : 'Age unknown'}{req.gender ? ` • ${req.gender}` : ''}{req.relationship ? ` (${req.relationship})` : ''}
+                          </span>
+                        </div>
+                      </div>
+                      <span style={{
+                        background: '#fef3c7', color: '#92400e', fontSize: '0.72rem', fontWeight: 700, padding: '3px 8px', borderRadius: '8px'
+                      }}>
+                        Pending
+                      </span>
+                    </div>
+
+                    <div style={{ background: '#f8fafc', padding: '10px 12px', borderRadius: '10px', fontSize: '0.8rem', marginBottom: '12px' }}>
+                      <div style={{ color: '#475569', marginBottom: '4px' }}>
+                        <strong>Requested By:</strong> {req.child_name || 'Family Member'} {req.child_phone ? `(${req.child_phone})` : ''}
+                      </div>
+                      {req.medical_conditions && (
+                        <div style={{ color: '#475569', marginBottom: '4px' }}>
+                          <strong>Medical:</strong> {req.medical_conditions}
+                        </div>
+                      )}
+                      {req.allergies && (
+                        <div style={{ color: '#dc2626' }}>
+                          <strong>Allergies:</strong> {req.allergies}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {rejectingId === req.id ? (
+                    <div style={{
+                      background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: '12px', padding: '12px', marginTop: '6px'
+                    }}>
+                      <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#9f1239', display: 'block', marginBottom: '6px' }}>
+                        Select Reason for Declining:
+                      </label>
+                      <select
+                        style={{ width: '100%', padding: '6px 10px', borderRadius: '8px', border: '1px solid #fda4af', fontSize: '0.78rem', marginBottom: '8px', background: 'white' }}
+                        value={rejectReason}
+                        onChange={e => setRejectReason(e.target.value)}
+                      >
+                        <option value="Reached maximum capacity (4/4 residents)">Reached maximum capacity (4/4 residents)</option>
+                        <option value="Schedule or working hours conflict">Schedule or working hours conflict</option>
+                        <option value="Specialized medical care required">Specialized medical care required</option>
+                        <option value="Location / distance not serviceable">Location / distance not serviceable</option>
+                      </select>
+                      <div style={{ display: 'flex', gap: '6px' }}>
+                        <button
+                          style={{ flex: 1, padding: '7px', background: '#e11d48', color: 'white', border: 'none', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}
+                          onClick={() => handleRejectRequest(req.id, req.name)}
+                          disabled={actionLoading}
+                        >
+                          Confirm Decline
+                        </button>
+                        <button
+                          style={{ padding: '7px 12px', background: '#cbd5e1', color: '#334155', border: 'none', borderRadius: '8px', fontSize: '0.78rem', fontWeight: 600, cursor: 'pointer' }}
+                          onClick={() => setRejectingId(null)}
+                          disabled={actionLoading}
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+                      <button
+                        style={{
+                          flex: 1,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          background: '#0d9488',
+                          color: 'white',
+                          border: 'none',
+                          padding: '8px 14px',
+                          borderRadius: '10px',
+                          fontWeight: 700,
+                          fontSize: '0.82rem',
+                          cursor: 'pointer',
+                          boxShadow: '0 2px 6px rgba(13,148,136,0.2)'
+                        }}
+                        onClick={() => handleAcceptRequest(req.id, req.name)}
+                        disabled={actionLoading}
+                      >
+                        <Check size={16} /> Accept Assignment
+                      </button>
+                      <button
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          background: '#fff1f2',
+                          color: '#e11d48',
+                          border: '1px solid #fecdd3',
+                          padding: '8px 12px',
+                          borderRadius: '10px',
+                          fontWeight: 700,
+                          fontSize: '0.82rem',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => {
+                          setRejectingId(req.id);
+                          setRejectReason(stats.total_residents >= (stats.max_capacity || 4)
+                            ? `Reached maximum capacity (${stats.total_residents}/${stats.max_capacity || 4} residents)`
+                            : 'Reached maximum capacity (4/4 residents)');
+                        }}
+                        disabled={actionLoading}
+                      >
+                        <X size={16} /> Decline
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* ── Main Grid ── */}
         <div className="main-grid">

@@ -134,12 +134,12 @@ const CaregiversList = () => {
         assigned_caregiver_id: assigningCg.id
       });
 
-      setSuccessMsg(`Successfully assigned ${assigningCg.name} to care plan.`);
+      setSuccessMsg(`Care request sent to ${assigningCg.name} for approval. They will review and accept/decline.`);
       
       // Update local parents state
       setParents(prev => prev.map(p => {
         if (p.id === parseInt(selectedParentId, 10)) {
-          return { ...p, assigned_caregiver_id: assigningCg.id, caregiver_name: assigningCg.name };
+          return { ...p, assigned_caregiver_id: assigningCg.id, caregiver_name: assigningCg.name, assignment_status: 'pending' };
         }
         return p;
       }));
@@ -417,9 +417,22 @@ const CaregiversList = () => {
                         </div>
 
                         {/* Availability Details */}
-                        <p className="cg-cg-avail">
-                          <Calendar size={13} /> Available: {cg.availability}
-                        </p>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '6px' }}>
+                          <p className="cg-cg-avail" style={{ margin: 0 }}>
+                            <Calendar size={13} /> Available: {cg.availability}
+                          </p>
+                          <span style={{
+                            fontSize: '0.72rem',
+                            fontWeight: 700,
+                            padding: '2px 8px',
+                            borderRadius: '12px',
+                            background: (cg.active_count || 0) >= (cg.max_capacity || 4) ? '#fee2e2' : '#f0fdf4',
+                            color: (cg.active_count || 0) >= (cg.max_capacity || 4) ? '#dc2626' : '#16a34a',
+                            border: `1px solid ${(cg.active_count || 0) >= (cg.max_capacity || 4) ? '#fca5a5' : '#86efac'}`
+                          }}>
+                            {cg.active_count || 0}/{cg.max_capacity || 4} Residents {(cg.active_count || 0) >= (cg.max_capacity || 4) ? '• Full' : ''}
+                          </span>
+                        </div>
 
                         {/* Bio Text */}
                         <p className="cg-cg-bio">{cg.bio || 'Dedicated professional caregiver committed to providing high quality personal and healthcare support.'}</p>
@@ -613,9 +626,13 @@ const CaregiversList = () => {
           <div className="cg-modal-overlay" onClick={() => setAssigningCg(null)}>
             <div className="cg-modal" onClick={e => e.stopPropagation()}>
               <h3 className="cg-modal-title">Assign Caregiver</h3>
-              <p className="cg-modal-subtitle">
-                Assign <span className="bold">{assigningCg.name}</span> to manage one of your parent plans.
+              <p className="cg-modal-sub">
+                Send a care assignment request to <span className="bold">{assigningCg.name}</span> for your family member.
               </p>
+
+              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem', color: '#166534', marginBottom: '16px' }}>
+                ℹ️ <strong>Approval Workflow:</strong> The caregiver will receive this request and can accept or decline based on their current workload capacity ({assigningCg.active_count || 0}/{assigningCg.max_capacity || 4} residents).
+              </div>
 
               <form onSubmit={handleAssignSubmit}>
                 <div className="cg-modal-field">
@@ -653,7 +670,7 @@ const CaregiversList = () => {
                     className="cg-modal-btn submit"
                     disabled={!selectedParentId}
                   >
-                    Assign Plan
+                    Send Care Request
                   </button>
                 </div>
               </form>

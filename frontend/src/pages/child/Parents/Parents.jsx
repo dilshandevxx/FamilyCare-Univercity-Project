@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Plus, User, HeartPulse, ShieldAlert, Phone, MapPin, 
-  UserSearch, Sparkles, Heart, Activity, Thermometer, Trash2, Edit2, X, MessageSquare, UserCheck
+  UserSearch, Sparkles, Heart, Activity, Thermometer, Trash2, Edit2, X, MessageSquare, UserCheck,
+  Clock, AlertTriangle, CheckCircle2
 } from 'lucide-react';
 import ChildLayout from '../../../layouts/ChildLayout';
 import api from '../../../services/api';
@@ -197,23 +198,49 @@ const Parents = () => {
                   <div className="pm-card-section">
                     <div className="pm-split-row">
                       <div style={{ width: '100%' }}>
-                        <span className="pm-med-lbl">ASSIGNED CAREGIVER</span>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+                          <span className="pm-med-lbl">ASSIGNED CAREGIVER</span>
+                          {parent.assigned_caregiver_id && (
+                            parent.assignment_status === 'pending' ? (
+                              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#b45309', background: '#fef3c7', padding: '2px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <Clock size={11} /> Request Pending
+                              </span>
+                            ) : parent.assignment_status === 'rejected' ? (
+                              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#b91c1c', background: '#fee2e2', padding: '2px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <AlertTriangle size={11} /> Request Declined
+                              </span>
+                            ) : (
+                              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#15803d', background: '#dcfce7', padding: '2px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <CheckCircle2 size={11} /> Active
+                              </span>
+                            )
+                          )}
+                        </div>
+
                         {parent.caregiver_name ? (
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px' }}>
-                            <div>
-                              <p className="pm-caregiver-name" style={{ margin: 0, fontWeight: '600', color: 'var(--color-primary)' }}>
-                                {parent.caregiver_name}
-                              </p>
-                              {parent.caregiver_specialization && (
-                                <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>{parent.caregiver_specialization}</span>
-                              )}
+                          <div>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px' }}>
+                              <div>
+                                <p className="pm-caregiver-name" style={{ margin: 0, fontWeight: '600', color: 'var(--color-primary)' }}>
+                                  {parent.caregiver_name}
+                                </p>
+                                {parent.caregiver_specialization && (
+                                  <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>{parent.caregiver_specialization}</span>
+                                )}
+                              </div>
+                              <button 
+                                onClick={() => startEdit(parent)}
+                                style={{ fontSize: '0.75rem', color: 'var(--color-primary)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                              >
+                                Change
+                              </button>
                             </div>
-                            <button 
-                              onClick={() => startEdit(parent)}
-                              style={{ fontSize: '0.75rem', color: 'var(--color-primary)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
-                            >
-                              Change
-                            </button>
+
+                            {parent.assignment_status === 'rejected' && (
+                              <div style={{ background: '#fff1f2', border: '1px solid #fecdd3', padding: '8px 10px', borderRadius: '6px', marginTop: '8px', fontSize: '0.78rem', color: '#9f1239' }}>
+                                <strong>Decline Reason:</strong> {parent.rejection_reason || 'Caregiver at maximum capacity.'}
+                              </div>
+                            )}
                           </div>
                         ) : (
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px' }}>
