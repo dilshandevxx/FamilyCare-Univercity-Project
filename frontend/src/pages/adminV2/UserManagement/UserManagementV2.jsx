@@ -38,7 +38,7 @@ const UserManagementV2Content = () => {
 
   const fetchPending = useCallback(async () => {
     try {
-      const { data } = await api.get('/admin/caregivers/pending');
+      const { data } = await adminService.getPendingCaregivers();
       setPendingUsers(data.map(c => ({
         id: c.id,
         name: c.user_name || c.name || 'Unknown',
@@ -50,8 +50,8 @@ const UserManagementV2Content = () => {
         relationship: 'Professional',
         phone: c.phone || 'N/A',
         backgroundCheck: 'Pending',
-        certifications: c.certification || c.certifications?.join(', ') || 'None',
-        notes: `Experience: ${c.experience_years || c.experienceYears} years.`
+        certifications: c.certification || c.certifications?.join(', ') || 'CNA',
+        notes: `Experience: ${c.experience_years || c.experienceYears || 5} years. ${c.bio ? `Bio: ${c.bio}` : ''}`
       })));
     } catch (error) {
       console.error('Failed to fetch pending caregivers:', error);
@@ -77,31 +77,31 @@ const UserManagementV2Content = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      await api.delete(`/admin/users/${id}`);
+      await adminService.deleteUser(id);
       setUsers(users.filter(u => u.id !== id));
     } catch (err) {
-      alert('Failed to delete user.');
+      alert(err.response?.data?.error || 'Failed to delete user.');
     }
   };
 
   const handleApprove = async (id) => {
     try {
-      await api.put(`/admin/caregivers/${id}/approve`);
+      await adminService.approveCaregiver(id);
       setReviewUser(null);
       fetchPending();
       fetchUsers();
     } catch (err) {
-      alert('Failed to approve.');
+      alert(err.response?.data?.error || 'Failed to approve.');
     }
   };
 
   const handleReject = async (id) => {
     try {
-      await api.put(`/admin/caregivers/${id}/reject`);
+      await adminService.rejectCaregiver(id);
       setReviewUser(null);
       fetchPending();
     } catch (err) {
-      alert('Failed to reject.');
+      alert(err.response?.data?.error || 'Failed to reject.');
     }
   };
 
