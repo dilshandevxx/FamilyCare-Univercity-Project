@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const pool = require('../config/db');
+const os = require('os');
 
 // ── GET /api/admin/residents ─────────────────────────────────────
 // All residents (parents) with their assigned caregiver name + user info
@@ -540,57 +541,52 @@ const getAdminActivity = async (req, res) => {
       WHERE c.status = 'approved'
       ORDER BY c.updated_at DESC LIMIT 3
     `);
-    approved.forEach(c => events.push({
-      type: 'caregiver_approved', icon: 'UserCheck',
+    approved.forEach(a => events.push({
+      type: 'caregiver_approved', icon: 'CheckCircle',
       title: 'Caregiver approved',
-      desc: `${c.name || 'Caregiver'} has been approved`,
-      ts: c.ts,
+      desc: `${a.name} is now an approved caregiver`,
+      ts: a.ts,
     }));
 
-    // Sort all events by timestamp desc, return top 10
-    events.sort((a, b) => new Date(b.ts) - new Date(a.ts));
-    res.json(events.slice(0, 10));
+    res.json(events);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// ── GET /api/admin/settings ──────────────────────────────────────
 const getAdminSettings = async (req, res) => {
   try {
-    const [rows] = await pool.query(
-      "SELECT setting_key, setting_value FROM admin_settings"
-    );
-    const settings = {};
-    rows.forEach(r => { settings[r.setting_key] = r.setting_value; });
+    const [settings] = await pool.query('SELECT * FROM settings');
     res.json(settings);
   } catch (err) {
-    // Table may not exist yet — return defaults
-    res.json({});
+    res.status(500).json({ error: err.message });
   }
 };
 
-// ── PUT /api/admin/settings ──────────────────────────────────────
 const updateAdminSettings = async (req, res) => {
-  const entries = Object.entries(req.body);
-  if (!entries.length) return res.status(400).json({ error: 'No settings provided' });
   try {
-    // Ensure table exists
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS admin_settings (
-        setting_key   VARCHAR(100) PRIMARY KEY,
-        setting_value TEXT,
-        updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      )
-    `);
-    for (const [key, value] of entries) {
-      await pool.query(
-        `INSERT INTO admin_settings (setting_key, setting_value) VALUES (?, ?)
-         ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)`,
-        [key, String(value)]
-      );
-    }
-    res.json({ message: 'Settings saved' });
+    const { key, value } = req.body;
+    await pool.query('INSERT INTO settings (k, v) VALUES (?, ?) ON DUPLICATE KEY UPDATE v = ?', [key, value, value]);
+    res.json({ message: 'Settings updated' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+const getSystemStatus = async (req, res) => {
+  try {
+    const [db] = await pool.query('SELECT 1');
+    res.json({ db: 'online', uptime: process.uptime() });
+  } catch (err) {
+    res.json({ db: 'offline' });
+  }
+};
+
+const sendBroadcast = async (req, res) => {
+  try {
+    const { message } = req.body;
+    await pool.query('INSERT INTO notifications (message, created_at) VALUES (?, NOW())', [message]);
+    res.json({ message: 'Broadcast sent' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -619,4 +615,6 @@ module.exports = {
   getAdminActivity,
   getAdminSettings,
   updateAdminSettings,
+  getSystemStatus,
+  sendBroadcast,
 };

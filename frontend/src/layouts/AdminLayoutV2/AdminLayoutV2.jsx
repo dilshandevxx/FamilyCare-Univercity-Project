@@ -1,20 +1,60 @@
-import React, { useState } from 'react';
-import { Bell, Search, Menu, Server, Shield } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Bell, Search, Menu, Server, Shield, Loader2 } from 'lucide-react';
 import AdminSidebarV2 from '../../components/adminV2/AdminSidebarV2';
 import { useAuth } from '../../context/AuthContext';
 import { AdminStatsProvider } from '../../context/AdminStatsContext';
+import adminService from '../../services/adminService';
 import './AdminLayoutV2.css';
+
+const formatTimeAgo = (ts) => {
+  if (!ts) return 'Just now';
+  const diffM = Math.floor((Date.now() - new Date(ts)) / 60000);
+  if (diffM < 1) return 'Just now';
+  if (diffM < 60) return `${diffM}m ago`;
+  const diffH = Math.floor(diffM / 60);
+  if (diffH < 24) return `${diffH}h ago`;
+  return `${Math.floor(diffH / 24)}d ago`;
+};
 
 const AdminLayoutV2 = ({ children, title = 'Dashboard' }) => {
   const { user } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [loadingNotifs, setLoadingNotifs] = useState(false);
 
-  const mockNotifications = [
-    { id: 1, title: 'New Caregiver Signup', desc: 'Ravi registered and requires verification approval.', time: '5m ago', unread: true },
-    { id: 2, title: 'Critical Health Alert', desc: 'Eleanor Vance reported Critical care status.', time: '12m ago', unread: true },
-    { id: 3, title: 'System Load Normal', desc: 'Weekly analytics reporting generated.', time: '1h ago', unread: false }
-  ];
+  useEffect(() => {
+    const fetchNotifs = async () => {
+      setLoadingNotifs(true);
+      try {
+        const { data } = await adminService.getAlerts();
+        const activeNotifs = (data || [])
+          .filter(a => !a.is_resolved)
+          .slice(0, 5)
+          .map(a => ({
+            id: a.id,
+            title: a.title || 'System Alert',
+            desc: a.description || `Alert regarding ${a.elder_name || 'resident'}`,
+            time: formatTimeAgo(a.created_at),
+            unread: true
+          }));
+        setNotifications(activeNotifs);
+      } catch (err) {
+        console.error('Failed to fetch header notifications:', err);
+        setNotifications([]);
+      } finally {
+        setLoadingNotifs(false);
+      }
+    };
+    if (showNotifications) {
+      fetchNotifs();
+    }
+  }, [showNotifications]);
+
+  const handleClearNotifications = () => {
+    setNotifications([]);
+    setShowNotifications(false);
+  };
 
   return (
     <AdminStatsProvider>
@@ -61,21 +101,31 @@ const AdminLayoutV2 = ({ children, title = 'Dashboard' }) => {
                     <div className="admin-v2-notif-dropdown">
                       <div className="admin-v2-notif-dropdown-header">
                         <h3>Notifications</h3>
-                        <span className="admin-v2-badge-unread">2 New</span>
+                        <span className="admin-v2-badge-unread">{notifications.length} Active</span>
                       </div>
                       <div className="admin-v2-notif-dropdown-body">
-                        {mockNotifications.map(n => (
-                          <div key={n.id} className={`admin-v2-notif-item ${n.unread ? 'unread' : ''}`}>
-                            <div className="admin-v2-notif-item-top">
-                              <span className="admin-v2-notif-title">{n.title}</span>
-                              <span className="admin-v2-notif-time">{n.time}</span>
-                            </div>
-                            <p className="admin-v2-notif-desc">{n.desc}</p>
+                        {loadingNotifs ? (
+                          <div style={{ display: 'flex', justifyContent: 'center', padding: '1.5rem 0' }}>
+                            <Loader2 className="animate-spin" size={20} color="#00A896" />
                           </div>
-                        ))}
+                        ) : notifications.length === 0 ? (
+                          <p style={{ textAlign: 'center', color: '#94A3B8', fontSize: '0.85rem', padding: '1rem 0' }}>
+                            No active notifications.
+                          </p>
+                        ) : (
+                          notifications.map(n => (
+                            <div key={n.id} className={`admin-v2-notif-item ${n.unread ? 'unread' : ''}`}>
+                              <div className="admin-v2-notif-item-top">
+                                <span className="admin-v2-notif-title">{n.title}</span>
+                                <span className="admin-v2-notif-time">{n.time}</span>
+                              </div>
+                              <p className="admin-v2-notif-desc">{n.desc}</p>
+                            </div>
+                          ))
+                        )}
                       </div>
                       <div className="admin-v2-notif-dropdown-footer">
-                        <button onClick={() => setShowNotifications(false)}>Clear Notifications</button>
+                        <button onClick={handleClearNotifications}>Dismiss All</button>
                       </div>
                     </div>
                   </>
@@ -86,15 +136,15 @@ const AdminLayoutV2 = ({ children, title = 'Dashboard' }) => {
 
               <div className="admin-v2-profile-group">
                 <div className="admin-v2-profile-info">
-                  <p className="admin-v2-profile-name">{user?.name || 'Rithwik Sen'}</p>
+                  <p className="admin-v2-profile-name">{user?.name || 'Administrator'}</p>
                   <div className="admin-v2-profile-badge">
                     <Shield size={10} style={{ marginRight: '4px' }} />
-                    Super Admin
+                    {user?.role === 'admin' ? 'Super Admin' : 'Admin User'}
                   </div>
                 </div>
                 <div className="admin-v2-profile-avatar">
                   <img
-                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user?.name || 'AdminRithwik')}&backgroundColor=b6e3f4`}
+                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user?.email || user?.name || 'SystemAdmin')}&backgroundColor=b6e3f4`}
                     alt="Admin Avatar"
                   />
                 </div>

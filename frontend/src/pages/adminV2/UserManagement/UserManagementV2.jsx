@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Search, UserPlus, Trash2, X, Mail, ShieldCheck, Users, CheckCircle, XCircle, Clock, FileText, AlertCircle, Loader2 } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
-import api from '../../../services/api';
+import adminService from '../../../services/adminService';
+import AdminErrorBoundary from '../../../components/common/AdminErrorBoundary';
 import './UserManagementV2.css';
 
-const UserManagementV2 = () => {
+const UserManagementV2Content = () => {
   const [users, setUsers] = useState([]);
   const [pendingUsers, setPendingUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,23 +22,23 @@ const UserManagementV2 = () => {
 
   const fetchUsers = useCallback(async () => {
     try {
-      const { data } = await api.get('/admin/users');
+      const { data } = await adminService.getUsers({ search });
       setUsers(data.map(u => ({
         id: u.id,
         name: u.name,
         email: u.email,
         role: u.role,
         status: 'active',
-        joined: new Date(u.created_at || u.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
+        joined: new Date(u.created_at || u.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
       })));
     } catch (error) {
       console.error('Failed to fetch users:', error);
     }
-  }, []);
+  }, [search]);
 
   const fetchPending = useCallback(async () => {
     try {
-      const { data } = await api.get('/admin/caregivers/pending');
+      const { data } = await adminService.getPendingCaregivers();
       setPendingUsers(data.map(c => ({
         id: c.id,
         name: c.user_name || c.name || 'Unknown',
@@ -49,8 +50,8 @@ const UserManagementV2 = () => {
         relationship: 'Professional',
         phone: c.phone || 'N/A',
         backgroundCheck: 'Pending',
-        certifications: c.certification || c.certifications?.join(', ') || 'None',
-        notes: `Experience: ${c.experience_years || c.experienceYears} years.`
+        certifications: c.certification || c.certifications?.join(', ') || 'CNA',
+        notes: `Experience: ${c.experience_years || c.experienceYears || 5} years. ${c.bio ? `Bio: ${c.bio}` : ''}`
       })));
     } catch (error) {
       console.error('Failed to fetch pending caregivers:', error);
@@ -76,31 +77,31 @@ const UserManagementV2 = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      await api.delete(`/admin/users/${id}`);
+      await adminService.deleteUser(id);
       setUsers(users.filter(u => u.id !== id));
     } catch (err) {
-      alert('Failed to delete user.');
+      alert(err.response?.data?.error || 'Failed to delete user.');
     }
   };
 
   const handleApprove = async (id) => {
     try {
-      await api.put(`/admin/caregivers/${id}/approve`);
+      await adminService.approveCaregiver(id);
       setReviewUser(null);
       fetchPending();
       fetchUsers();
     } catch (err) {
-      alert('Failed to approve.');
+      alert(err.response?.data?.error || 'Failed to approve.');
     }
   };
 
   const handleReject = async (id) => {
     try {
-      await api.put(`/admin/caregivers/${id}/reject`);
+      await adminService.rejectCaregiver(id);
       setReviewUser(null);
       fetchPending();
     } catch (err) {
-      alert('Failed to reject.');
+      alert(err.response?.data?.error || 'Failed to reject.');
     }
   };
 
@@ -109,9 +110,9 @@ const UserManagementV2 = () => {
     if (!newName.trim() || !newEmail.trim()) return;
 
     try {
-      await api.post('/admin/users', {
-        name: newName,
-        email: newEmail,
+      await adminService.createUser({
+        name: newName.trim(),
+        email: newEmail.trim(),
         password: 'Password123!', 
         role: newRole
       });
@@ -121,7 +122,7 @@ const UserManagementV2 = () => {
       setNewRole('child');
       fetchUsers();
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to add user');
+      alert(err.response?.data?.error || err.response?.data?.message || 'Failed to add user');
     }
   };
 
@@ -421,5 +422,11 @@ const UserManagementV2 = () => {
     </AdminLayoutV2>
   );
 };
+
+const UserManagementV2 = () => (
+  <AdminErrorBoundary title="User Management Error">
+    <UserManagementV2Content />
+  </AdminErrorBoundary>
+);
 
 export default UserManagementV2;

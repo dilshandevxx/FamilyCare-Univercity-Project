@@ -8,6 +8,9 @@ import { useAuth } from '../../context/AuthContext';
 import { useAdminStats } from '../../context/AdminStatsContext';
 import './AdminSidebarV2.css';
 
+import adminService from '../../services/adminService';
+import { dispatchAdminStatsUpdate } from '../../context/AdminStatsContext';
+
 const AdminSidebarV2 = () => {
   const { logout } = useAuth();
   const navigate = useNavigate();
@@ -15,6 +18,7 @@ const AdminSidebarV2 = () => {
   const [showBroadcast, setShowBroadcast] = useState(false);
   const [broadcastText, setBroadcastText] = useState('');
   const [broadcastSent, setBroadcastSent] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   // V2 Navigation routes with dynamic real-time badges
   const navItems = [
@@ -34,15 +38,24 @@ const AdminSidebarV2 = () => {
     navigate('/login');
   };
 
-  const handleSendBroadcast = (e) => {
+  const handleSendBroadcast = async (e) => {
     e.preventDefault();
     if (!broadcastText.trim()) return;
-    setBroadcastSent(true);
-    setTimeout(() => {
-      setBroadcastSent(false);
-      setBroadcastText('');
-      setShowBroadcast(false);
-    }, 2000);
+    setIsSending(true);
+    try {
+      await adminService.sendBroadcast(broadcastText);
+      dispatchAdminStatsUpdate();
+      setBroadcastSent(true);
+      setTimeout(() => {
+        setBroadcastSent(false);
+        setBroadcastText('');
+        setShowBroadcast(false);
+      }, 2000);
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to dispatch broadcast alert');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -133,9 +146,9 @@ const AdminSidebarV2 = () => {
                   <button type="button" className="admin-v2-modal-cancel" onClick={() => setShowBroadcast(false)}>
                     Cancel
                   </button>
-                  <button type="submit" className="admin-v2-modal-send">
+                  <button type="submit" className="admin-v2-modal-send" disabled={isSending}>
                     <Radio size={14} />
-                    Send Broadcast
+                    {isSending ? 'Transmitting...' : 'Send Broadcast'}
                   </button>
                 </div>
               </form>

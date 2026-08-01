@@ -1,74 +1,95 @@
-import React, { useState, useEffect } from 'react';
-import { Server, Database, HardDrive, Cpu, Terminal, RefreshCw, Layers } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Database, HardDrive, Cpu, Terminal, RefreshCw, AlertCircle, Loader2 } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
+import api from '../../../services/api';
 import './SystemMonitoringV2.css';
 
-const initialConsoleLogs = [
-  { time: '21:40:02', event: 'Database connection pool verified', type: 'info' },
-  { time: '21:41:12', event: 'GET /api/admin/stats - 200 OK - 8ms', type: 'request' },
-  { time: '21:42:30', event: 'GET /api/messages/contacts - 200 OK - 15ms', type: 'request' },
-  { time: '21:43:05', event: 'Auto-migration checked - schema matches version 1.0.4', type: 'info' }
-];
-
-const mockEvents = [
-  { event: 'GET /api/admin/activity - 200 OK - 12ms', type: 'request' },
-  { time: '21:44:00', event: 'Session token verified for user_id=4', type: 'info' },
-  { event: 'POST /api/auth/login - 200 OK - 145ms', type: 'request' },
-  { event: 'GET /api/caregiver/residents - 200 OK - 22ms', type: 'request' },
-  { event: 'Database cleanup routine executed successfully', type: 'info' }
-];
+const POLL_INTERVAL_MS = 10_000; // 10 seconds
 
 const SystemMonitoringV2 = () => {
-  const [cpu, setCpu] = useState(24);
-  const [ram, setRam] = useState(58);
-  const [dbStatus, setDbStatus] = useState('Healthy');
-  const [logs, setLogs] = useState(initialConsoleLogs);
+  const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [lastRefreshed, setLastRefreshed] = useState(null);
+  const terminalRef = useRef(null);
+
+  const fetchStatus = useCallback(async () => {
+    try {
+      const { data } = await api.get('/admin/system-status');
+      setStatus(data);
+      setError(null);
+      setLastRefreshed(new Date());
+    } catch (err) {
+      console.error('[SystemMonitoring] Failed to fetch /admin/system-status:', err);
+      setError(err?.response?.data?.error || 'Failed to reach system status endpoint.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    // Fluctuating hardware stats
-    const statsInterval = setInterval(() => {
-      setCpu(prev => {
-        const change = Math.floor(Math.random() * 9) - 4; // -4 to +4
-        return Math.max(10, Math.min(90, prev + change));
-      });
-      setRam(prev => {
-        const change = Math.floor(Math.random() * 3) - 1; // -1 to +1
-        return Math.max(45, Math.min(85, prev + change));
-      });
-    }, 2000);
+    fetchStatus();
+    const intervalId = setInterval(fetchStatus, POLL_INTERVAL_MS);
+    return () => clearInterval(intervalId);
+  }, [fetchStatus]);
 
-    // Live terminal logger
-    const logInterval = setInterval(() => {
-      const now = new Date();
-      const timeStr = now.toTimeString().split(' ')[0];
-      const randomEvent = mockEvents[Math.floor(Math.random() * mockEvents.length)];
-      
-      const newLog = {
-        time: timeStr,
-        event: randomEvent.event,
-        type: randomEvent.type
-      };
+  // Auto-scroll terminal to bottom on new logs
+  useEffect(() => {
+    if (terminalRef.current) {
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    }
+  }, [status?.logs]);
 
-      setLogs(prev => [...prev.slice(-9), newLog]); // Keep last 10 logs
-    }, 4000);
+  if (loading && !status) {
+    return (
+      <AdminLayoutV2 title="System Infrastructure Health">
+        <div className="monitor-v2-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+          <Loader2 className="animate-spin" size={40} color="#00A896" />
+        </div>
+      </AdminLayoutV2>
+    );
+  }
 
-    return () => {
-      clearInterval(statsInterval);
-      clearInterval(logInterval);
-    };
-  }, []);
+  const cpu         = status?.cpu            ?? 0;
+  const ram         = status?.ram            ?? 0;
+  const ramDetails  = status?.ramDetails     ?? '— GB of — GB assigned';
+  const dbStatus    = status?.dbStatus       ?? 'Unknown';
+  const activeConns = status?.activeConnections ?? '—';
+  const poolLimit   = status?.poolLimit      ?? '—';
+  const latencyMs   = status?.latencyMs      ?? '—';
+  const logs        = status?.logs           ?? [];
 
   return (
     <AdminLayoutV2 title="System Infrastructure Health">
       <div className="monitor-v2-container">
-        
+
+        {/* Error Banner */}
+        {error && (
+          <div style={{
+            background: '#FFF1F2', border: '1px solid #FECDD3', borderRadius: '12px',
+            padding: '12px 18px', display: 'flex', alignItems: 'center', gap: '10px',
+            color: '#BE123C', fontSize: '0.88rem', fontWeight: 600
+          }}>
+            <AlertCircle size={18} />
+            {error} — Showing last known data.
+          </div>
+        )}
+
+        {/* Auto-refresh indicator */}
+        {lastRefreshed && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '8px', color: '#94A3B8', fontSize: '0.78rem' }}>
+            <RefreshCw size={12} />
+            Last synced: {lastRefreshed.toLocaleTimeString()} · auto-refreshes every 10s
+          </div>
+        )}
+
         {/* Hardware meters */}
         <div className="monitor-v2-gauges-grid">
-          
+
           <div className="monitor-v2-gauge-card">
             <div className="gauge-header">
               <Cpu size={18} color="#00A896" />
-              <span>Simulated CPU Allocation</span>
+              <span>CPU Utilization</span>
             </div>
             <div className="gauge-body">
               <div className="gauge-radial-progress" style={{ '--progress-val': `${cpu}%` }}>
@@ -87,7 +108,7 @@ const SystemMonitoringV2 = () => {
               <div className="gauge-radial-progress progress-indigo" style={{ '--progress-val': `${ram}%` }}>
                 <span className="gauge-num">{ram}%</span>
               </div>
-              <p className="gauge-sub">4.8 GB of 8 GB currently assigned</p>
+              <p className="gauge-sub">{ramDetails}</p>
             </div>
           </div>
 
@@ -99,15 +120,15 @@ const SystemMonitoringV2 = () => {
             <div className="gauge-body stats-text-layout">
               <div className="db-stat-item">
                 <span className="label">Database Pool:</span>
-                <span className="value text-teal">Active</span>
+                <span className={`value ${dbStatus === 'Healthy' ? 'text-teal' : ''}`}>{dbStatus}</span>
               </div>
               <div className="db-stat-item">
                 <span className="label">Active Connections:</span>
-                <span className="value">4 / 10 limit</span>
+                <span className="value">{activeConns} / {poolLimit} limit</span>
               </div>
               <div className="db-stat-item">
                 <span className="label">Response Latency:</span>
-                <span className="value">4 ms</span>
+                <span className="value">{latencyMs} ms</span>
               </div>
             </div>
           </div>
@@ -127,16 +148,20 @@ const SystemMonitoringV2 = () => {
             </div>
           </div>
 
-          <div className="terminal-body-log-display">
-            {logs.map((log, index) => (
-              <div key={index} className="terminal-log-line">
-                <span className="log-timestamp">[{log.time}]</span>
-                <span className={`log-event-badge type-${log.type}`}>
-                  {log.type.toUpperCase()}
-                </span>
-                <span className="log-event-text">{log.event}</span>
-              </div>
-            ))}
+          <div className="terminal-body-log-display" ref={terminalRef}>
+            {logs.length === 0 ? (
+              <span style={{ color: '#475569', fontStyle: 'italic' }}>No log entries available.</span>
+            ) : (
+              logs.map((log, index) => (
+                <div key={index} className="terminal-log-line">
+                  <span className="log-timestamp">[{log.time}]</span>
+                  <span className={`log-event-badge type-${log.type}`}>
+                    {log.type.toUpperCase()}
+                  </span>
+                  <span className="log-event-text">{log.event}</span>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
