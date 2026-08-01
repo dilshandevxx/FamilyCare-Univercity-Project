@@ -35,6 +35,13 @@ export const AdminStatsProvider = ({ children }) => {
     fetchStats();
   }, [fetchStats]);
 
+  // ── 60-second polling — keeps badges fresh without page reload ────
+  useEffect(() => {
+    const POLL_MS = 60_000; // 1 minute
+    const intervalId = setInterval(fetchStats, POLL_MS);
+    return () => clearInterval(intervalId); // cleanup on unmount
+  }, [fetchStats]);
+
   // ── Build the context value ───────────────────────────────────────
   // pendingApprovals: caregivers with status='pending' from /admin/stats
   // activeAlerts: unresolved alerts (is_resolved=0) from /admin/stats
