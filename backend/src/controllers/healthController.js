@@ -694,10 +694,10 @@ const getChildDashboardStats = async (req, res) => {
 
     // 5. Assigned Caregivers
     const [assignedCaregivers] = await pool.query(
-      `SELECT DISTINCT c.id as caregiver_id, c.name, c.specialization, u.id as user_id, u.avatar_url, p.name as parent_name
+      `SELECT DISTINCT c.id as caregiver_id, COALESCE(c.name, u.name) as name, c.specialization, COALESCE(u.id, c.user_id) as user_id, u.avatar_url as avatar_url, p.name as parent_name
        FROM parents p
        JOIN caregivers c ON p.assigned_caregiver_id = c.id
-       JOIN users u ON c.user_id = u.id
+       LEFT JOIN users u ON c.user_id = u.id
        WHERE p.child_id = ?`,
       [child_id]
     );

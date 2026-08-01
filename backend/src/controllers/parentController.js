@@ -65,9 +65,17 @@ const getParents = async (req, res) => {
 
   try {
     const [rows] = await pool.query(
-      `SELECT parents.*, caregivers.name AS caregiver_name, caregivers.user_id AS caregiver_user_id 
+      `SELECT parents.*, 
+              COALESCE(caregivers.name, u.name) AS caregiver_name, 
+              caregivers.user_id AS caregiver_user_id,
+              caregivers.specialization AS caregiver_specialization,
+              caregivers.hourly_rate AS caregiver_hourly_rate,
+              u.avatar_url AS caregiver_avatar_url,
+              u.phone AS caregiver_phone,
+              u.email AS caregiver_email
        FROM parents 
        LEFT JOIN caregivers ON parents.assigned_caregiver_id = caregivers.id 
+       LEFT JOIN users u ON caregivers.user_id = u.id
        WHERE parents.child_id = ?
        ORDER BY parents.created_at DESC`,
       [child_id]
@@ -88,11 +96,16 @@ const getParentById = async (req, res) => {
 
   try {
     const [[parent]] = await pool.query(
-      `SELECT parents.*, caregivers.name AS caregiver_name,
+      `SELECT parents.*, 
+              COALESCE(caregivers.name, u.name) AS caregiver_name,
+              caregivers.user_id AS caregiver_user_id,
               caregivers.specialization AS caregiver_specialization,
-              caregivers.phone AS caregiver_phone
+              u.phone AS caregiver_phone,
+              u.email AS caregiver_email,
+              u.avatar_url AS caregiver_avatar_url
        FROM parents
        LEFT JOIN caregivers ON parents.assigned_caregiver_id = caregivers.id
+       LEFT JOIN users u ON caregivers.user_id = u.id
        WHERE parents.id = ? AND parents.child_id = ?`,
       [id, child_id]
     );
@@ -153,14 +166,17 @@ const updateParent = async (req, res) => {
   }
 
   try {
-    const [result] = await pool.query(
-      `UPDATE parents SET
+    let query;
+    let params;
+
+    if (assigned_caregiver_id !== undefined) {
+      query = `UPDATE parents SET
         name = ?, age = ?, gender = ?, relationship = ?, phone = ?, address = ?,
         emergency_contact_name = ?, emergency_contact_phone = ?,
         medical_conditions = ?, allergies = ?, current_medications = ?,
         assigned_caregiver_id = ?
-       WHERE id = ? AND child_id = ?`,
-      [
+       WHERE id = ? AND child_id = ?`;
+      params = [
         name,
         age || null,
         gender || null,
@@ -172,11 +188,34 @@ const updateParent = async (req, res) => {
         medical_conditions || null,
         allergies || null,
         current_medications || null,
-        assigned_caregiver_id || null,
+        assigned_caregiver_id ? parseInt(assigned_caregiver_id, 10) : null,
         id,
         child_id
-      ]
-    );
+      ];
+    } else {
+      query = `UPDATE parents SET
+        name = ?, age = ?, gender = ?, relationship = ?, phone = ?, address = ?,
+        emergency_contact_name = ?, emergency_contact_phone = ?,
+        medical_conditions = ?, allergies = ?, current_medications = ?
+       WHERE id = ? AND child_id = ?`;
+      params = [
+        name,
+        age || null,
+        gender || null,
+        relationship || null,
+        phone || null,
+        address || null,
+        emergency_contact_name || null,
+        emergency_contact_phone || null,
+        medical_conditions || null,
+        allergies || null,
+        current_medications || null,
+        id,
+        child_id
+      ];
+    }
+
+    const [result] = await pool.query(query, params);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Parent not found or access denied' });

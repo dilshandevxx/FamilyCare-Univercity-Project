@@ -4,12 +4,14 @@ const pool = require('../config/db');
 const getPublicCaregivers = async (req, res) => {
   try {
     const [rows] = await pool.query(`
-      SELECT c.id, c.name, c.specialization, c.experience_years,
+      SELECT c.id, c.user_id, COALESCE(c.name, u.name) AS name, c.specialization, c.experience_years,
              c.certification, c.license_id, c.hourly_rate, c.bio,
              c.is_available, c.rating, c.total_reviews,
-             c.location, c.languages, u.avatar_url
+             c.location, c.languages, c.status,
+             u.avatar_url, u.email, u.phone
       FROM caregivers c
       LEFT JOIN users u ON u.id = c.user_id
+      ORDER BY c.id DESC
     `);
     res.json(rows);
   } catch (err) {
@@ -21,10 +23,11 @@ const getPublicCaregivers = async (req, res) => {
 const getPublicCaregiverById = async (req, res) => {
   try {
     const [rows] = await pool.query(`
-      SELECT c.id, c.name, c.specialization, c.experience_years,
+      SELECT c.id, c.user_id, COALESCE(c.name, u.name) AS name, c.specialization, c.experience_years,
              c.certification, c.license_id, c.hourly_rate, c.bio,
              c.is_available, c.rating, c.total_reviews,
-             c.location, c.languages, u.avatar_url, u.email, u.phone
+             c.location, c.languages, c.status,
+             u.avatar_url, u.email, u.phone
       FROM caregivers c
       LEFT JOIN users u ON u.id = c.user_id
       WHERE c.id = ?
@@ -39,7 +42,16 @@ const getPublicCaregiverById = async (req, res) => {
 // GET /api/caregivers
 const getCaregivers = async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT c.*, u.avatar_url, u.email, u.phone FROM caregivers c LEFT JOIN users u ON u.id = c.user_id');
+    const [rows] = await pool.query(`
+      SELECT c.id, c.user_id, COALESCE(c.name, u.name) AS name, c.specialization, c.experience_years,
+             c.certification, c.license_id, c.hourly_rate, c.bio,
+             c.is_available, c.rating, c.total_reviews,
+             c.location, c.languages, c.status,
+             u.avatar_url, u.email, u.phone
+      FROM caregivers c
+      LEFT JOIN users u ON u.id = c.user_id
+      ORDER BY c.id DESC
+    `);
     res.json(rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -49,13 +61,20 @@ const getCaregivers = async (req, res) => {
 // GET /api/caregivers/:id
 const getCaregiverById = async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT c.*, u.avatar_url, u.email, u.phone FROM caregivers c LEFT JOIN users u ON u.id = c.user_id WHERE c.id = ?', [req.params.id]);
+    const [rows] = await pool.query(
+      `SELECT c.*, COALESCE(c.name, u.name) AS name, u.avatar_url, u.email, u.phone 
+       FROM caregivers c 
+       LEFT JOIN users u ON u.id = c.user_id 
+       WHERE c.id = ?`,
+      [req.params.id]
+    );
     if (rows.length === 0) return res.status(404).json({ error: 'Caregiver not found' });
     res.json(rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 // POST /api/caregivers
 const createCaregiver = async (req, res) => {

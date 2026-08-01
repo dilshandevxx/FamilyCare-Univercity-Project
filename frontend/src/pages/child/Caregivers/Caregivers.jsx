@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Search, SlidersHorizontal, CheckCircle, HelpCircle, 
-  Star, Calendar, UserCheck, Heart, Sparkles, AlertCircle
+  Star, Calendar, UserCheck, Heart, Sparkles, AlertCircle,
+  MessageSquare, User, Phone, Mail, Award, FileText, Globe, MapPin, X
 } from 'lucide-react';
 import ChildLayout from '../../../layouts/ChildLayout';
 import api from '../../../services/api';
@@ -17,6 +18,7 @@ const CaregiversList = () => {
   const [parents, setParents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [assigningCg, setAssigningCg] = useState(null); // Caregiver being assigned
+  const [viewingCg, setViewingCg] = useState(null); // Caregiver profile modal
   const [selectedParentId, setSelectedParentId] = useState('');
   
   // Filter States
@@ -29,13 +31,22 @@ const CaregiversList = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
+  const fetchParentsData = async () => {
+    try {
+      const parentRes = await api.get('/parents');
+      setParents(parentRes.data || []);
+    } catch (pErr) {
+      console.warn('Error fetching parents in child Caregivers view:', pErr);
+    }
+  };
+
   // Fetch Caregivers and Parents on mount
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         
-        // Fetch caregivers (try auth first, then public endpoint)
+        // 1. Fetch caregivers
         let cgData = [];
         try {
           const cgRes = await api.get('/caregivers');
@@ -43,7 +54,7 @@ const CaregiversList = () => {
             cgData = cgRes.data;
           }
         } catch (authErr) {
-          console.warn('Could not load /caregivers via auth token, trying public:', authErr);
+          console.warn('Could not load /caregivers via auth, trying public:', authErr);
         }
 
         if (cgData.length === 0) {
@@ -57,15 +68,10 @@ const CaregiversList = () => {
           }
         }
         
-        // Fetch parents
-        try {
-          const parentRes = await api.get('/parents');
-          setParents(parentRes.data || []);
-        } catch (pErr) {
-          console.warn('Error fetching parents in child Caregivers view:', pErr);
-        }
+        // 2. Fetch parents
+        await fetchParentsData();
 
-        // If DB has no caregivers, seed mock data matching the premium design for visual beauty
+        // 3. Fallback mock if completely empty
         if (cgData.length === 0) {
           cgData = [
             {
@@ -76,7 +82,7 @@ const CaregiversList = () => {
               hourly_rate: 32.00,
               bio: 'Specialized in elderly dementia support with 8 years of certified nursing assistance experience.',
               rating: 4.9,
-              reviews_count: 128,
+              total_reviews: 128,
               availability: 'Mon, Wed, Fri',
               avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Elena',
             },
@@ -88,31 +94,19 @@ const CaregiversList = () => {
               hourly_rate: 45.00,
               bio: 'PT assistant focusing on senior mobility enhancement and post-injury rehabilitation.',
               rating: 4.8,
-              reviews_count: 94,
+              total_reviews: 94,
               availability: 'Weeknights',
               avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus',
-            },
-            {
-              id: 3,
-              name: 'Sarah Jenkins',
-              specialization: 'Meal Prep, Medication Mgmt, Companion Care',
-              experience_years: '5',
-              hourly_rate: 28.00,
-              bio: 'Compassionate caregiver specializing in daily nutrition logs, scheduling, and medication tracking.',
-              rating: 5.0,
-              reviews_count: 215,
-              availability: 'Immediate',
-              avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah',
             }
           ];
         } else {
-          // Add styling metadata to actual DB caregivers
+          // Normalize caregiver fields
           cgData = cgData.map((cg, index) => ({
             ...cg,
-            rating: cg.rating || (4.5 + (index * 0.1) % 0.5),
-            reviews_count: cg.total_reviews || cg.reviews_count || (45 + index * 12),
+            rating: Number(cg.rating || (4.6 + ((index * 7) % 5) * 0.1)).toFixed(1),
+            total_reviews: cg.total_reviews || (25 + index * 8),
             availability: (cg.is_available ? 'Immediate' : 'Weekdays') || cg.availability || 'Weekdays',
-            avatar: cg.avatar_url || cg.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cg.name || 'Caregiver')}`
+            avatar: cg.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cg.name || 'Caregiver' + index)}`
           }));
         }
 
@@ -142,9 +136,9 @@ const CaregiversList = () => {
 
       setSuccessMsg(`Successfully assigned ${assigningCg.name} to care plan.`);
       
-      // Update local parents list state
+      // Update local parents state
       setParents(prev => prev.map(p => {
-        if (p.id === parseInt(selectedParentId)) {
+        if (p.id === parseInt(selectedParentId, 10)) {
           return { ...p, assigned_caregiver_id: assigningCg.id, caregiver_name: assigningCg.name };
         }
         return p;
@@ -153,6 +147,9 @@ const CaregiversList = () => {
       setAssigningCg(null);
       setSelectedParentId('');
       
+      // Refetch parents for complete backend sync
+      await fetchParentsData();
+
       setTimeout(() => setSuccessMsg(''), 4000);
     } catch (err) {
       console.error('Error assigning caregiver:', err);
@@ -183,6 +180,9 @@ const CaregiversList = () => {
         return p;
       }));
 
+      // Refetch parents for complete backend sync
+      await fetchParentsData();
+
       setTimeout(() => setSuccessMsg(''), 4000);
     } catch (err) {
       console.error('Error unassigning caregiver:', err);
@@ -193,12 +193,17 @@ const CaregiversList = () => {
   // Filter Logic
   const filteredCaregivers = caregivers.filter(cg => {
     // 1. Search Query
-    const query = searchQuery.toLowerCase();
-    const safeName = cg.name || '';
-    const safeSpec = cg.specialization || 'General Care';
-    const matchesSearch = safeName.toLowerCase().includes(query) || 
-                          safeSpec.toLowerCase().includes(query) ||
-                          (cg.bio && cg.bio.toLowerCase().includes(query));
+    const query = searchQuery.toLowerCase().trim();
+    const safeName = (cg.name || '').toLowerCase();
+    const safeSpec = (cg.specialization || '').toLowerCase();
+    const safeBio = (cg.bio || '').toLowerCase();
+    const safeLoc = (cg.location || '').toLowerCase();
+
+    const matchesSearch = !query || 
+                          safeName.includes(query) || 
+                          safeSpec.includes(query) ||
+                          safeBio.includes(query) ||
+                          safeLoc.includes(query);
 
     // 2. Experience Filter
     let matchesExperience = true;
@@ -214,18 +219,22 @@ const CaregiversList = () => {
     // 3. Availability Filter
     let matchesAvailability = true;
     if (availabilityFilter !== 'Anytime') {
-      matchesAvailability = cg.availability.toLowerCase().includes(availabilityFilter.toLowerCase()) ||
-                            cg.availability.toLowerCase().includes('immediate');
+      const avail = (cg.availability || '').toLowerCase();
+      matchesAvailability = avail.includes(availabilityFilter.toLowerCase()) ||
+                            avail.includes('immediate') ||
+                            cg.is_available === 1 ||
+                            cg.is_available === true;
     }
 
     // 4. Rating Filter
     let matchesRating = true;
+    const ratingVal = parseFloat(cg.rating) || 0;
     if (ratingFilter === '4.5+ Stars') {
-      matchesRating = (cg.rating || 0) >= 4.5;
+      matchesRating = ratingVal >= 4.5;
     } else if (ratingFilter === '4.8+ Stars') {
-      matchesRating = (cg.rating || 0) >= 4.8;
+      matchesRating = ratingVal >= 4.8;
     } else if (ratingFilter === '5.0 Stars') {
-      matchesRating = (cg.rating || 0) >= 5.0;
+      matchesRating = ratingVal >= 5.0;
     }
 
     return matchesSearch && matchesExperience && matchesAvailability && matchesRating;
@@ -251,7 +260,7 @@ const CaregiversList = () => {
           </div>
         </div>
 
-        <h2 className="cg-page-title">Caregivers Management</h2>
+        <h2 className="cg-page-title">Caregivers Directory</h2>
 
         {/* FEEDBACK BANNERS */}
         {successMsg && (
@@ -271,13 +280,13 @@ const CaregiversList = () => {
             className={`cg-tab-btn${activeTab === 'browse' ? ' active' : ''}`}
             onClick={() => setActiveTab('browse')}
           >
-            Browse Caregivers
+            Browse All Caregivers ({filteredCaregivers.length})
           </button>
           <button 
             className={`cg-tab-btn${activeTab === 'assigned' ? ' active' : ''}`}
             onClick={() => setActiveTab('assigned')}
           >
-            Assigned Caregivers ({Array.isArray(parents) ? parents.filter(p => p.assigned_caregiver_id).length : 0})
+            Assigned Caregivers ({assignedCaregivers.length})
           </button>
         </div>
 
@@ -290,7 +299,7 @@ const CaregiversList = () => {
                 <Search size={16} className="cg-search-icon" />
                 <input 
                   type="text" 
-                  placeholder="Search by name or specialty..."
+                  placeholder="Search by name, specialty, or location..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -328,9 +337,21 @@ const CaregiversList = () => {
                 </select>
               </div>
 
-              <button className="cg-filter-icon-btn">
-                <SlidersHorizontal size={16} />
-              </button>
+              {(searchQuery || experienceFilter !== 'All Levels' || availabilityFilter !== 'Anytime' || ratingFilter !== 'All Ratings') && (
+                <button 
+                  className="cg-filter-icon-btn" 
+                  title="Reset Filters"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setExperienceFilter('All Levels');
+                    setAvailabilityFilter('Anytime');
+                    setRatingFilter('All Ratings');
+                  }}
+                  style={{ cursor: 'pointer', background: 'var(--color-primary)', color: 'white', border: 'none' }}
+                >
+                  <X size={16} />
+                </button>
+              )}
             </div>
           </div>
         )}
@@ -344,7 +365,18 @@ const CaregiversList = () => {
             {displayCaregivers.length === 0 ? (
               <div className="cg-empty-state">
                 <h3>No caregivers found matching filters</h3>
-                <p>Try resetting search filters or keywords.</p>
+                <p>Try resetting your search query or dropdown filters.</p>
+                <button 
+                  onClick={() => {
+                    setSearchQuery('');
+                    setExperienceFilter('All Levels');
+                    setAvailabilityFilter('Anytime');
+                    setRatingFilter('All Ratings');
+                  }}
+                  style={{ marginTop: '12px', padding: '8px 16px', background: 'var(--color-primary)', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
+                >
+                  Reset All Filters
+                </button>
               </div>
             ) : (
               <div className="cg-grid">
@@ -366,9 +398,13 @@ const CaregiversList = () => {
                         <div className="cg-card-header">
                           <div>
                             <h4 className="cg-cg-name">{cg.name}</h4>
-                            <p className="cg-cg-exp">{cg.experience_years} Years Experience</p>
+                            <p className="cg-cg-exp">
+                              {cg.experience_years ? `${cg.experience_years} Years Experience` : 'Certified Caregiver'}
+                            </p>
                           </div>
-                          <span className="cg-cg-rate">${cg.hourly_rate}<span className="small">/hr</span></span>
+                          <span className="cg-cg-rate">
+                            ${cg.hourly_rate || '25'}<span className="small">/hr</span>
+                          </span>
                         </div>
 
                         {/* Specializations Badges */}
@@ -386,7 +422,7 @@ const CaregiversList = () => {
                         </p>
 
                         {/* Bio Text */}
-                        <p className="cg-cg-bio">{cg.bio}</p>
+                        <p className="cg-cg-bio">{cg.bio || 'Dedicated professional caregiver committed to providing high quality personal and healthcare support.'}</p>
 
                         {/* Assignments / Actions */}
                         {assignedParents.length > 0 && (
@@ -401,7 +437,7 @@ const CaregiversList = () => {
                                   className="cg-unassign-x"
                                   title="Unassign Caregiver"
                                 >
-                                  Ã—
+                                  ×
                                 </button>
                               </div>
                             ))}
@@ -409,16 +445,20 @@ const CaregiversList = () => {
                         )}
 
                         <div className="cg-card-actions">
-                          {assignedParents.length > 0 && (
+                          {assignedParents.length > 0 && cg.user_id && (
                             <Link 
                               to={`/messages?recipient=${cg.user_id}`}
                               className="cg-action-btn"
                               style={{ background: '#0ea5e9', color: '#fff', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}
+                              title={`Chat with ${cg.name}`}
                             >
-                              Chat
+                              <MessageSquare size={14} /> Chat
                             </Link>
                           )}
-                          <button className="cg-action-btn secondary">
+                          <button 
+                            className="cg-action-btn secondary"
+                            onClick={() => setViewingCg(cg)}
+                          >
                             View Profile
                           </button>
                           <button 
@@ -468,7 +508,7 @@ const CaregiversList = () => {
                     className="cg-mkt-image"
                   />
                   <div className="cg-verified-badge">
-                    <span className="cg-v-icon">âœ“</span>
+                    <span className="cg-v-icon">✓</span>
                     <div>
                       <span className="cg-v-lbl">VERIFIED STAFF</span>
                       <p className="cg-v-text">All our caregivers are licensed professionals with active certifications.</p>
@@ -484,6 +524,88 @@ const CaregiversList = () => {
               <span>Need help matching?</span>
             </div>
           </>
+        )}
+
+        {/* VIEW PROFILE MODAL */}
+        {viewingCg && (
+          <div className="cg-modal-overlay" onClick={() => setViewingCg(null)}>
+            <div className="cg-modal" style={{ maxWidth: '560px' }} onClick={e => e.stopPropagation()}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h3 className="cg-modal-title" style={{ margin: 0 }}>Caregiver Profile</h3>
+                <button onClick={() => setViewingCg(null)} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
+              </div>
+
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid #e2e8f0' }}>
+                <img src={viewingCg.avatar} alt={viewingCg.name} style={{ width: '72px', height: '72px', borderRadius: '50%', objectFit: 'cover', border: '2px solid var(--color-primary)' }} />
+                <div>
+                  <h4 style={{ margin: '0 0 4px 0', fontSize: '1.2rem', color: '#1e293b' }}>{viewingCg.name}</h4>
+                  <p style={{ margin: '0 0 6px 0', fontSize: '0.9rem', color: 'var(--color-primary)', fontWeight: '500' }}>{viewingCg.specialization || 'General Elder Care'}</p>
+                  <div style={{ display: 'flex', gap: '12px', fontSize: '0.85rem', color: '#64748b' }}>
+                    <span>⭐ {viewingCg.rating} ({viewingCg.total_reviews} reviews)</span>
+                    <span>•</span>
+                    <span>${viewingCg.hourly_rate || '25'}/hr</span>
+                    <span>•</span>
+                    <span>{viewingCg.experience_years ? `${viewingCg.experience_years} yrs exp` : 'Certified'}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '0.9rem', color: '#334155' }}>
+                <div>
+                  <strong style={{ display: 'block', color: '#475569', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '4px' }}>About</strong>
+                  <p style={{ margin: 0, lineHeight: 1.5, color: '#64748b' }}>{viewingCg.bio || 'Professional caregiver dedicated to the safety, happiness, and health of elders.'}</p>
+                </div>
+
+                {viewingCg.certification && (
+                  <div>
+                    <strong style={{ display: 'block', color: '#475569', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '4px' }}>Certifications</strong>
+                    <p style={{ margin: 0, color: '#334155' }}>{viewingCg.certification}</p>
+                  </div>
+                )}
+
+                {viewingCg.license_id && (
+                  <div>
+                    <strong style={{ display: 'block', color: '#475569', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '4px' }}>License ID</strong>
+                    <p style={{ margin: 0, color: '#334155' }}>{viewingCg.license_id}</p>
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', gap: '20px' }}>
+                  {viewingCg.phone && (
+                    <div>
+                      <strong style={{ display: 'block', color: '#475569', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '4px' }}>Phone</strong>
+                      <p style={{ margin: 0, color: '#334155' }}>{viewingCg.phone}</p>
+                    </div>
+                  )}
+                  {viewingCg.email && (
+                    <div>
+                      <strong style={{ display: 'block', color: '#475569', fontSize: '0.8rem', textTransform: 'uppercase', marginBottom: '4px' }}>Email</strong>
+                      <p style={{ margin: 0, color: '#334155' }}>{viewingCg.email}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div style={{ marginTop: '24px', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                <button 
+                  className="cg-modal-btn cancel"
+                  onClick={() => setViewingCg(null)}
+                >
+                  Close
+                </button>
+                <button 
+                  className="cg-modal-btn submit"
+                  onClick={() => {
+                    const cg = viewingCg;
+                    setViewingCg(null);
+                    setAssigningCg(cg);
+                  }}
+                >
+                  Assign to Parent
+                </button>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* ASSIGN MODAL DIALOG */}
@@ -511,7 +633,7 @@ const CaregiversList = () => {
                       <option value="">-- Select Parent --</option>
                       {parents.map(p => (
                         <option key={p.id} value={p.id}>
-                          {p.name} {p.assigned_caregiver_id ? `(Current Caregiver: ${p.caregiver_name})` : ''}
+                          {p.name} {p.assigned_caregiver_id ? `(Current: ${p.caregiver_name || 'Caregiver #' + p.assigned_caregiver_id})` : '(No caregiver)'}
                         </option>
                       ))}
                     </select>
