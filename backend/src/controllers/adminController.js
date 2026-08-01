@@ -113,14 +113,14 @@ const deleteResident = async (req, res) => {
 const getCaregiversList = async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT c.id, c.name, c.specialization, c.is_available,
+      `SELECT c.id, COALESCE(c.name, u.name) AS name, c.specialization, c.is_available,
               u.email, u.name AS user_name,
               COUNT(p.id) AS resident_count
        FROM caregivers c
        LEFT JOIN users u    ON u.id  = c.user_id
        LEFT JOIN parents p  ON p.assigned_caregiver_id = c.id
        GROUP BY c.id
-       ORDER BY c.name`
+       ORDER BY c.id DESC`
     );
     res.json(rows);
   } catch (err) {
@@ -269,7 +269,7 @@ const getPendingCaregivers = async (req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT
-         c.id, c.name, c.specialization, c.experience_years,
+         c.id, COALESCE(c.name, u.name) AS name, c.specialization, c.experience_years,
          c.certification, c.license_id, c.bio, c.hourly_rate,
          c.is_available, c.created_at,
          u.email, u.name AS user_name, u.created_at AS registered_at
