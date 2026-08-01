@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { ShieldCheck, UserCheck, ShieldX, Check, AlertCircle, Award, Clock, Hash, MapPin, Users, Search, Loader2 } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
-import api from '../../../services/api';
+import adminService from '../../../services/adminService';
+import AdminErrorBoundary from '../../../components/common/AdminErrorBoundary';
 import { useAdminStats } from '../../../context/AdminStatsContext';
 import './CaregiverApprovalV2.css';
 
-const CaregiverApprovalV2 = () => {
+const CaregiverApprovalV2Content = () => {
   const { refresh: refreshAdminStats } = useAdminStats();
   const [applicants, setApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -15,21 +16,22 @@ const CaregiverApprovalV2 = () => {
   const fetchApplicants = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/admin/caregivers/pending');
+      const { data } = await adminService.getPendingCaregivers();
       setApplicants(data.map(item => ({
         id: item.id,
         name: item.user_name || item.name || 'Caregiver',
-        email: item.email || 'caregiver@care.com',
+        email: item.email || 'N/A',
         experience: item.experience_years ? `${item.experience_years} years` : '5 years',
         certification: item.certification || 'CNA',
-        license: item.license_id || `CNA-${item.id}8890`,
-        location: 'New York, NY',
+        license: item.license_id || `LIC-${item.id}889`,
+        location: item.location || 'Regional Facility',
         status: 'pending',
-        bio: item.bio || 'Compassionate nurse specialized in elder care, stroke recovery assistance, and cognitive therapies.',
+        bio: item.bio || 'Qualified care specialist dedicated to assisting senior residents with daily routines and clinical monitoring.',
         rating: 4.8
       })));
     } catch (err) {
       console.error('Failed to fetch pending caregivers:', err);
+      setApplicants([]);
     } finally {
       setLoading(false);
     }
@@ -204,5 +206,11 @@ const CaregiverApprovalV2 = () => {
     </AdminLayoutV2>
   );
 };
+
+const CaregiverApprovalV2 = () => (
+  <AdminErrorBoundary title="Caregiver Approval Error">
+    <CaregiverApprovalV2Content />
+  </AdminErrorBoundary>
+);
 
 export default CaregiverApprovalV2;
