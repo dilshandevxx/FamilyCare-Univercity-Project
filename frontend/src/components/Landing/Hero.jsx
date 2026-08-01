@@ -256,7 +256,7 @@ const Hero = () => {
           <div className="hero-content">
             <span className="hero-badge">
               <span style={{ width:'7px', height:'7px', borderRadius:'50%', background:'var(--color-primary)', display:'inline-block', animation:'hero-live-pulse 2s ease-in-out infinite' }} />
-              Powered by Compassion
+              Caring Beyond Distance
             </span>
 
             <h1 className="hero-headline" style={{ fontSize:'4.2rem', marginTop:0, marginBottom:'1.4rem', color:'#1A202C', lineHeight:1.1, letterSpacing:'-0.5px' }}>

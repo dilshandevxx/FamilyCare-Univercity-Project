@@ -200,6 +200,10 @@ const CallToAction = () => {
 
         /* Buttons */
         .cta-btn-primary {
+          flex: 0 0 auto !important;
+          width: auto !important;
+          min-width: 175px !important;
+          text-align: center !important;
           transition:transform 0.2s ease, box-shadow 0.2s ease !important;
           box-shadow:0 4px 16px rgba(0,168,150,0.4) !important;
         }
@@ -215,7 +219,13 @@ const CallToAction = () => {
         }
         .cta-btn-primary:hover .cta-btn-shine { animation:cta-shine 0.55s ease forwards; }
 
-        .cta-btn-ghost { transition:background 0.25s ease, border-color 0.25s ease, transform 0.2s ease !important; }
+        .cta-btn-ghost {
+          flex: 0 0 auto !important;
+          width: auto !important;
+          min-width: 175px !important;
+          text-align: center !important;
+          transition:background 0.25s ease, border-color 0.25s ease, transform 0.2s ease !important;
+        }
         .cta-btn-ghost:hover {
           background:rgba(255,255,255,0.1) !important;
           border-color:rgba(255,255,255,0.5) !important;

@@ -1,235 +1,173 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { 
   Search, Video, Phone, MoreVertical, Paperclip, Smile, Send,
-  PhoneCall, User, Calendar, Heart, ShieldAlert, Plus, Sparkles, AlertCircle
+  PhoneCall, User, Calendar, Heart, ShieldAlert, Plus, AlertCircle, Loader2, MessageSquare
 } from 'lucide-react';
 import ChildLayout from '../../../layouts/ChildLayout';
+import { useAuth } from '../../../context/AuthContext';
 import api from '../../../services/api';
 import './Messages.css';
 
-// Pre-seeded chat list contacts
-const contactsData = [
-  {
-    id: 'Sarah',
-    user_id: 101, // Mock user ID for the receiver
-    name: 'Nurse Sarah Jenkins',
-    title: 'Senior Care Specialist',
-    relation: 'Mother',
-    relationColor: 'teal',
-    status: 'ONLINE',
-    avatar: 'Sarah',
-    lastMessage: 'The latest BP reading looks much more stable today.',
-    lastTime: '10:42 AM',
-    unread: 0,
-    heartRate: '72 BPM',
-    bp: '128 / 82',
-    focus: 'Mother',
-    sharedMedia: [
-      'https://api.dicebear.com/7.x/identicon/svg?seed=meds1',
-      'https://api.dicebear.com/7.x/identicon/svg?seed=meds2'
-    ],
-    initialMessages: [
-      {
-        id: 1,
-        sender: 'caregiver',
-        text: "Hello! I just finished the morning check-in. Mother's blood pressure was 128/82 at 9:00 AM. This is a significant improvement from yesterday.",
-        time: '10:40 AM'
-      },
-      {
-        id: 2,
-        sender: 'user',
-        text: "That's wonderful news, Sarah. Thank you for the update. Did she take her medication with breakfast as prescribed?",
-        time: '10:42 AM'
-      },
-      {
-        id: 3,
-        sender: 'caregiver',
-        text: "Yes, she did. I've attached the full log for your review. The latest BP reading looks much more stable today.",
-        time: '10:45 AM',
-        attachment: 'Daily_Log_May26.pdf'
-      }
-    ]
-  },
-  {
-    id: 'Thompson',
-    user_id: 102,
-    name: 'Dr. Mark Thompson',
-    title: 'Chief Cardiologist',
-    relation: 'Father',
-    relationColor: 'orange',
-    status: 'OFFLINE',
-    avatar: 'Mark',
-    lastMessage: "I've updated the physical therapy schedule...",
-    lastTime: '9:15 AM',
-    unread: 2,
-    heartRate: '84 BPM',
-    bp: '135 / 90',
-    focus: 'Father',
-    sharedMedia: [
-      'https://api.dicebear.com/7.x/identicon/svg?seed=chart1'
-    ],
-    initialMessages: [
-      {
-        id: 1,
-        sender: 'caregiver',
-        text: "Hello, I wanted to review your father's exercise chart. He completed his walk today without chest pain.",
-        time: '9:00 AM'
-      },
-      {
-        id: 2,
-        sender: 'caregiver',
-        text: "I've updated the physical therapy schedule to three times a week. Let me know if you want to dial in for our sync.",
-        time: '9:15 AM'
-      }
-    ]
-  },
-  {
-    id: 'Emily',
-    user_id: 103,
-    name: 'Emily Davis',
-    title: 'Speech Therapist',
-    relation: 'Mother',
-    relationColor: 'teal',
-    status: 'ONLINE',
-    avatar: 'Emily',
-    lastMessage: 'Lunch was finished today! She had salmon...',
-    lastTime: 'Yesterday',
-    unread: 0,
-    heartRate: '68 BPM',
-    bp: '120 / 78',
-    focus: 'Mother',
-    sharedMedia: [],
-    initialMessages: [
-      {
-        id: 1,
-        sender: 'caregiver',
-        text: 'Lunch was finished today! She had salmon and wilted spinach. Very good appetite.',
-        time: 'Yesterday'
-      }
-    ]
-  }
-];
+const avatarUrl = (seed) =>
+  `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed || 'user')}`;
+
+const formatTime = (dateStr) => {
+  if (!dateStr) return '';
+  const date    = new Date(dateStr);
+  const now     = new Date();
+  const diffMs  = now - date;
+  const diffDay = Math.floor(diffMs / 86400000);
+  if (diffDay === 0) return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  if (diffDay === 1) return 'Yesterday';
+  if (diffDay < 7)   return date.toLocaleDateString([], { weekday: 'short' });
+  return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+};
 
 const Messages = () => {
-  const [contacts, setContacts] = useState(contactsData);
-  const [activeContactId, setActiveContactId] = useState('Sarah');
+  const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const recipientId = searchParams.get('recipient');
+
+  const [contacts, setContacts] = useState([]);
+  const [selected, setSelected] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [typedMessage, setTypedMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  
+  const [loadingContacts, setLoadingContacts] = useState(true);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState('');
 
-  const activeContact = contacts.find(c => c.id === activeContactId) || contacts[0];
   const messagesEndRef = useRef(null);
+  const pollingRef = useRef(null);
 
-  // Scroll to bottom of chat
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [activeContact.initialMessages, isTyping]);
-
-  // Handle active contact change and reset unread badge
-  const handleSelectContact = (id) => {
-    setActiveContactId(id);
-    setContacts(prev => prev.map(c => {
-      if (c.id === id) {
-        return { ...c, unread: 0 };
-      }
-      return c;
-    }));
-  };
-
-  // Send message
-  const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (!typedMessage.trim()) return;
-
-    const messageText = typedMessage.trim();
-    setTypedMessage('');
-
-    const now = new Date();
-    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-    // Append to local state
-    const newUserMsg = {
-      id: Date.now(),
-      sender: 'user',
-      text: messageText,
-      time: timeStr
-    };
-
-    setContacts(prev => prev.map(c => {
-      if (c.id === activeContactId) {
-        return {
-          ...c,
-          lastMessage: messageText,
-          lastTime: timeStr,
-          initialMessages: [...c.initialMessages, newUserMsg]
-        };
-      }
-      return c;
-    }));
-
-    // Post to API (non-blocking mock save to database)
+  // Load Contacts
+  const loadContacts = useCallback(async (silent = false) => {
+    if (!silent) setLoadingContacts(true);
     try {
-      await api.post('/messages', {
-        receiver_id: activeContact.user_id,
-        message: messageText
-      });
+      const { data } = await api.get('/messages/contacts');
+      setContacts(data);
     } catch (err) {
-      console.error('Error saving message in DB:', err);
+      console.error('loadContacts:', err);
+    } finally {
+      if (!silent) setLoadingContacts(false);
     }
+  }, []);
 
-    // Trigger simulated caregiver auto-reply
-    setIsTyping(true);
-    setTimeout(() => {
-      setIsTyping(false);
-      
-      const caregiverReplies = [
-        "Thank you for letting me know. I will make sure to check on that right away.",
-        "That sounds perfect! I've updated the record for today.",
-        "Yes, absolutely. I'll monitor this closely and send you another update shortly.",
-        "I'm on it. Mother is resting comfortably right now, but I will ask her as soon as she wakes up.",
-        "Vitals are looking really positive today, so nothing to worry about. I'll keep you posted!"
-      ];
-      
-      const randomReply = caregiverReplies[Math.floor(Math.random() * caregiverReplies.length)];
-      const replyTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      
-      const newCaregiverMsg = {
-        id: Date.now() + 1,
-        sender: 'caregiver',
-        text: randomReply,
-        time: replyTime
-      };
+  useEffect(() => { loadContacts(); }, [loadContacts]);
 
-      setContacts(prev => prev.map(c => {
-        if (c.id === activeContactId) {
-          return {
-            ...c,
-            lastMessage: randomReply,
-            lastTime: replyTime,
-            initialMessages: [...c.initialMessages, newCaregiverMsg]
-          };
+  // Handle URL recipient parameter to select a contact on load
+  useEffect(() => {
+    if (recipientId && contacts.length > 0 && !selected) {
+      const match = contacts.find(c => String(c.id) === String(recipientId));
+      if (match) {
+        handleSelect(match);
+        const regardingName = searchParams.get('regardingName');
+        if (regardingName && !newMessage) {
+          setNewMessage(`[Regarding ${regardingName}] `);
         }
-        return c;
-      }));
-    }, 2000);
+      }
+    }
+  }, [recipientId, contacts, selected, searchParams, newMessage]);
+
+  // Load Messages
+  const loadMessages = useCallback(async (contactId, quiet = false) => {
+    if (!contactId) return;
+    if (!quiet) setLoadingMessages(true);
+    try {
+      const { data } = await api.get(`/messages/${contactId}`);
+      setMessages(data);
+    } catch (err) {
+      console.error('loadMessages:', err);
+    } finally {
+      if (!quiet) setLoadingMessages(false);
+    }
+  }, []);
+
+  // Polling
+  useEffect(() => {
+    if (!selected) { clearInterval(pollingRef.current); return; }
+    pollingRef.current = setInterval(() => {
+      loadMessages(selected.id, true);
+      loadContacts(true);
+    }, 5000);
+    return () => clearInterval(pollingRef.current);
+  }, [selected, loadMessages, loadContacts]);
+
+  // Scroll to bottom
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSelect = async (contact) => {
+    setSelected(contact);
+    setLoadingMessages(true);
+
+    // Clear unread badge optimistically
+    setContacts((prev) =>
+      prev.map((c) => (c.id === contact.id ? { ...c, unreadCount: 0 } : c))
+    );
+
+    try {
+      const { data } = await api.get(`/messages/${contact.id}`);
+      setMessages(data);
+    } catch (err) {
+      console.error('handleSelect:', err);
+    } finally {
+      setLoadingMessages(false);
+    }
   };
 
-  // Filter contacts by search query
+  const handleSend = async (e) => {
+    if (e) e.preventDefault();
+    const text = newMessage.trim();
+    if (!text || !selected || sending) return;
+
+    setSendError('');
+    setNewMessage('');
+    setSending(true);
+
+    const optimisticId = `opt-${Date.now()}`;
+    setMessages((prev) => [
+      ...prev,
+      {
+        id:          optimisticId,
+        sender_id:   user?.id,
+        receiver_id: selected.id,
+        message:     text,
+        created_at:  new Date().toISOString(),
+        pending:     true,
+      },
+    ]);
+
+    try {
+      await api.post('/messages', { receiver_id: selected.id, message: text });
+      await loadMessages(selected.id, true);
+      loadContacts(true);
+    } catch (err) {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === optimisticId ? { ...m, failed: true, pending: false } : m
+        )
+      );
+      setNewMessage(text);
+      setSendError('Failed to send message.');
+      setTimeout(() => setSendError(''), 5000);
+    } finally {
+      setSending(false);
+    }
+  };
+
   const filteredContacts = contacts.filter(c => 
     c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.relation.toLowerCase().includes(searchQuery.toLowerCase())
+    (c.elder_name && c.elder_name.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
     <ChildLayout title="Messages">
       <div className="mc-container">
-        
-        {/* THREE COLUMN GRID */}
         <div className="mc-grid">
           
           {/* COLUMN 1 - CHATS LIST */}
@@ -245,40 +183,45 @@ const Messages = () => {
             </div>
 
             <div className="mc-contacts-list">
-              {filteredContacts.map(c => {
-                const isActive = c.id === activeContactId;
-                return (
-                  <div 
-                    key={c.id} 
-                    className={`mc-contact-item ${isActive ? 'active' : ''}`}
-                    onClick={() => handleSelectContact(c.id)}
-                  >
-                    <img 
-                      src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(c.name)}`} 
-                      alt={c.name} 
-                      className="mc-contact-avatar"
-                    />
-                    
-                    <div className="mc-contact-details">
-                      <div className="mc-contact-row">
-                        <span className="mc-contact-name">{c.name}</span>
-                        <span className="mc-contact-time">{c.lastTime}</span>
-                      </div>
-                      
-                      <div className="mc-contact-row">
-                        <span className="mc-contact-snippet">{c.lastMessage}</span>
-                        {c.unread > 0 && (
-                          <span className="mc-unread-badge">{c.unread}</span>
+              {loadingContacts ? (
+                <div style={{ padding: '20px', textAlign: 'center' }}><Loader2 className="spin" size={24} /></div>
+              ) : filteredContacts.length === 0 ? (
+                <div style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>No conversations found.</div>
+              ) : (
+                filteredContacts.map(c => {
+                  const isActive = selected?.id === c.id;
+                  return (
+                    <div 
+                      key={c.id} 
+                      className={`mc-contact-item ${isActive ? 'active' : ''}`}
+                      onClick={() => handleSelect(c)}
+                    >
+                      <img 
+                        src={avatarUrl(c.name)} 
+                        alt={c.name} 
+                        className="mc-contact-avatar"
+                      />
+                      <div className="mc-contact-details">
+                        <div className="mc-contact-row">
+                          <span className="mc-contact-name">{c.name}</span>
+                          <span className="mc-contact-time">{c.lastMessage ? formatTime(c.lastMessage.created_at) : ''}</span>
+                        </div>
+                        <div className="mc-contact-row">
+                          <span className="mc-contact-snippet">{c.lastMessage?.message || 'No messages yet'}</span>
+                          {c.unreadCount > 0 && (
+                            <span className="mc-unread-badge">{c.unreadCount}</span>
+                          )}
+                        </div>
+                        {c.elder_name && (
+                          <span className="mc-relation-badge teal">
+                            {c.elder_name}
+                          </span>
                         )}
                       </div>
-                      
-                      <span className={`mc-relation-badge ${c.relationColor}`}>
-                        {c.relation}
-                      </span>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
 
             <button className="mc-new-msg-btn">
@@ -288,170 +231,135 @@ const Messages = () => {
 
           {/* COLUMN 2 - CHAT WORKSPACE */}
           <div className="mc-chat-workspace">
-            {/* Header */}
-            <div className="mc-chat-header">
-              <div className="mc-header-profile">
-                <img 
-                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(activeContact.name)}`} 
-                  alt={activeContact.name} 
-                />
-                <div>
-                  <h4 className="mc-header-name">{activeContact.name}</h4>
-                  <p className="mc-header-status">
-                    Related to <span className="bold">{activeContact.relation}</span> • 
-                    <span className={`mc-status-indicator ${activeContact.status.toLowerCase()}`}>
-                      {activeContact.status}
-                    </span>
-                  </p>
-                </div>
-              </div>
-
-              <div className="mc-header-actions">
-                <button className="mc-header-btn"><Video size={18} /></button>
-                <button className="mc-header-btn"><Phone size={18} /></button>
-                <button className="mc-header-btn"><MoreVertical size={18} /></button>
-              </div>
-            </div>
-
-            {/* Chat Messages Log */}
-            <div className="mc-chat-messages">
-              
-              <div className="mc-system-date"><span>TODAY</span></div>
-
-              {activeContact.initialMessages.map(msg => {
-                const isUser = msg.sender === 'user';
-                return (
-                  <div key={msg.id} className={`mc-bubble-wrapper ${isUser ? 'right' : 'left'}`}>
-                    {!isUser && (
-                      <img 
-                        src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(activeContact.name)}`} 
-                        alt="avatar" 
-                        className="mc-bubble-avatar"
-                      />
-                    )}
-                    
-                    <div className={`mc-bubble-card ${isUser ? 'user-bg' : 'cg-bg'}`}>
-                      {msg.attachment && (
-                        <div className="mc-attachment-block">
-                          <Paperclip size={14} className="mc-attach-icon" />
-                          <span className="mc-attach-text">{msg.attachment}</span>
-                        </div>
-                      )}
-                      
-                      <p className="mc-bubble-text">{msg.text}</p>
-                      <span className="mc-bubble-time">{msg.time}</span>
+            {selected ? (
+              <>
+                {/* Header */}
+                <div className="mc-chat-header">
+                  <div className="mc-header-profile">
+                    <img 
+                      src={avatarUrl(selected.name)} 
+                      alt={selected.name} 
+                    />
+                    <div>
+                      <h4 className="mc-header-name">{selected.name}</h4>
+                      <p className="mc-header-status">
+                        {selected.elder_name && `Regarding ${selected.elder_name} • `}
+                        <span className="mc-status-indicator online">ONLINE</span>
+                      </p>
                     </div>
                   </div>
-                );
-              })}
-
-              {/* Typing indicator */}
-              {isTyping && (
-                <div className="mc-bubble-wrapper left">
-                  <img 
-                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(activeContact.name)}`} 
-                    alt="avatar" 
-                    className="mc-bubble-avatar"
-                  />
-                  <div className="mc-bubble-card cg-bg mc-typing-bubble">
-                    <span className="mc-typing-dot"></span>
-                    <span className="mc-typing-dot"></span>
-                    <span className="mc-typing-dot"></span>
+                  <div className="mc-header-actions">
+                    <button className="mc-header-btn"><Video size={18} /></button>
+                    <button className="mc-header-btn"><Phone size={18} /></button>
+                    <button className="mc-header-btn"><MoreVertical size={18} /></button>
                   </div>
                 </div>
-              )}
 
-              <div ref={messagesEndRef} />
-            </div>
+                {/* Chat Messages Log */}
+                <div className="mc-chat-messages">
+                  {loadingMessages ? (
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
+                      <Loader2 size={32} className="spin" color="#00a896" />
+                    </div>
+                  ) : messages.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
+                      <MessageSquare size={48} style={{ margin: '0 auto 10px', opacity: 0.5 }} />
+                      <p>No messages yet. Say hello!</p>
+                    </div>
+                  ) : (
+                    messages.map(msg => {
+                      const isMe = Number(msg.sender_id) === Number(user?.id);
+                      return (
+                        <div key={msg.id} className={`mc-bubble-wrapper ${isMe ? 'right' : 'left'}`}>
+                          {!isMe && (
+                            <img 
+                              src={avatarUrl(selected.name)} 
+                              alt="avatar" 
+                              className="mc-bubble-avatar"
+                            />
+                          )}
+                          <div className={`mc-bubble-card ${isMe ? 'user-bg' : 'cg-bg'} ${msg.pending ? 'pending' : ''} ${msg.failed ? 'failed' : ''}`}>
+                            <p className="mc-bubble-text">{msg.message}</p>
+                            <span className="mc-bubble-time">{formatTime(msg.created_at)}</span>
+                            {msg.failed && <span style={{ fontSize: '0.7rem', color: '#ef4444' }}> Failed to send</span>}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
 
-            {/* Message Input Footer */}
-            <form onSubmit={handleSendMessage} className="mc-chat-footer">
-              <button type="button" className="mc-input-btn"><Paperclip size={18} /></button>
-              
-              <input 
-                type="text" 
-                placeholder={`Message ${activeContact.name.split(' ').pop()}...`}
-                value={typedMessage}
-                onChange={(e) => setTypedMessage(e.target.value)}
-              />
-              
-              <button type="button" className="mc-input-btn"><Smile size={18} /></button>
-              <button type="submit" className="mc-send-btn">
-                <Send size={16} />
-              </button>
-            </form>
+                {sendError && (
+                  <div style={{ padding: '8px 16px', background: '#fef2f2', color: '#991b1b', fontSize: '0.85rem' }}>
+                    {sendError}
+                  </div>
+                )}
+
+                {/* Message Input Footer */}
+                <form onSubmit={handleSend} className="mc-chat-footer">
+                  <button type="button" className="mc-input-btn"><Paperclip size={18} /></button>
+                  <input 
+                    type="text" 
+                    placeholder="Type message..."
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    disabled={sending}
+                  />
+                  <button type="button" className="mc-input-btn"><Smile size={18} /></button>
+                  <button type="submit" className={`mc-send-btn ${sending ? 'sending' : ''}`} disabled={sending || !newMessage.trim()}>
+                    {sending ? <Loader2 size={16} className="spin" /> : <Send size={16} />}
+                  </button>
+                </form>
+              </>
+            ) : (
+              <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>
+                <MessageSquare size={64} style={{ opacity: 0.2, marginBottom: '16px' }} />
+                <h3>Select a Conversation</h3>
+                <p>Choose a contact from the list to start messaging</p>
+              </div>
+            )}
           </div>
 
           {/* COLUMN 3 - CONTACT PROFILE SIDEBAR */}
           <div className="mc-contact-profile-sidebar">
-            <div className="mc-sidebar-profile-card">
-              <img 
-                src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(activeContact.name)}`} 
-                alt={activeContact.name} 
-                className="mc-sb-avatar"
-              />
-              <h3 className="mc-sb-name">{activeContact.name}</h3>
-              <p className="mc-sb-title">{activeContact.title}</p>
-              
-              <span className={`mc-sb-badge ${activeContact.relationColor}`}>
-                CARING FOR {activeContact.relation.toUpperCase()}
-              </span>
-            </div>
-
-            <div className="mc-sb-action-btns">
-              <button className="mc-sb-action-btn">
-                <PhoneCall size={16} /> Call Caregiver
-              </button>
-              <Link to="/parents" className="mc-sb-action-btn">
-                <User size={16} /> View Parent Profile
-              </Link>
-              <button className="mc-sb-action-btn">
-                <Calendar size={16} /> Schedule Meeting
-              </button>
-            </div>
-
-            {/* Current Focus Vitals */}
-            <div className="mc-sb-card">
-              <span className="mc-sb-widget-lbl">CURRENT FOCUS: {activeContact.relation.toUpperCase()}</span>
-              
-              <div className="mc-sb-vitals-row">
-                <div className="mc-sb-vital-box">
-                  <div className="mc-sb-vital-header">
-                    <Heart size={14} className="teal-text" />
-                    <span>Heart Rate</span>
-                  </div>
-                  <h4>{activeContact.heartRate}</h4>
+            {selected ? (
+              <>
+                <div className="mc-sidebar-profile-card">
+                  <img 
+                    src={avatarUrl(selected.name)} 
+                    alt={selected.name} 
+                    className="mc-sb-avatar"
+                  />
+                  <h3 className="mc-sb-name">{selected.name}</h3>
+                  <p className="mc-sb-title">{selected.role === 'caregiver' ? 'Caregiver' : selected.role}</p>
+                  
+                  {selected.elder_name && (
+                    <span className="mc-sb-badge teal">
+                      CARING FOR {selected.elder_name.toUpperCase()}
+                    </span>
+                  )}
                 </div>
-                <div className="mc-sb-vital-box">
-                  <div className="mc-sb-vital-header">
-                    <AlertCircle size={14} className="orange-text" />
-                    <span>Blood Pressure</span>
-                  </div>
-                  <h4>{activeContact.bp}</h4>
+
+                <div className="mc-sb-action-btns">
+                  <button className="mc-sb-action-btn">
+                    <PhoneCall size={16} /> Call {selected.role === 'caregiver' ? 'Caregiver' : 'User'}
+                  </button>
+                  <Link to="/parents" className="mc-sb-action-btn">
+                    <User size={16} /> View Parent Profile
+                  </Link>
+                  <button className="mc-sb-action-btn">
+                    <Calendar size={16} /> Schedule Meeting
+                  </button>
                 </div>
+              </>
+            ) : (
+              <div style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>
+                Select a contact to view details.
               </div>
-            </div>
-
-            {/* Shared Media */}
-            <div className="mc-sb-card">
-              <div className="mc-sb-media-header">
-                <span className="mc-sb-widget-lbl no-margin">Shared Media</span>
-                <span className="mc-view-all-link">VIEW ALL</span>
-              </div>
-
-              <div className="mc-sb-media-grid">
-                {activeContact.sharedMedia.map((img, i) => (
-                  <img key={i} src={img} alt="Shared attachment" className="mc-media-item" />
-                ))}
-                
-                <button className="mc-add-media-btn">+</button>
-              </div>
-            </div>
-
+            )}
           </div>
-
         </div>
-
       </div>
     </ChildLayout>
   );

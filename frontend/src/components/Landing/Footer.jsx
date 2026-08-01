@@ -55,11 +55,7 @@ const Footer = () => {
     { label: 'Caregivers', action: () => navigate('/caregivers') },
   ];
   const company = [
-    { label: 'About Us', action: () => navigate('/about') },
-    { label: 'Careers',  action: () => navigate('/careers') },
-    { label: 'Blog',     action: () => navigate('/blog') },
-  ];
-  const support = [
+    { label: 'About Us',       action: () => navigate('/about') },
     { label: 'Help Center',    action: () => navigate('/help-center') },
     { label: 'Tours & Safety', action: () => navigate('/tours-and-safety') },
     { label: 'Privacy Policy', action: () => navigate('/privacy-policy') },
@@ -84,7 +80,7 @@ const Footer = () => {
       {toast && <Toast message={toast} onDone={() => setToast(null)} />}
 
       <div className="container">
-        <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1fr', gap: '4rem' }}>
+        <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: '4rem' }}>
 
           <div>
             <h4
@@ -122,13 +118,6 @@ const Footer = () => {
             <h5 style={{ marginBottom: '1.5rem', fontSize: '1rem' }}>Company</h5>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {company.map(l => <FooterLink key={l.label} label={l.label} onClick={l.action} />)}
-            </div>
-          </div>
-
-          <div>
-            <h5 style={{ marginBottom: '1.5rem', fontSize: '1rem' }}>Support</h5>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {support.map(l => <FooterLink key={l.label} label={l.label} onClick={l.action} />)}
             </div>
           </div>
         </div>

@@ -29,6 +29,17 @@ const Analytics = () => {
     alertStatus: 'Needs Review'
   });
 
+  const [bpChartData, setBpChartData] = useState({
+    Systolic: [0, 0, 0, 0, 0, 0, 0],
+    Diastolic: [0, 0, 0, 0, 0, 0, 0]
+  });
+
+  const [nutritionData, setNutritionData] = useState([
+    { label: 'Breakfast', percent: 0, color: '#00A896' },
+    { label: 'Lunch', percent: 0, color: '#00c4af' },
+    { label: 'Dinner', percent: 0, color: '#5eead4' }
+  ]);
+
   // Mobile navigation/sub-tabs state: 'vitals', 'insights'
   const [mobileTab, setMobileTab] = useState('vitals');
 
@@ -57,51 +68,46 @@ const Analytics = () => {
 
   // Fetch / Calculate analytics metrics based on selected parent and range
   useEffect(() => {
-    // In a real production app we'd query /api/health/resident/:id/logs or /api/health/analytics
-    // Here we dynamically calculate stats or generate realistic seeded ones matching the design mockups.
     if (!selectedParentId) return;
 
-    // Simulate load
-    setLoading(true);
-    const timer = setTimeout(() => {
-      const parent = parents.find(p => p.id.toString() === selectedParentId);
-      
-      // Calculate statistics based on parent health profile
-      if (parent) {
-        let avgBp = '120/80';
-        let bpStatus = 'Optimal';
-        let avgTemp = '98.6';
-        let tempStatus = 'Stable';
-        let criticalAlerts = 0;
-        let alertStatus = 'All Clear';
-
-        if (parent.medical_conditions?.toLowerCase().includes('hypertension') || parent.medical_conditions?.toLowerCase().includes('heart')) {
-          avgBp = '138/88';
-          bpStatus = 'Elevated';
-          criticalAlerts = 2;
-          alertStatus = 'Needs Review';
-        }
-        if (parent.medical_conditions?.toLowerCase().includes('diabetes')) {
-          avgTemp = '98.8';
-          tempStatus = 'Stable';
-        }
+    const fetchAnalytics = async () => {
+      setLoading(true);
+      try {
+        const { data } = await api.get(`/health/analytics?parent_id=${selectedParentId}&range=${selectedRange}`);
         
+        // Determine status based on values
+        const sys = parseInt(data.avgBp.split('/')[0]);
+        let bpStatus = 'Optimal';
+        let alertStatus = data.criticalAlerts > 0 ? 'Needs Review' : 'All Clear';
+        
+        if (sys >= 130) bpStatus = 'Elevated';
+        if (sys >= 140) bpStatus = 'High';
+
         setVitalsSummary({
-          avgBp,
+          avgBp: data.avgBp,
           bpStatus,
-          avgTemp,
-          tempStatus,
-          totalLogs: 32 + (parent.id % 5) * 4,
-          logStatus: '+8% vs last mo',
-          criticalAlerts,
+          avgTemp: data.avgTemp,
+          tempStatus: data.avgTemp > 99.5 ? 'Elevated' : 'Stable',
+          totalLogs: data.totalLogs,
+          logStatus: 'Updated recently',
+          criticalAlerts: data.criticalAlerts,
           alertStatus
         });
+        
+        if (data.bpChartData) {
+          setBpChartData(data.bpChartData);
+        }
+        if (data.nutritionData) {
+          setNutritionData(data.nutritionData);
+        }
+      } catch (err) {
+        console.error('Error fetching analytics:', err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    }, 400);
-
-    return () => clearTimeout(timer);
-  }, [selectedParentId, selectedRange, parents]);
+    };
+    fetchAnalytics();
+  }, [selectedParentId, selectedRange]);
 
   // Generate Report action
   const handleGenerateReport = () => {
@@ -120,18 +126,7 @@ const Analytics = () => {
     }, 1500);
   };
 
-  // Mock Trend Chart Data (Last 7 Days)
-  const bpChartData = {
-    Systolic: [118, 122, 120, 126, 121, 119, 120],
-    Diastolic: [76, 82, 80, 84, 79, 78, 80]
-  };
   const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-
-  const nutritionData = [
-    { label: 'Breakfast', percent: 100, color: '#00A896' },
-    { label: 'Lunch', percent: 85, color: '#00c4af' },
-    { label: 'Dinner', percent: 90, color: '#5eead4' }
-  ];
 
   return (
     <ChildLayout title="Analytics">
@@ -512,3 +507,4 @@ const Analytics = () => {
 };
 
 export default Analytics;
+

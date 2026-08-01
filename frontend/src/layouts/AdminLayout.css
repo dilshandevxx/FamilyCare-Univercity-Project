@@ -169,7 +169,7 @@
   border-radius: 50%;
   background: #f1f5f9;
   overflow: hidden;
-  border: 2px solid #14b8a6;
+  border: 2px solid #00a896;
 }
 
 .admin-profile-avatar img {
@@ -204,7 +204,7 @@
 
   .admin-mobile-menu-btn {
     display: flex;
-    color: #14b8a6;
+    color: #00a896;
   }
 
   .admin-search-bar {

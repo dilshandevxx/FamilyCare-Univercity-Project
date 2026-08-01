@@ -4,9 +4,10 @@ import {
   Users, UserPlus, Bell, ThumbsUp,
   Activity, Thermometer, UserSearch,
   Calendar, AlertTriangle, CheckCircle,
-  Plus, Heart
+  Plus, Heart, MessageSquare
 } from 'lucide-react';
 import ChildLayout from '../../../layouts/ChildLayout';
+import { useAuth } from '../../../context/AuthContext';
 import api from '../../../services/api';
 import './Dashboard.css';
 
@@ -16,6 +17,7 @@ const barHeights = [30, 50, 38, 65, 85, 55, 70];
 const barDays    = ['M','T','W','T','F','S','S'];
 
 const Dashboard = () => {
+  const { user } = useAuth();
   const [dbParents, setDbParents] = useState([]);
   const [alerts, setAlerts] = useState([]);
   const [dashboardData, setDashboardData] = useState(null);
@@ -58,7 +60,7 @@ const Dashboard = () => {
         {/* ── Hero Banner ── */}
         <div className="cd-hero-banner animate-fade-in">
           <div className="cd-hero-content">
-            <h1 className="cd-hero-title">{getGreeting()}, Dilshan!</h1>
+            <h1 className="cd-hero-title">{getGreeting()}, {user?.name || 'User'}!</h1>
             <p className="cd-hero-subtitle">Here's the latest update on your family's health and activity.</p>
           </div>
           <div className="cd-hero-decoration">
@@ -189,7 +191,7 @@ const Dashboard = () => {
                           </div>
                         </div>
                         <div className="cd-family-btns">
-                          <button className="cd-fbtn">Vitals</button>
+                          <Link to={`/health-feed?parent_id=${p.id}`} className="cd-fbtn" style={{ textAlign: 'center', textDecoration: 'none' }}>Vitals</Link>
                           <Link to="/parents" className="cd-fbtn" style={{ textAlign: 'center', textDecoration: 'none' }}>Details</Link>
                         </div>
                       </div>
@@ -228,8 +230,8 @@ const Dashboard = () => {
                         <p className="cd-alert-title">{alert.title}</p>
                         <p className="cd-alert-desc">{alert.description}</p>
                         <div className="cd-alert-actions">
-                          <button className={`cd-alert-btn-primary ${alert.type || 'info'}`}>VIEW DETAILS</button>
-                          <button className="cd-alert-btn-ghost">DISMISS</button>
+                          <Link to="/alerts" className={`cd-alert-btn-primary ${alert.type || 'info'}`} style={{ textDecoration: 'none' }}>VIEW DETAILS</Link>
+                          <button className="cd-alert-btn-ghost" onClick={() => setAlerts(alerts.filter(a => a.id !== alert.id))}>DISMISS</button>
                         </div>
                       </div>
                     </div>
@@ -344,15 +346,44 @@ const Dashboard = () => {
                   <UserSearch size={20} className="cd-qa-icon" />
                   <span>Find Carer</span>
                 </Link>
-                <button className="cd-qa-btn">
-                  <Calendar size={20} className="cd-qa-icon" />
-                  <span>Schedule</span>
-                </button>
+                <Link to="/messages" className="cd-qa-btn">
+                  <MessageSquare size={20} className="cd-qa-icon" />
+                  <span>Messages</span>
+                </Link>
                 <button className="cd-qa-btn emergency" onClick={() => setShowEmergency(true)}>
                   <AlertTriangle size={20} />
                   <span>Emergency</span>
                 </button>
               </div>
+            </div>
+
+            {/* Assigned Caregivers */}
+            <div className="cd-card">
+              <h3 className="cd-card-title">Assigned Caregivers</h3>
+              {loading ? (
+                <div className="cd-skeleton cd-skeleton-box" style={{ height: '80px' }}></div>
+              ) : !dashboardData?.assignedCaregivers || dashboardData.assignedCaregivers.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '1rem 0', color: '#64748b', fontSize: '0.82rem' }}>
+                  No caregivers currently assigned.
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {dashboardData.assignedCaregivers.map((cg, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <img src={cg.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cg.name)}`} alt={cg.name} style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#e2e8f0' }} />
+                        <div>
+                          <p style={{ margin: 0, fontWeight: '600', color: '#0f172a', fontSize: '0.9rem' }}>{cg.name}</p>
+                          <p style={{ margin: 0, color: '#64748b', fontSize: '0.75rem' }}>{cg.specialization || 'Caregiver'} • For: {cg.parent_name}</p>
+                        </div>
+                      </div>
+                      <Link to={`/messages?recipient=${cg.user_id}`} style={{ padding: '6px 12px', background: '#00a896', color: '#fff', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '500', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#008a7b'} onMouseOut={e => e.currentTarget.style.background = '#00a896'}>
+                        Chat
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
 
@@ -374,8 +405,8 @@ const Dashboard = () => {
                 Please select a service or primary caregiver to contact immediately.
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <button style={{ padding: '12px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Call 911</button>
-                <button style={{ padding: '12px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Call Primary Nurse</button>
+                <button onClick={() => { alert('Emergency dispatch simulated.'); setShowEmergency(false); }} style={{ padding: '12px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Call 911</button>
+                <button onClick={() => { alert('Primary Nurse notified.'); setShowEmergency(false); }} style={{ padding: '12px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Call Primary Nurse</button>
                 <button onClick={() => setShowEmergency(false)} style={{ padding: '12px', background: 'transparent', color: '#64748b', border: '1px solid #e2e8f0', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px' }}>Cancel</button>
               </div>
             </div>

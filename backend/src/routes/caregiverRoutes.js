@@ -6,8 +6,7 @@ const {
   getPublicCaregiverById,
   getCaregivers,
   getCaregiverById,
-  createCaregiver,
-  updateCaregiver,
+  createCaregiver
 } = require('../controllers/caregiverController');
 
 router.get('/public', getPublicCaregivers);
@@ -15,6 +14,6 @@ router.get('/public/:id', getPublicCaregiverById);
 router.get('/', protect, getCaregivers);
 router.get('/:id', protect, getCaregiverById);
 router.post('/', protect, createCaregiver);
-router.put('/:id', protect, updateCaregiver);
+
 
 module.exports = router;

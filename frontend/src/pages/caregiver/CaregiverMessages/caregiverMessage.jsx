@@ -365,7 +365,7 @@ const CaregiverMessage = () => {
             )}
           </div>
 
-          <button className="mobile-fab">
+          <button className="mobile-fab" onClick={openCompose} title="New message">
             <MessageSquarePlus size={24} color="white" />
           </button>
         </div>

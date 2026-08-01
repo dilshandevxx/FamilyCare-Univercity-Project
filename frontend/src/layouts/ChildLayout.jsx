@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Bell, MessageSquare, HelpCircle, Menu, Search } from 'lucide-react';
 import ChildSidebar from '../components/child/ChildSidebar';
 import { useAuth } from '../context/AuthContext';
@@ -30,12 +31,12 @@ const ChildLayout = ({ children, title = 'Dashboard' }) => {
               <Search size={16} className="cl-search-icon" />
               <input type="text" placeholder="Search care network..." />
             </div>
-            <button className="cl-icon-btn">
+            <Link to="/alerts" className="cl-icon-btn">
               <Bell size={20} />
               <span className="cl-badge"></span>
-            </button>
-            <button className="cl-icon-btn hide-mobile"><MessageSquare size={20} /></button>
-            <button className="cl-icon-btn hide-mobile"><HelpCircle size={20} /></button>
+            </Link>
+            <Link to="/messages" className="cl-icon-btn hide-mobile"><MessageSquare size={20} /></Link>
+            <Link to="/help-center" className="cl-icon-btn hide-mobile"><HelpCircle size={20} /></Link>
             <div className="cl-profile">
               <img
                 src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name || 'Alex'}`}
