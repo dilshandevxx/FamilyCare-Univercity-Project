@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   User, Calendar, Heart, ShieldAlert, Phone, MapPin, 
@@ -37,15 +37,21 @@ const AddParent = () => {
     const fetchCaregivers = async () => {
       try {
         const { data } = await api.get('/caregivers');
-        setCaregivers(data || []);
+        if (Array.isArray(data) && data.length > 0) {
+          setCaregivers(data);
+          return;
+        }
       } catch (err) {
-        console.error('Error fetching caregivers:', err);
-        // Fallback mock caregivers in case database is empty or error occurs
-        setCaregivers([
-          { id: 1, name: 'Sarah Jenkins', specialization: 'Geriatric Care' },
-          { id: 2, name: 'David Chan', specialization: 'Dementia Specialist' },
-          { id: 3, name: 'Maria Rodriguez', specialization: 'Physical Therapy' }
-        ]);
+        console.warn('Could not fetch /caregivers with auth, trying public endpoint:', err);
+      }
+
+      try {
+        const { data } = await api.get('/caregivers/public');
+        if (Array.isArray(data) && data.length > 0) {
+          setCaregivers(data);
+        }
+      } catch (err) {
+        console.error('Error fetching caregivers from public endpoint:', err);
       }
     };
     fetchCaregivers();

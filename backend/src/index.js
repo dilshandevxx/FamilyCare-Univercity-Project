@@ -19,7 +19,7 @@ const alertRoutes = require('./routes/alertRoutes');
 const app = express();
 
 // ── Middleware ────────────────────────────────────────────────
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' }));
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 app.use(passport.initialize());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
