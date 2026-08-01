@@ -42,6 +42,15 @@ export const AdminStatsProvider = ({ children }) => {
     fetchStats();
   }, [fetchStats]);
 
+  // ── Custom DOM event listener for instant cross-component updates ──
+  useEffect(() => {
+    const handleCustomUpdate = () => {
+      fetchStats();
+    };
+    window.addEventListener('admin-stats-update', handleCustomUpdate);
+    return () => window.removeEventListener('admin-stats-update', handleCustomUpdate);
+  }, [fetchStats]);
+
   // ── 30-second polling — keeps badges fresh without page reload ────
   useEffect(() => {
     const POLL_MS = 30_000; // 30 seconds
@@ -64,6 +73,11 @@ export const AdminStatsProvider = ({ children }) => {
       {children}
     </AdminStatsContext.Provider>
   );
+};
+
+// ── Helper to dispatch real-time update event across components ────
+export const dispatchAdminStatsUpdate = () => {
+  window.dispatchEvent(new CustomEvent('admin-stats-update'));
 };
 
 // ── useAdminStats — convenience hook for consumers ───────────────
