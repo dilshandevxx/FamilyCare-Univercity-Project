@@ -650,6 +650,26 @@ const getSystemStatus = async (req, res) => {
   }
 };
 
+// ── POST /api/admin/broadcast ─────────────────────────────────────
+// Transmit system-wide emergency broadcast alert to all clients & caregivers
+const sendBroadcast = async (req, res) => {
+  const { message } = req.body;
+  if (!message || !message.trim()) {
+    return res.status(400).json({ error: 'Broadcast message content is required' });
+  }
+
+  try {
+    await pool.query(
+      `INSERT INTO alerts (title, description, type, created_at)
+       VALUES ('Emergency System Broadcast', ?, 'critical', NOW())`,
+      [message.trim()]
+    );
+    res.status(201).json({ message: 'Broadcast dispatched successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   getResidents,
   addResident,
@@ -674,4 +694,5 @@ module.exports = {
   getAdminSettings,
   updateAdminSettings,
   getSystemStatus,
+  sendBroadcast,
 };
