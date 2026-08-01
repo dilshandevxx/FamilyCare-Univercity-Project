@@ -67,7 +67,12 @@ const AdminSidebarV2 = () => {
             <Icon size={18} className="admin-v2-nav-icon" />
             <span className="admin-v2-nav-label">{label}</span>
             {badge !== undefined && badge > 0 && (
-              <span className="admin-v2-nav-badge">{badge}</span>
+              <span 
+                className="admin-v2-nav-badge" 
+                aria-label={`${badge} pending ${label.toLowerCase()}`}
+              >
+                {badge > 99 ? '99+' : badge}
+              </span>
             )}
           </NavLink>
         ))}
