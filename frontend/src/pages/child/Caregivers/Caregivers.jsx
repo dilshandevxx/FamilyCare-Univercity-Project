@@ -10,7 +10,7 @@ import './Caregivers.css';
 
 const CaregiversList = () => {
   // Tabs: 'browse' or 'assigned'
-  const [activeTab, setActiveTab] = useState('assigned');
+  const [activeTab, setActiveTab] = useState('browse');
   
   // States for caregivers and parents
   const [caregivers, setCaregivers] = useState([]);
@@ -23,7 +23,7 @@ const CaregiversList = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [experienceFilter, setExperienceFilter] = useState('All Levels');
   const [availabilityFilter, setAvailabilityFilter] = useState('Anytime');
-  const [ratingFilter, setRatingFilter] = useState('4.5+ Stars');
+  const [ratingFilter, setRatingFilter] = useState('All Ratings');
 
   // UI Status Banners
   const [successMsg, setSuccessMsg] = useState('');
@@ -85,13 +85,13 @@ const CaregiversList = () => {
             }
           ];
         } else {
-                    // Add styling metadata to actual DB caregivers
+          // Add styling metadata to actual DB caregivers
           cgData = cgData.map((cg, index) => ({
             ...cg,
             rating: cg.rating || (4.5 + (index * 0.1) % 0.5),
             reviews_count: cg.total_reviews || cg.reviews_count || (45 + index * 12),
             availability: (cg.is_available ? 'Immediate' : 'Weekdays') || cg.availability || 'Weekdays',
-            avatar: cg.avatar_url || cg.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cg.name)}"
+            avatar: cg.avatar_url || cg.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cg.name || 'Caregiver')}`
           }));
         }
 
@@ -199,10 +199,12 @@ const CaregiversList = () => {
 
     // 4. Rating Filter
     let matchesRating = true;
-    if (ratingFilter === '4.8+ Stars') {
-      matchesRating = cg.rating >= 4.8;
+    if (ratingFilter === '4.5+ Stars') {
+      matchesRating = (cg.rating || 0) >= 4.5;
+    } else if (ratingFilter === '4.8+ Stars') {
+      matchesRating = (cg.rating || 0) >= 4.8;
     } else if (ratingFilter === '5.0 Stars') {
-      matchesRating = cg.rating === 5.0;
+      matchesRating = (cg.rating || 0) >= 5.0;
     }
 
     return matchesSearch && matchesExperience && matchesAvailability && matchesRating;
@@ -298,6 +300,7 @@ const CaregiversList = () => {
               <div className="cg-drop">
                 <span className="cg-search-label">RATING</span>
                 <select value={ratingFilter} onChange={(e) => setRatingFilter(e.target.value)}>
+                  <option>All Ratings</option>
                   <option>4.5+ Stars</option>
                   <option>4.8+ Stars</option>
                   <option>5.0 Stars</option>
