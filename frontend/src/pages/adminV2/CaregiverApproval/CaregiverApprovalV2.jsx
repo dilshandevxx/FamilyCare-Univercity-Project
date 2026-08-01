@@ -2,9 +2,11 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { ShieldCheck, UserCheck, ShieldX, Check, AlertCircle, Award, Clock, Hash, MapPin, Users, Search, Loader2 } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
 import api from '../../../services/api';
+import { useAdminStats } from '../../../context/AdminStatsContext';
 import './CaregiverApprovalV2.css';
 
 const CaregiverApprovalV2 = () => {
+  const { refresh: refreshAdminStats } = useAdminStats();
   const [applicants, setApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [recentAction, setRecentAction] = useState(null);
@@ -51,6 +53,11 @@ const CaregiverApprovalV2 = () => {
         }
         return a;
       }));
+
+      // Trigger immediate refresh of sidebar badge count
+      if (typeof refreshAdminStats === 'function') {
+        refreshAdminStats();
+      }
 
       setRecentAction({ name, decision });
       setTimeout(() => {
