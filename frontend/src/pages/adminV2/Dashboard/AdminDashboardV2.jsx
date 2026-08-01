@@ -77,7 +77,7 @@ const AdminDashboardV2 = () => {
               <span className={`dot ${stats.critical_alerts > 0 ? 'active' : ''}`} style={stats.critical_alerts === 0 ? {background: '#94A3B8', boxShadow: 'none'} : {}} />
               <span>{stats.critical_alerts !== '—' ? stats.critical_alerts : 0} Critical Alerts</span>
             </div>
-            <div className="v2-hero-stat-pill" onClick={() => navigate('/admin-v2/caregiver-approval')} style={{ cursor: 'pointer' }}>
+            <div className="v2-hero-stat-pill" onClick={() => navigate('/admin/caregiver-approval')} style={{ cursor: 'pointer' }}>
               <span className={`dot ${stats.pending_approvals > 0 ? 'pending' : ''}`} style={stats.pending_approvals === 0 ? {background: '#94A3B8', boxShadow: 'none'} : {}} />
               <span>{stats.pending_approvals !== '—' ? stats.pending_approvals : 0} Pending Audits</span>
             </div>
