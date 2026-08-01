@@ -155,7 +155,7 @@ const AdminDashboardV2 = () => {
                 <h4>Weekly System Traffic Activity</h4>
                 <p>Track uploads of daily health records and active user registrations</p>
               </div>
-              <button className="v2-header-action-btn" onClick={() => navigate('/admin-v2/analytics')}>
+              <button className="v2-header-action-btn" onClick={() => navigate('/admin/analytics')}>
                 <ActivitySquare size={14} style={{ marginRight: '6px' }} />
                 Detailed Reports
               </button>
@@ -208,7 +208,7 @@ const AdminDashboardV2 = () => {
           <div className="v2-dashboard-panel feed-panel">
             <div className="v2-panel-header">
               <h4>Recent Event Logs</h4>
-              <button className="v2-header-link" onClick={() => navigate('/admin-v2/health-logs')}>View All Logs</button>
+              <button className="v2-header-link" onClick={() => navigate('/admin/health-logs')}>View All Logs</button>
             </div>
 
             <div className="v2-feed-list">
@@ -286,7 +286,7 @@ const AdminDashboardV2 = () => {
               <ChevronRight size={18} className="v2-control-arrow" />
             </div>
 
-            <div className="v2-control-card" onClick={() => navigate('/admin-v2/monitoring')}>
+            <div className="v2-control-card" onClick={() => navigate('/admin/monitoring')}>
               <div className="v2-control-icon-circle bg-orange">
                 <Server size={20} />
               </div>
