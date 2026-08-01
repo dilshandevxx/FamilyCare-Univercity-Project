@@ -73,7 +73,7 @@ const AdminDashboardV2 = () => {
             </p>
           </div>
           <div className="v2-hero-stats">
-            <div className="v2-hero-stat-pill" onClick={() => navigate('/admin-v2/alerts')} style={{ cursor: 'pointer' }}>
+            <div className="v2-hero-stat-pill" onClick={() => navigate('/admin/alerts')} style={{ cursor: 'pointer' }}>
               <span className={`dot ${stats.critical_alerts > 0 ? 'active' : ''}`} style={stats.critical_alerts === 0 ? {background: '#94A3B8', boxShadow: 'none'} : {}} />
               <span>{stats.critical_alerts !== '—' ? stats.critical_alerts : 0} Critical Alerts</span>
             </div>
