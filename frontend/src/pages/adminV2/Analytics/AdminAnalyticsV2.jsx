@@ -8,6 +8,7 @@ const AdminAnalyticsV2 = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('30D');
+  const [barTooltip, setBarTooltip] = useState({ visible: false, x: 0, y: 0, content: '' });
 
   const filterOptions = [
     { label: '7 Days', value: '7D' },
@@ -182,14 +183,27 @@ const AdminAnalyticsV2 = () => {
               <p>Representing total active children and caregiver accounts</p>
             </div>
             <div className="chart-wrapper">
+              {barTooltip.visible && (
+                <div 
+                  className="chart-tooltip" 
+                  style={{ left: `${barTooltip.x}px`, top: `${barTooltip.y}px` }}
+                >
+                  {barTooltip.content}
+                </div>
+              )}
               {monthly_users.length > 0 ? (
                 <>
                   <svg viewBox="0 0 500 200" className="analytics-svg-graph">
                     {/* Horizontal Guide Lines */}
-                    <line x1="20" y1="40" x2="480" y2="40" stroke="#f1f5f9" />
-                    <line x1="20" y1="90" x2="480" y2="90" stroke="#f1f5f9" />
-                    <line x1="20" y1="140" x2="480" y2="140" stroke="#f1f5f9" />
+                    <line x1="20" y1="40" x2="480" y2="40" stroke="#f1f5f9" strokeDasharray="4 4" />
+                    <line x1="20" y1="90" x2="480" y2="90" stroke="#f1f5f9" strokeDasharray="4 4" />
+                    <line x1="20" y1="140" x2="480" y2="140" stroke="#f1f5f9" strokeDasharray="4 4" />
                     <line x1="20" y1="180" x2="480" y2="180" stroke="#cbd5e1" strokeWidth="1.5" />
+                    
+                    {/* Vertical Guide Lines */}
+                    {monthly_users.slice(-6).map((_, i) => (
+                      <line key={`v-${i}`} x1={40 + (i * 80) + 15} y1="40" x2={40 + (i * 80) + 15} y2="180" stroke="#f8fafc" />
+                    ))}
                     
                     {/* Bar Graph Columns */}
                     {monthly_users.slice(-6).map((dataPoint, i) => {
@@ -202,7 +216,26 @@ const AdminAnalyticsV2 = () => {
 
                       return (
                         <g key={dataPoint.month_key}>
-                          <rect x={xPos} y={yPos} width="30" height={barHeight} rx="3" fill="#00A896" />
+                          <rect 
+                            x={xPos} 
+                            y={yPos} 
+                            width="30" 
+                            height={barHeight} 
+                            rx="3" 
+                            fill="#00A896"
+                            className="bar-chart-bar"
+                            onMouseEnter={(e) => {
+                              const rect = e.target.getBoundingClientRect();
+                              const wrapperRect = e.target.closest('.chart-wrapper').getBoundingClientRect();
+                              setBarTooltip({
+                                visible: true,
+                                x: rect.left - wrapperRect.left + (rect.width / 2),
+                                y: rect.top - wrapperRect.top,
+                                content: `${dataPoint.users} Users (${dataPoint.month})`
+                              });
+                            }}
+                            onMouseLeave={() => setBarTooltip(prev => ({ ...prev, visible: false }))}
+                          />
                         </g>
                       );
                     })}

@@ -188,6 +188,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
 
 .chart-wrapper.flex-row {
@@ -201,6 +202,51 @@
 .analytics-svg-graph {
   width: 100%;
   max-height: 190px;
+  overflow: visible;
+}
+
+.bar-chart-bar {
+  transition: all 0.3s ease;
+  transform-origin: bottom;
+  cursor: pointer;
+}
+
+.bar-chart-bar:hover {
+  fill: #008B7A; /* Darker teal */
+  filter: drop-shadow(0 -4px 6px rgba(0, 168, 150, 0.3));
+}
+
+.chart-tooltip {
+  position: absolute;
+  background-color: #1E293B;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translate(-50%, -100%);
+  margin-top: -10px;
+  z-index: 10;
+  white-space: nowrap;
+  animation: fade-in 0.2s ease-out;
+}
+
+.chart-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #1E293B transparent transparent transparent;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translate(-50%, -80%); }
+  to { opacity: 1; transform: translate(-50%, -100%); }
 }
 
 .chart-legend-x {
