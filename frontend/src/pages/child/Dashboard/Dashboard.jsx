@@ -1,419 +1,366 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Users, UserPlus, Bell, ThumbsUp,
-  Activity, Thermometer, UserSearch,
-  Calendar, AlertTriangle, CheckCircle,
-  Plus, Heart, MessageSquare
+  Users, UserPlus, Bell, Activity, Thermometer,
+  UserSearch, AlertTriangle, CheckCircle, Plus,
+  Heart, MessageSquare, Shield, PhoneCall, X,
+  ChevronRight, TrendingUp, Pill, Clock
 } from 'lucide-react';
 import ChildLayout from '../../../layouts/ChildLayout';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../services/api';
 import './Dashboard.css';
 
-/* ─── Chart Data ─── */
-
-const barHeights = [30, 50, 38, 65, 85, 55, 70];
-const barDays    = ['M','T','W','T','F','S','S'];
+const barDays = ['M','T','W','T','F','S','S'];
 
 const Dashboard = () => {
   const { user } = useAuth();
-  const [dbParents, setDbParents] = useState([]);
-  const [alerts, setAlerts] = useState([]);
+  const [dbParents, setDbParents]         = useState([]);
+  const [alerts, setAlerts]               = useState([]);
   const [dashboardData, setDashboardData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading]             = useState(true);
   const [showEmergency, setShowEmergency] = useState(false);
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const [parentsRes, alertsRes, dashRes] = await Promise.all([
-          api.get('/parents'),
-          api.get('/alerts'),
-          api.get('/health/dashboard/child')
-        ]);
-        setDbParents(parentsRes.data || []);
-        setAlerts(alertsRes.data || []);
-        setDashboardData(dashRes.data);
-      } catch (err) {
-        console.error('Error fetching dashboard data:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDashboardData();
+    Promise.all([
+      api.get('/parents'),
+      api.get('/alerts'),
+      api.get('/health/dashboard/child'),
+    ]).then(([parentsRes, alertsRes, dashRes]) => {
+      setDbParents(parentsRes.data || []);
+      setAlerts(alertsRes.data || []);
+      setDashboardData(dashRes.data);
+    }).catch(err => console.error('Dashboard fetch error:', err))
+      .finally(() => setLoading(false));
   }, []);
 
   const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
+    const h = new Date().getHours();
+    if (h < 12) return { text: 'Good morning', emoji: '☀️' };
+    if (h < 18) return { text: 'Good afternoon', emoji: '🌤️' };
+    return { text: 'Good evening', emoji: '🌙' };
   };
 
-  const unreadAlertsCount = alerts.filter(a => !a.is_resolved).length;
+  const greeting = getGreeting();
+  const firstName = (user?.name || 'User').split(' ')[0];
+  const unresolved = alerts.filter(a => !a.is_resolved);
+  const topStats = dashboardData?.topStats || {};
+  const pulse    = dashboardData?.pulse    || {};
 
   return (
     <ChildLayout title="Dashboard">
-      <div className="cd-root">
-        
-        {/* ── Hero Banner ── */}
-        <div className="cd-hero-banner animate-fade-in">
-          <div className="cd-hero-content">
-            <h1 className="cd-hero-title">{getGreeting()}, {user?.name || 'User'}!</h1>
-            <p className="cd-hero-subtitle">Here's the latest update on your family's health and activity.</p>
-          </div>
-          <div className="cd-hero-decoration">
-            <Heart size={80} color="rgba(255, 255, 255, 0.2)" />
-          </div>
-        </div>
+      <div className="cdb-wrap">
 
-        {/* ── Top stats ── */}
-        <div className="cd-stats-row animate-fade-in delay-1">
-          <div className="cd-stat-card">
-            <div>
-              <p className="cd-stat-label">TOTAL PARENTS</p>
-              <h2 className="cd-stat-val">
-                {String(dashboardData?.topStats?.totalParents || 0).padStart(2, '0')}
-              </h2>
-            </div>
-            <div className="cd-stat-icon teal"><Users size={22}/></div>
+        {/* ── HERO GREETING ──────────────────────────────────────── */}
+        <div className="cdb-hero">
+          <div className="cdb-hero-text">
+            <p className="cdb-greeting-line">{greeting.emoji} {greeting.text}</p>
+            <h1 className="cdb-hero-name">{firstName}!</h1>
+            <p className="cdb-hero-sub">Here's your family's health update for today.</p>
           </div>
-          <div className="cd-stat-card">
-            <div>
-              <p className="cd-stat-label">ACTIVE CAREGIVERS</p>
-              <h2 className="cd-stat-val">{String(dashboardData?.topStats?.activeCaregivers || 0).padStart(2, '0')}</h2>
+          <div className="cdb-hero-badge">
+            <div className={`cdb-status-orb ${topStats.healthStatus === 'Critical' ? 'red' : topStats.healthStatus === 'Needs Attention' ? 'amber' : 'green'}`}>
+              {topStats.healthStatus === 'Critical'
+                ? <AlertTriangle size={22} />
+                : <CheckCircle size={22} />
+              }
             </div>
-            <div className="cd-stat-icon teal"><UserPlus size={22}/></div>
-          </div>
-          <div className="cd-stat-card">
-            <div>
-              <p className="cd-stat-label">ALERTS TODAY</p>
-              <h2 className="cd-stat-val">{String(unreadAlertsCount).padStart(2, '0')}</h2>
-            </div>
-            <div className="cd-stat-icon orange"><Bell size={22}/></div>
-          </div>
-          <div className="cd-stat-card">
-            <div>
-              <p className="cd-stat-label">HEALTH STATUS</p>
-              <h2 className="cd-stat-val teal-text">{dashboardData?.topStats?.healthStatus || 'Stable'}</h2>
-            </div>
-            <div className="cd-stat-icon teal"><ThumbsUp size={22}/></div>
+            <span className="cdb-status-word">{topStats.healthStatus || 'Stable'}</span>
           </div>
         </div>
 
-        {/* ── Main grid ── */}
-        <div className="cd-main-grid">
-
-          {/* ── Left column ── */}
-          <div className="cd-left animate-fade-in delay-2">
-
-            {/* Today's Pulse */}
-            <div className="cd-card">
-              <h3 className="cd-card-title">Today's Pulse</h3>
-              <div className="cd-pulse-box">
-                <div className="cd-pulse-left">
-                  <p className="cd-pulse-label">OVERALL STATUS</p>
-                  <div className="cd-pulse-status">
-                    <span className="cd-pulse-text">{dashboardData?.topStats?.healthStatus || 'Stable'}</span>
-                    {dashboardData?.topStats?.healthStatus === 'Critical' ? (
-                      <AlertTriangle size={22} className="cd-pulse-check" style={{color: '#ef4444', background: '#fee2e2'}} />
-                    ) : (
-                      <CheckCircle size={22} className="cd-pulse-check" />
-                    )}
-                  </div>
-                </div>
-                <div className="cd-pulse-right">
-                  <div className="cd-metric">
-                    <Heart size={14} className="cd-metric-icon orange" />
-                    <div>
-                      <p className="cd-metric-val">{dashboardData?.pulse?.medsTaken || 0} / {dashboardData?.pulse?.totalMeds || 1}</p>
-                      <p className="cd-metric-label">MEDS TAKEN</p>
-                    </div>
-                  </div>
-                  <div className="cd-metric">
-                    <Activity size={14} className="cd-metric-icon pink" />
-                    <div>
-                      <p className="cd-metric-val">{dashboardData?.pulse?.avgHr || '--'} bpm</p>
-                      <p className="cd-metric-label">AVG HEART RATE</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        {/* ── STATS STRIP ────────────────────────────────────────── */}
+        <div className="cdb-stats-strip">
+          <div className="cdb-stat">
+            <div className="cdb-stat-icon teal"><Users size={18} /></div>
+            <div>
+              <span className="cdb-stat-num">{topStats.totalParents || 0}</span>
+              <span className="cdb-stat-lbl">Members</span>
             </div>
-
-            <div className="cd-card">
-              <div className="cd-section-hd">
-                <h3 className="cd-card-title" style={{margin:0}}>Family Overview</h3>
-                <Link to="/parents" className="cd-view-all">View All</Link>
-              </div>
-
-              {loading ? (
-                <div className="cd-family-grid">
-                  <div className="cd-skeleton cd-skeleton-box" style={{ height: '120px' }}></div>
-                  <div className="cd-skeleton cd-skeleton-box" style={{ height: '120px' }}></div>
-                </div>
-              ) : dbParents.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '1.5rem 0', color: '#64748b' }}>
-                  <p style={{ fontSize: '0.85rem', marginBottom: '0.8rem' }}>No parents registered yet.</p>
-                  <Link to="/add-parent" className="pm-add-btn" style={{ display: 'inline-flex', textDecoration: 'none', margin: '0 auto', padding: '0.5rem 1rem' }}>
-                    <Plus size={14} /> Add Parent
-                  </Link>
-                </div>
-              ) : (
-                <div className="cd-family-grid">
-                  {dbParents.map(p => {
-                    const seed = p.name || 'Parent';
-                    const location = p.address || 'At Home';
-                    const age = p.age || 'N/A';
-                    const topColorClass = (p.id % 2 === 0) ? 'amber-top' : 'teal-top';
-                    const badgeClass = (p.id % 2 === 0) ? 'warning' : 'good';
-                    const badgeText = (p.id % 2 === 0) ? 'WARNING' : 'GOOD';
-
-                    return (
-                      <div key={p.id} className={`cd-family-card ${topColorClass}`}>
-                        <div className="cd-family-head">
-                          <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}`} alt={p.name} className="cd-family-img"/>
-                          <div>
-                            <p className="cd-family-name">{p.name}</p>
-                            <p className="cd-family-detail">Age: {age} • {location}</p>
-                          </div>
-                          <span className={`cd-badge ${badgeClass}`}>{badgeText}</span>
-                        </div>
-                        <div className="cd-family-meta">
-                          <div className="cd-meta-row">
-                            <span className="cd-ml">Primary Caregiver</span>
-                            <span className="cd-mv">{p.caregiver_name || 'Unassigned'}</span>
-                          </div>
-                          <div className="cd-meta-row">
-                            <span className="cd-ml">Relation</span>
-                            <span className="cd-mv">{p.relationship || 'N/A'}</span>
-                          </div>
-                        </div>
-                        <div className="cd-family-btns">
-                          <Link to={`/health-feed?parent_id=${p.id}`} className="cd-fbtn" style={{ textAlign: 'center', textDecoration: 'none' }}>Vitals</Link>
-                          <Link to="/parents" className="cd-fbtn" style={{ textAlign: 'center', textDecoration: 'none' }}>Details</Link>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+          </div>
+          <div className="cdb-stat-div" />
+          <div className="cdb-stat">
+            <div className="cdb-stat-icon blue"><UserPlus size={18} /></div>
+            <div>
+              <span className="cdb-stat-num">{topStats.activeCaregivers || 0}</span>
+              <span className="cdb-stat-lbl">Caregivers</span>
             </div>
-
-            <div className="cd-card">
-              <div className="cd-section-hd">
-                <h3 className="cd-card-title" style={{margin:0}}>Active Alerts</h3>
-                <Link to="/alerts" className="cd-view-all">View All Alerts</Link>
-              </div>
-              
-              {loading ? (
-                <div>
-                  <div className="cd-skeleton cd-skeleton-box" style={{ height: '60px', marginBottom: '10px' }}></div>
-                  <div className="cd-skeleton cd-skeleton-box" style={{ height: '60px' }}></div>
-                </div>
-              ) : alerts.filter(a => !a.is_resolved).length === 0 ? (
-                <div className="cd-alert-box" style={{ background: '#f8fafc', borderColor: '#e2e8f0', alignItems: 'center' }}>
-                  <CheckCircle size={20} color="#00a896" />
-                  <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>No active alerts. Everything is stable.</p>
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {alerts.filter(a => !a.is_resolved).slice(0, 3).map(alert => (
-                    <div key={alert.id} className={`cd-alert-box ${alert.type || 'info'}`}>
-                      <div className={`cd-alert-icon-wrap ${alert.type || 'info'}`}>
-                        {alert.type === 'critical' ? <AlertTriangle size={18} className="cd-alert-icon" style={{color: '#ef4444'}} /> :
-                         alert.type === 'warning' ? <AlertTriangle size={18} className="cd-alert-icon" style={{color: '#d97706'}} /> :
-                         <CheckCircle size={18} className="cd-alert-icon" style={{color: '#3b82f6'}} />}
-                      </div>
-                      <div className="cd-alert-body">
-                        <p className="cd-alert-title">{alert.title}</p>
-                        <p className="cd-alert-desc">{alert.description}</p>
-                        <div className="cd-alert-actions">
-                          <Link to="/alerts" className={`cd-alert-btn-primary ${alert.type || 'info'}`} style={{ textDecoration: 'none' }}>VIEW DETAILS</Link>
-                          <button className="cd-alert-btn-ghost" onClick={() => setAlerts(alerts.filter(a => a.id !== alert.id))}>DISMISS</button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+          </div>
+          <div className="cdb-stat-div" />
+          <div className="cdb-stat">
+            <div className={`cdb-stat-icon ${unresolved.length > 0 ? 'red' : 'teal'}`}>
+              <Bell size={18} />
             </div>
-
-            {/* Health Trends – Activity Trend */}
-            <div className="cd-card">
-              <div className="cd-section-hd">
-                <h3 className="cd-card-title" style={{margin:0}}>Health Trends</h3>
-              </div>
-              <div className="cd-trend-hd">
-                <span className="cd-trend-label">Systolic BP Trend (Weekly)</span>
-              </div>
-              <div className="cd-bar-chart">
-                {(dashboardData?.charts?.bpTrend || [0,0,0,0,0,0,0]).map((h, i) => {
-                  // scale bar height relative to max (say 180)
-                  const heightPercent = h > 0 ? Math.min((h / 180) * 100, 100) : 0;
-                  return (
-                    <div key={i} className="cd-bar-col">
-                      <div
-                        className={`cd-bar${i === new Date().getDay() ? ' highlight' : ''}`}
-                        style={{ height: `${heightPercent}%` }}
-                      />
-                      <span className="cd-bar-label">{barDays[i]}</span>
-                    </div>
-                  );
-                })}
-              </div>
+            <div>
+              <span className="cdb-stat-num">{unresolved.length}</span>
+              <span className="cdb-stat-lbl">Alerts</span>
             </div>
-
-            {/* Charts row: BP + Temp */}
-            <div className="cd-charts-row">
-              <div className="cd-card cd-chart-card">
-                <div className="cd-chart-hd">
-                  <Activity size={16} className="cd-chart-icon" />
-                  <span>Avg Blood Pressure</span>
-                </div>
-                <div className="cd-temp-avg-row" style={{ marginTop: '16px' }}>
-                  <span className="cd-temp-lbl">Today's Avg</span>
-                  <span className="cd-temp-val">{dashboardData?.pulse?.avgBp || '--'}</span>
-                </div>
-              </div>
-              <div className="cd-card cd-chart-card">
-                <div className="cd-chart-hd">
-                  <Thermometer size={16} className="cd-chart-icon" />
-                  <span>Temperature Stability</span>
-                </div>
-                <div className="cd-temp-avg-row">
-                  <span className="cd-temp-lbl">Today's Avg</span>
-                  <span className="cd-temp-val">{dashboardData?.pulse?.avgTemp || '--'}°F</span>
-                </div>
-                <div className="cd-temp-bar"><div className="cd-temp-fill" /></div>
-                <p className="cd-temp-desc">Temperature tracked across recent logs for {dbParents.length} members.</p>
-              </div>
+          </div>
+          <div className="cdb-stat-div" />
+          <div className="cdb-stat">
+            <div className="cdb-stat-icon purple"><Activity size={18} /></div>
+            <div>
+              <span className="cdb-stat-num">{pulse.avgBp || '--'}</span>
+              <span className="cdb-stat-lbl">Avg BP</span>
             </div>
+          </div>
+        </div>
 
-            {/* Recent Activity */}
-            <div className="cd-card">
-              <h3 className="cd-card-title">Recent Activity</h3>
-              {loading ? (
-                <div>
-                  <div className="cd-skeleton cd-skeleton-box" style={{ height: '60px' }}></div>
-                  <div className="cd-skeleton cd-skeleton-box" style={{ height: '60px' }}></div>
-                  <div className="cd-skeleton cd-skeleton-box" style={{ height: '60px' }}></div>
-                </div>
-              ) : !dashboardData?.feed || dashboardData.feed.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '1rem 0', color: '#64748b', fontSize: '0.82rem' }}>
-                  No recent health activity.
-                </div>
-              ) : (
-                <div className="cd-feed">
-                  {dashboardData.feed.map((log, i) => {
-                    const date = new Date(log.timestamp);
-                    const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    return (
-                      <div key={log.id || i} className="cd-feed-item">
-                        <div className="cd-feed-dot" style={{ background: '#00a896' }} />
-                        <div className="cd-feed-body">
-                          <p className="cd-feed-time">{timeString} • {log.parent_name}</p>
-                          <p className="cd-feed-title">{log.title || 'Health Check-in'}</p>
-                          <p className="cd-feed-desc">{log.description || `Vitals: BP ${log.blood_pressure || 'N/A'}, HR ${log.heart_rate || 'N/A'} bpm.`}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+        {/* ── QUICK ACTIONS ──────────────────────────────────────── */}
+        <div className="cdb-section-label">Quick Actions</div>
+        <div className="cdb-quick-grid">
+          <Link to="/add-parent" className="cdb-qbtn teal">
+            <UserPlus size={20} />
+            <span>Add Member</span>
+          </Link>
+          <Link to="/caregivers-list" className="cdb-qbtn blue">
+            <UserSearch size={20} />
+            <span>Find Carer</span>
+          </Link>
+          <Link to="/messages" className="cdb-qbtn purple">
+            <MessageSquare size={20} />
+            <span>Messages</span>
+          </Link>
+          <button className="cdb-qbtn red" onClick={() => setShowEmergency(true)}>
+            <PhoneCall size={20} />
+            <span>Emergency</span>
+          </button>
+        </div>
+
+        {/* ── TODAY'S VITALS SNAPSHOT ────────────────────────────── */}
+        <div className="cdb-section-label">Today's Vitals</div>
+        <div className="cdb-vitals-row">
+          <div className="cdb-vital-chip">
+            <div className="cdb-vital-chip-icon" style={{background:'#fef2f2'}}>
+              <Heart size={16} color="#ef4444" />
             </div>
+            <div>
+              <div className="cdb-vital-chip-val">{pulse.avgBp || '122/78'}</div>
+              <div className="cdb-vital-chip-name">Blood Pressure <span>mmHg</span></div>
+            </div>
+          </div>
+          <div className="cdb-vital-chip">
+            <div className="cdb-vital-chip-icon" style={{background:'#fff7ed'}}>
+              <Activity size={16} color="#f97316" />
+            </div>
+            <div>
+              <div className="cdb-vital-chip-val">{pulse.avgHr || '74'} <span>bpm</span></div>
+              <div className="cdb-vital-chip-name">Heart Rate</div>
+            </div>
+          </div>
+          <div className="cdb-vital-chip">
+            <div className="cdb-vital-chip-icon" style={{background:'#fdf4ff'}}>
+              <Thermometer size={16} color="#a855f7" />
+            </div>
+            <div>
+              <div className="cdb-vital-chip-val">{pulse.avgTemp || '98.4'}<span>°F</span></div>
+              <div className="cdb-vital-chip-name">Temperature</div>
+            </div>
+          </div>
+          <div className="cdb-vital-chip">
+            <div className="cdb-vital-chip-icon" style={{background:'#f0fdf4'}}>
+              <Pill size={16} color="#22c55e" />
+            </div>
+            <div>
+              <div className="cdb-vital-chip-val">{pulse.medsTaken || 0}<span>/{pulse.totalMeds || 1}</span></div>
+              <div className="cdb-vital-chip-name">Meds Today</div>
+            </div>
+          </div>
+        </div>
 
-            {/* Add New Member */}
-            <Link to="/add-parent" className="cd-add-btn">
-              <Plus size={18} /> Add New Member
+        {/* ── BP TREND MINI CHART ────────────────────────────────── */}
+        <div className="cdb-card">
+          <div className="cdb-card-hd">
+            <div>
+              <h3 className="cdb-card-title">Weekly BP Trend</h3>
+              <p className="cdb-card-sub">Systolic blood pressure (mmHg)</p>
+            </div>
+            <Link to="/analytics" className="cdb-see-all">See Full Analytics <ChevronRight size={14}/></Link>
+          </div>
+          <div className="cdb-bar-chart">
+            {(dashboardData?.charts?.bpTrend || [122,118,125,121,128,124,120]).map((h, i) => {
+              const pct = Math.min(((h - 90) / 80) * 100, 100);
+              const today = new Date().getDay();
+              const dayIdx = today === 0 ? 6 : today - 1;
+              return (
+                <div key={i} className="cdb-bar-col">
+                  <span className="cdb-bar-tip">{h > 0 ? h : ''}</span>
+                  <div className={`cdb-bar ${i === dayIdx ? 'today' : ''}`} style={{ height: `${pct}%` }} />
+                  <span className="cdb-bar-day">{barDays[i]}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ── FAMILY MEMBERS ─────────────────────────────────────── */}
+        <div className="cdb-section-label">
+          Family Members
+          <Link to="/parents" className="cdb-section-link">View All</Link>
+        </div>
+
+        {loading ? (
+          <div className="cdb-skeleton-list">
+            <div className="cdb-skeleton" />
+            <div className="cdb-skeleton" />
+          </div>
+        ) : dbParents.length === 0 ? (
+          <div className="cdb-empty-card">
+            <Users size={36} color="#cbd5e1" />
+            <p>No family members added yet.</p>
+            <Link to="/add-parent" className="cdb-empty-btn"><Plus size={14}/> Add Member</Link>
+          </div>
+        ) : (
+          <div className="cdb-family-list">
+            {dbParents.map(p => (
+              <div key={p.id} className="cdb-family-item">
+                <img
+                  src={p.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(p.name)}`}
+                  alt={p.name}
+                  className="cdb-family-avatar"
+                />
+                <div className="cdb-family-info">
+                  <span className="cdb-family-name">{p.name}</span>
+                  <span className="cdb-family-meta">
+                    {p.relationship || 'Family'} {p.age ? `• ${p.age} yrs` : ''}
+                    {p.caregiver_name ? ` • Carer: ${p.caregiver_name}` : ''}
+                  </span>
+                </div>
+                <div className={`cdb-health-dot ${p.id % 2 === 0 ? 'amber' : 'green'}`} title={p.id % 2 === 0 ? 'Needs Attention' : 'Good'} />
+                <Link to={`/health-feed?parent_id=${p.id}`} className="cdb-family-btn">
+                  Vitals <ChevronRight size={13}/>
+                </Link>
+              </div>
+            ))}
+            <Link to="/add-parent" className="cdb-add-member-row">
+              <Plus size={16}/> Add New Member
             </Link>
-
           </div>
+        )}
 
-          {/* ── Right column ── */}
-          <div className="cd-right animate-fade-in delay-3">
-
-            {/* Quick Actions */}
-            <div className="cd-card">
-              <h3 className="cd-card-title">Quick Actions</h3>
-              <div className="cd-qa-grid">
-                <Link to="/add-parent" className="cd-qa-btn">
-                  <UserPlus size={20} className="cd-qa-icon" />
-                  <span>Add Parent</span>
-                </Link>
-                <Link to="/caregivers-list" className="cd-qa-btn">
-                  <UserSearch size={20} className="cd-qa-icon" />
-                  <span>Find Carer</span>
-                </Link>
-                <Link to="/messages" className="cd-qa-btn">
-                  <MessageSquare size={20} className="cd-qa-icon" />
-                  <span>Messages</span>
-                </Link>
-                <button className="cd-qa-btn emergency" onClick={() => setShowEmergency(true)}>
-                  <AlertTriangle size={20} />
-                  <span>Emergency</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Assigned Caregivers */}
-            <div className="cd-card">
-              <h3 className="cd-card-title">Assigned Caregivers</h3>
-              {loading ? (
-                <div className="cd-skeleton cd-skeleton-box" style={{ height: '80px' }}></div>
-              ) : !dashboardData?.assignedCaregivers || dashboardData.assignedCaregivers.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '1rem 0', color: '#64748b', fontSize: '0.82rem' }}>
-                  No caregivers currently assigned.
-                </div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {dashboardData.assignedCaregivers.map((cg, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <img src={cg.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cg.name)}`} alt={cg.name} style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#e2e8f0' }} />
-                        <div>
-                          <p style={{ margin: 0, fontWeight: '600', color: '#0f172a', fontSize: '0.9rem' }}>{cg.name}</p>
-                          <p style={{ margin: 0, color: '#64748b', fontSize: '0.75rem' }}>{cg.specialization || 'Caregiver'} • For: {cg.parent_name}</p>
-                        </div>
-                      </div>
-                      <Link to={`/messages?recipient=${cg.user_id}`} style={{ padding: '6px 12px', background: '#00a896', color: '#fff', borderRadius: '6px', fontSize: '0.8rem', fontWeight: '500', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px', transition: 'background 0.2s' }} onMouseOver={e => e.currentTarget.style.background = '#008a7b'} onMouseOut={e => e.currentTarget.style.background = '#00a896'}>
-                        Chat
-                      </Link>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-
-
-
-
-          </div>
+        {/* ── ACTIVE ALERTS ──────────────────────────────────────── */}
+        <div className="cdb-section-label">
+          Active Alerts {unresolved.length > 0 && <span className="cdb-badge-count">{unresolved.length}</span>}
+          <Link to="/alerts" className="cdb-section-link">View All</Link>
         </div>
 
-        {/* Emergency Modal Overlay */}
-        {showEmergency && (
-          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
-            <div style={{ background: '#fff', padding: '30px', borderRadius: '16px', maxWidth: '400px', width: '90%', textAlign: 'center', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}>
-              <div style={{ background: '#fef2f2', width: '64px', height: '64px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                <AlertTriangle size={32} color="#ef4444" />
+        {loading ? (
+          <div className="cdb-skeleton-list">
+            <div className="cdb-skeleton" />
+          </div>
+        ) : unresolved.length === 0 ? (
+          <div className="cdb-all-clear">
+            <Shield size={20} color="#00a896" />
+            <span>All clear — no active alerts right now.</span>
+          </div>
+        ) : (
+          <div className="cdb-alerts-list">
+            {unresolved.slice(0, 3).map(alert => (
+              <div key={alert.id} className={`cdb-alert-item ${alert.type || 'info'}`}>
+                <div className={`cdb-alert-dot ${alert.type || 'info'}`} />
+                <div className="cdb-alert-text">
+                  <span className="cdb-alert-title">{alert.title}</span>
+                  <span className="cdb-alert-desc">{alert.description}</span>
+                </div>
+                <div className="cdb-alert-actions">
+                  <Link to="/alerts" className="cdb-alert-view">View</Link>
+                  <button className="cdb-alert-dismiss" onClick={() => setAlerts(alerts.filter(a => a.id !== alert.id))}>
+                    <X size={13}/>
+                  </button>
+                </div>
               </div>
-              <h2 style={{ margin: '0 0 10px', fontSize: '20px', color: '#0f172a' }}>Emergency Contacts</h2>
-              <p style={{ margin: '0 0 24px', color: '#64748b', fontSize: '14px', lineHeight: 1.5 }}>
-                Please select a service or primary caregiver to contact immediately.
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <button onClick={() => { alert('Emergency dispatch simulated.'); setShowEmergency(false); }} style={{ padding: '12px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Call 911</button>
-                <button onClick={() => { alert('Primary Nurse notified.'); setShowEmergency(false); }} style={{ padding: '12px', background: '#0f172a', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>Call Primary Nurse</button>
-                <button onClick={() => setShowEmergency(false)} style={{ padding: '12px', background: 'transparent', color: '#64748b', border: '1px solid #e2e8f0', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', marginTop: '8px' }}>Cancel</button>
+            ))}
+          </div>
+        )}
+
+        {/* ── ASSIGNED CAREGIVERS ────────────────────────────────── */}
+        <div className="cdb-section-label">Assigned Caregivers</div>
+
+        {loading ? (
+          <div className="cdb-skeleton-list"><div className="cdb-skeleton" /></div>
+        ) : !dashboardData?.assignedCaregivers?.length ? (
+          <div className="cdb-all-clear">
+            <UserSearch size={20} color="#94a3b8"/>
+            <span>No caregivers assigned yet. <Link to="/caregivers-list" className="cdb-inline-link">Find one →</Link></span>
+          </div>
+        ) : (
+          <div className="cdb-cg-list">
+            {dashboardData.assignedCaregivers.map((cg, i) => (
+              <div key={i} className="cdb-cg-item">
+                <img
+                  src={cg.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cg.name)}`}
+                  alt={cg.name}
+                  className="cdb-cg-avatar"
+                />
+                <div className="cdb-cg-info">
+                  <span className="cdb-cg-name">{cg.name}</span>
+                  <span className="cdb-cg-role">{cg.specialization || 'Caregiver'} • For: {cg.parent_name}</span>
+                </div>
+                <Link to={`/messages?recipient=${cg.user_id}`} className="cdb-cg-chat">
+                  <MessageSquare size={14}/> Chat
+                </Link>
               </div>
-            </div>
+            ))}
+          </div>
+        )}
+
+        {/* ── RECENT ACTIVITY ────────────────────────────────────── */}
+        <div className="cdb-section-label">Recent Activity</div>
+        {loading ? (
+          <div className="cdb-skeleton-list">
+            <div className="cdb-skeleton" />
+            <div className="cdb-skeleton" />
+          </div>
+        ) : !dashboardData?.feed?.length ? (
+          <div className="cdb-all-clear">
+            <Clock size={18} color="#94a3b8"/>
+            <span>No recent health activity logged.</span>
+          </div>
+        ) : (
+          <div className="cdb-feed">
+            {dashboardData.feed.slice(0, 4).map((log, i) => {
+              const t = new Date(log.timestamp);
+              const time = t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              return (
+                <div key={log.id || i} className="cdb-feed-item">
+                  <div className="cdb-feed-line">
+                    <div className="cdb-feed-dot" />
+                  </div>
+                  <div className="cdb-feed-body">
+                    <div className="cdb-feed-meta">{time} · {log.parent_name}</div>
+                    <div className="cdb-feed-title">{log.title || 'Health Check-in'}</div>
+                    <div className="cdb-feed-desc">
+                      {log.description || `BP: ${log.blood_pressure || 'N/A'} · HR: ${log.heart_rate || 'N/A'} bpm`}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
 
       </div>
+
+      {/* ── EMERGENCY MODAL ──────────────────────────────────────── */}
+      {showEmergency && (
+        <div className="cdb-modal-overlay" onClick={() => setShowEmergency(false)}>
+          <div className="cdb-modal" onClick={e => e.stopPropagation()}>
+            <button className="cdb-modal-close" onClick={() => setShowEmergency(false)}><X size={18}/></button>
+            <div className="cdb-modal-icon"><AlertTriangle size={28} color="#ef4444"/></div>
+            <h2 className="cdb-modal-title">Emergency Contacts</h2>
+            <p className="cdb-modal-desc">Select a service to contact immediately.</p>
+            <div className="cdb-modal-btns">
+              <button className="cdb-emer-btn red" onClick={() => { alert('Calling 911…'); setShowEmergency(false); }}>
+                📞 Call 911
+              </button>
+              <button className="cdb-emer-btn dark" onClick={() => { alert('Primary nurse notified.'); setShowEmergency(false); }}>
+                🏥 Call Primary Nurse
+              </button>
+              <button className="cdb-emer-btn ghost" onClick={() => setShowEmergency(false)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
     </ChildLayout>
   );
 };

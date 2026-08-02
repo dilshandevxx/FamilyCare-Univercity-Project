@@ -1,650 +1,524 @@
-/* Analytics.css */
+/* ═══════════════════════════════════════════════════════════════════
+   FamilyCare — Child Analytics Page  (fan-* prefix)
+   Clean, family-friendly, premium healthcare dashboard
+═══════════════════════════════════════════════════════════════════ */
 
-.an-container {
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* ── Wrapper ─────────────────────────────────────────────────────── */
+.fan-wrap {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1.5rem;
+  padding: 1.5rem 1.5rem 3rem;
   font-family: 'Inter', sans-serif;
-  color: #1e293b;
-}
-
-/* Header select styles */
-.an-header-panel {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.an-page-title {
-  font-size: 1.6rem;
-  font-weight: 800;
   color: #0f172a;
+}
+
+/* ── Top bar ──────────────────────────────────────────────────────── */
+.fan-topbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.fan-page-h1 {
+  font-size: 1.65rem;
+  font-weight: 800;
+  margin: 0 0 .25rem;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.fan-h1-emoji { font-size: 1.5rem; }
+
+.fan-page-sub {
+  font-size: .85rem;
+  color: #64748b;
   margin: 0;
 }
 
-.an-filter-row {
+.fan-topbar-right {
   display: flex;
-  gap: 12px;
+  gap: .75rem;
+  flex-wrap: wrap;
   align-items: center;
 }
 
-.an-filter-pill {
-  background-color: white;
+.fan-select-wrap {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  background: white;
   border: 1.5px solid #e2e8f0;
-  border-radius: 20px;
-  padding: 6px 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-}
-
-.an-filter-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.an-pill-icon {
+  border-radius: 24px;
+  padding: .4rem 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
   color: #64748b;
+  transition: border-color .2s;
 }
-
-.an-caregivers-link {
-  text-decoration: none;
-  cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s;
-}
-
-.an-caregivers-link:hover {
-  background-color: #f0fdfa;
-  border-color: #00A896;
-}
-
-.an-caregivers-link:hover .an-pill-icon {
-  color: #00A896;
-}
-
-.an-caregivers-label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #0f172a;
-  text-transform: none;
-  letter-spacing: normal;
-}
-
-.an-select {
+.fan-select-wrap:focus-within { border-color: #00A896; }
+.fan-select {
   border: none;
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: #0f172a;
-  outline: none;
   background: transparent;
+  outline: none;
+  font-size: .82rem;
+  font-weight: 600;
+  color: #0f172a;
   cursor: pointer;
-  padding-right: 4px;
 }
 
-/* Feedback toast message */
-.an-toast {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0.75rem 1.2rem;
-  border-radius: 10px;
-  font-size: 0.85rem;
-  margin-bottom: 1.2rem;
+/* ── Toast ────────────────────────────────────────────────────────── */
+.fan-toast {
+  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  border: 1px solid #86efac;
+  color: #15803d;
+  border-radius: 12px;
+  padding: .75rem 1.25rem;
+  font-size: .88rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+  animation: slideDown .3s ease;
 }
+@keyframes slideDown { from { opacity:0; transform: translateY(-8px); } to { opacity:1; transform:none; } }
 
-.an-toast.success {
-  background-color: #dcfce7;
-  color: #166534;
-  border: 1px solid #bbf7d0;
-}
-
-/* Loading box */
-.an-loading-box {
+/* ── Loading ──────────────────────────────────────────────────────── */
+.fan-loading {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 5rem 0;
+  gap: 1rem;
+  min-height: 52vh;
   color: #64748b;
-  gap: 12px;
-  background-color: white;
-  border-radius: 16px;
-  border: 1px dashed #cbd5e1;
+  font-size: .9rem;
 }
+.fan-spin { animation: spin 1.2s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-.an-spin {
-  animation: an-spin 1.2s linear infinite;
-  color: #00A896;
-}
+/* ── Body ─────────────────────────────────────────────────────────── */
+.fan-body { display: flex; flex-direction: column; gap: 1.25rem; }
 
-@keyframes an-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* Page Layout grid */
-.an-content-grid {
+/* ══════════════════════════════════════════════════════════════════
+   ROW 1 — Wellness Score + Vital Cards
+══════════════════════════════════════════════════════════════════ */
+.fan-row-top {
   display: grid;
-  grid-template-columns: 2.1fr 1fr;
-  gap: 1.6rem;
+  grid-template-columns: 340px 1fr;
+  gap: 1.25rem;
 }
 
-.an-main-col {
+/* ── Wellness Score card ─────────────────────────────────────────── */
+.fan-score-card {
+  background: white;
+  border-radius: 20px;
+  border: 1.5px solid #f1f5f9;
+  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1.6rem;
-}
-
-/* Summary Row & Cards */
-.an-summary-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1.2rem;
-}
-
-.an-summary-card {
-  background-color: white;
-  border: 1px solid #f1f5f9;
-  border-radius: 16px;
-  padding: 1.1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 110px;
-}
-
-.an-card-top {
-  display: flex;
-  justify-content: space-between;
+  gap: 1rem;
   align-items: center;
+  text-align: center;
 }
 
-.an-icon-box {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  display: flex;
+.fan-score-ring-wrap {
+  position: relative;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-.an-icon-box.bp { background-color: #e6f7f5; color: #00A896; }
-.an-icon-box.temp { background-color: #fef3c7; color: #d97706; }
-.an-icon-box.logs { background-color: #dbeafe; color: #2563eb; }
-.an-icon-box.alerts { background-color: #fee2e2; color: #dc2626; }
-
-.an-status-badge {
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 10px;
-}
-
-.an-status-badge.bp.optimal { background-color: #dcfce7; color: #15803d; }
-.an-status-badge.bp.elevated { background-color: #fef3c7; color: #b45309; }
-.an-status-badge.temp.stable { background-color: #f1f5f9; color: #475569; }
-.an-status-badge.trend-up { color: #2563eb; }
-.an-status-badge.alert.review { background-color: #fee2e2; color: #b91c1c; }
-.an-status-badge.alert.clear { background-color: #dcfce7; color: #15803d; }
-
-.an-card-bottom {
+.fan-score-center {
+  position: absolute;
   display: flex;
   flex-direction: column;
-  margin-top: 10px;
+  align-items: center;
+  line-height: 1;
 }
 
-.an-metric-val {
-  font-size: 1.45rem;
+.fan-score-num {
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.fan-score-label { font-size: .75rem; color: #94a3b8; font-weight: 500; }
+
+.fan-score-info { display: flex; flex-direction: column; align-items: center; gap: .5rem; }
+
+.fan-score-title { font-size: .82rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: .5px; }
+
+.fan-score-badge {
+  display: inline-block;
+  border-radius: 20px;
+  padding: .25rem .9rem;
+  font-size: .78rem;
+  font-weight: 700;
+}
+
+.fan-score-desc { font-size: .85rem; color: #475569; margin: .25rem 0 0; line-height: 1.5; }
+
+.fan-score-pills { display: flex; flex-wrap: wrap; gap: .4rem; justify-content: center; margin-top: .25rem; }
+
+.fan-pill {
+  display: flex;
+  align-items: center;
+  gap: .3rem;
+  border-radius: 20px;
+  padding: .2rem .65rem;
+  font-size: .75rem;
+  font-weight: 600;
+}
+.fan-pill.green { background: #f0fdf4; color: #16a34a; }
+.fan-pill.amber { background: #fffbeb; color: #d97706; }
+.fan-pill.red   { background: #fef2f2; color: #dc2626; }
+
+/* ── 4 Vital cards grid ──────────────────────────────────────────── */
+.fan-vitals-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1rem;
+}
+
+.fan-vital-card {
+  background: white;
+  border-radius: 18px;
+  border: 1.5px solid #f1f5f9;
+  box-shadow: 0 2px 8px rgba(0,0,0,.05);
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: .35rem;
+  transition: transform .18s, box-shadow .18s;
+  cursor: default;
+}
+.fan-vital-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.09);
+}
+
+.fan-vital-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: .1rem;
+}
+
+.fan-vital-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.spark-svg { width: 80px; height: 34px; display: block; }
+
+.fan-vital-val {
+  font-size: 1.55rem;
   font-weight: 800;
   color: #0f172a;
   line-height: 1.1;
 }
 
-.an-metric-lbl {
-  font-size: 0.72rem;
+.fan-vital-name {
+  font-size: .78rem;
+  color: #64748b;
   font-weight: 500;
-  color: #64748b;
-  margin-top: 4px;
 }
 
-.an-unit {
-  font-size: 0.65rem;
-  font-weight: 400;
-  color: #94a3b8;
-}
+.fan-unit { font-size: .68rem; color: #94a3b8; font-weight: 400; }
 
-/* Trend Chart Card */
-.an-chart-card {
-  background-color: white;
-  border: 1px solid #f1f5f9;
+.fan-vital-status {
+  display: inline-block;
+  font-size: .72rem;
+  font-weight: 700;
   border-radius: 20px;
-  padding: 1.4rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  padding: .18rem .6rem;
+  width: fit-content;
 }
+.fan-vital-status.green { background: #f0fdf4; color: #16a34a; }
+.fan-vital-status.amber { background: #fffbeb; color: #d97706; }
+.fan-vital-status.red   { background: #fef2f2; color: #dc2626; }
 
-.an-chart-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.4rem;
-}
-
-.an-card-title {
-  font-size: 0.98rem;
-  font-weight: 800;
-  color: #0f172a;
-  margin: 0;
-}
-
-.an-card-subtitle {
-  font-size: 0.76rem;
-  color: #64748b;
-  margin: 2px 0 0 0;
-}
-
-.an-toggle-group {
-  display: flex;
-  background-color: #f1f5f9;
-  padding: 3px;
-  border-radius: 8px;
-}
-
-.an-toggle-btn {
-  background: none;
-  border: none;
-  font-size: 0.76rem;
-  font-weight: 700;
-  color: #64748b;
-  padding: 5px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.an-toggle-btn.active {
-  background-color: #0f172a;
-  color: white;
-}
-
-/* Sparkline area styles */
-.an-sparkline-container {
-  position: relative;
-  margin-top: 0.5rem;
-}
-
-.an-spark-grid-lines {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 140px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  pointer-events: none;
-}
-
-.an-grid-line {
-  height: 1px;
-  background-color: #f1f5f9;
-  width: 100%;
-}
-
-.an-spark-line-wrapper {
-  position: relative;
-  z-index: 2;
-  height: 160px;
-}
-
-.an-spark-svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.chart-dot-group {
-  cursor: pointer;
-}
-
-.chart-dot-group:hover circle {
-  r: 9px;
-  stroke-width: 3px;
-}
-
-.chart-dot-label {
-  font-size: 0.65rem;
-  font-weight: 700;
-  fill: #475569;
-}
-
-.an-chart-xaxis {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.6rem 20px 0 20px;
-  border-top: 1.5px solid #f1f5f9;
-}
-
-.an-xaxis-day {
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: #94a3b8;
-}
-
-/* Bottom Cards Row */
-.an-bottom-row {
+/* ══════════════════════════════════════════════════════════════════
+   ROW 2 — Vitals Chart + Medication
+══════════════════════════════════════════════════════════════════ */
+.fan-row-mid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.4rem;
+  grid-template-columns: 1fr 300px;
+  gap: 1.25rem;
 }
 
-.an-card {
-  background-color: white;
-  border: 1px solid #f1f5f9;
+/* ── Shared card base ────────────────────────────────────────────── */
+.fan-chart-card,
+.fan-med-card,
+.fan-meals-card,
+.fan-mood-card,
+.fan-insights-card {
+  background: white;
   border-radius: 20px;
+  border: 1.5px solid #f1f5f9;
+  box-shadow: 0 2px 12px rgba(0,0,0,.05);
   padding: 1.4rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 }
 
-/* Nutrition bars styles */
-.an-nutrition-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 1.2rem;
-  flex-grow: 1;
-  justify-content: center;
-}
-
-.an-bar-row {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.an-bar-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.an-bar-lbl {
-  font-size: 0.76rem;
-  font-weight: 700;
-  color: #475569;
-}
-
-.an-bar-val {
-  font-size: 0.76rem;
-  font-weight: 800;
-  color: #0f172a;
-}
-
-.an-bar-track {
-  height: 8px;
-  background-color: #f1f5f9;
-  border-radius: 4px;
-  overflow: hidden;
-  width: 100%;
-}
-
-.an-bar-fill {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.6s ease-out;
-}
-
-/* Medication donut charts */
-.an-med-donut-section {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  margin-top: 1.2rem;
-  justify-content: center;
-  flex-grow: 1;
-}
-
-.an-donut-box {
-  width: 100px;
-  height: 100px;
-  position: relative;
-}
-
-.an-donut-svg {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-}
-
-.an-donut-inner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.an-donut-pct {
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: #0f172a;
-  line-height: 1;
-}
-
-.an-donut-lbl {
-  font-size: 0.52rem;
-  font-weight: 800;
-  color: #00A896;
-  letter-spacing: 0.5px;
-  margin-top: 2px;
-}
-
-.an-med-legend {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.an-leg-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.an-leg-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-}
-
-.an-leg-dot.on-time { background-color: #00A896; }
-.an-leg-dot.delayed { background-color: #d97706; }
-
-.an-leg-lbl {
-  font-size: 0.74rem;
-  font-weight: 600;
-  color: #64748b;
-  min-width: 60px;
-}
-
-.an-leg-count {
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-/* RIGHT COLUMN: AI INSIGHTS CARD */
-.an-insights-card {
-  background-color: #0f172a; /* Slate dark background */
-  border-radius: 20px;
-  padding: 1.6rem;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  justify-content: space-between;
-  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.15);
-}
-
-.an-ins-title-row {
+.fan-card-head {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: .25rem;
 }
 
-.an-ins-star-icon {
-  color: #2dd4bf; /* Mint glow */
-  margin-top: 2px;
+.fan-card-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 .15rem;
 }
 
-.an-ins-title {
-  font-size: 0.98rem;
-  font-weight: 800;
-  color: white;
-  margin: 0;
-}
-
-.an-ins-subtitle {
-  font-size: 0.74rem;
+.fan-card-subtitle {
+  font-size: .8rem;
   color: #94a3b8;
-  margin: 2px 0 0 0;
+  margin: 0 0 1rem;
 }
 
-.an-insights-feed {
+/* ── Chart tabs ──────────────────────────────────────────────────── */
+.fan-chart-tabs {
+  display: flex;
+  gap: .4rem;
+  flex-wrap: wrap;
+}
+.fan-chart-tab {
+  border: 1.5px solid #e2e8f0;
+  background: transparent;
+  border-radius: 20px;
+  padding: .25rem .7rem;
+  font-size: .76rem;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all .18s;
+}
+.fan-chart-tab:hover { border-color: #00A896; color: #00A896; }
+.fan-chart-tab.active { background: #f0fdfa; }
+
+/* ── Main SVG chart ──────────────────────────────────────────────── */
+.fan-chart-body { margin-top: .75rem; }
+.fan-main-svg { width: 100%; height: 180px; overflow: visible; }
+.fan-dot-label { font-size: 10px; font-weight: 700; font-family: 'Inter', sans-serif; }
+.fan-x-label   { font-size: 10px; fill: #94a3b8; font-family: 'Inter', sans-serif; }
+
+.fan-chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: .5rem;
+  font-size: .78rem;
+  font-weight: 600;
+  color: #64748b;
+}
+.fan-chart-normal { font-weight: 400; color: #94a3b8; }
+.fan-no-data { color: #94a3b8; font-size: .85rem; text-align: center; padding: 2rem 0; }
+
+/* ── Medication card ─────────────────────────────────────────────── */
+.fan-med-card { display: flex; flex-direction: column; gap: .25rem; }
+
+.fan-med-pct { font-size: 1.4rem; font-weight: 900; }
+
+.fan-med-card .donut-ring { margin: .5rem auto; display: block; }
+
+.fan-med-legend-row {
+  display: flex;
+  justify-content: space-around;
+  margin: .5rem 0 .75rem;
+}
+.fan-med-stat {
   display: flex;
   flex-direction: column;
-  gap: 1.2rem;
-  margin: 1.8rem 0;
-  flex-grow: 1;
-}
-
-.an-ins-item {
-  padding: 1.1rem;
-  border-radius: 12px;
-  background-color: #1e293b; /* Darker slate nested */
-}
-
-.an-ins-lbl {
-  font-size: 0.6rem;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  padding: 2px 8px;
-  border-radius: 6px;
-  display: inline-block;
-  margin-bottom: 8px;
-}
-
-.an-ins-lbl.warning { background-color: rgba(245, 158, 11, 0.15); color: #f59e0b; }
-.an-ins-lbl.trend { background-color: rgba(45, 212, 191, 0.15); color: #2dd4bf; }
-
-.an-ins-item-title {
-  font-size: 0.85rem;
+  align-items: center;
+  gap: .2rem;
+  font-size: .9rem;
   font-weight: 700;
-  color: white;
-  margin: 0 0 4px 0;
-}
-
-.an-ins-item-desc {
-  font-size: 0.76rem;
-  color: #cbd5e1;
-  line-height: 1.4;
-  margin: 0;
-}
-
-.an-generate-report-btn {
-  background-color: white;
   color: #0f172a;
-  border: none;
-  font-size: 0.82rem;
-  font-weight: 700;
-  padding: 0.75rem;
-  border-radius: 10px;
-  cursor: pointer;
+}
+.fan-med-stat small { font-size: .72rem; font-weight: 400; color: #94a3b8; }
+.fan-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-bottom: .1rem;
+}
+.fan-dot.green { background: #22c55e; }
+.fan-dot.amber { background: #f59e0b; }
+.fan-dot.red   { background: #ef4444; }
+
+.fan-med-list { display: flex; flex-direction: column; gap: .55rem; border-top: 1px solid #f1f5f9; padding-top: .75rem; }
+
+.fan-med-item {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+}
+.fan-med-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.fan-med-info { flex: 1; }
+.fan-med-name { font-size: .82rem; font-weight: 700; color: #0f172a; display: block; }
+.fan-med-dose { font-size: .72rem; font-weight: 400; color: #64748b; }
+.fan-med-freq { font-size: .72rem; color: #94a3b8; display: block; }
+.fan-med-adh  { font-size: .82rem; font-weight: 700; color: #00A896; flex-shrink: 0; }
+
+/* ══════════════════════════════════════════════════════════════════
+   ROW 3 — Meals + Mood + Insights
+══════════════════════════════════════════════════════════════════ */
+.fan-row-bot {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.25rem;
+}
+
+/* ── Meals ───────────────────────────────────────────────────────── */
+.fan-meals-list { display: flex; flex-direction: column; gap: .85rem; margin-top: .5rem; }
+.fan-meal-row { display: flex; align-items: center; gap: .75rem; }
+.fan-meal-label {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  width: 80px;
+  flex-shrink: 0;
+  font-size: .82rem;
+  font-weight: 600;
+  color: #475569;
+}
+.fan-meal-bar-wrap {
+  flex: 1;
+  background: #f1f5f9;
+  border-radius: 20px;
+  height: 8px;
+  overflow: hidden;
+}
+.fan-meal-bar {
+  height: 100%;
+  border-radius: 20px;
+  transition: width 1s ease;
+}
+.fan-meal-pct { font-size: .78rem; font-weight: 700; color: #475569; width: 34px; text-align: right; flex-shrink: 0; }
+
+/* ── Mood ────────────────────────────────────────────────────────── */
+.fan-mood-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem;
+  margin-top: .5rem;
+}
+.fan-mood-item {
+  background: #f8fafc;
+  border-radius: 14px;
+  padding: .85rem .6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .2rem;
+  transition: transform .2s;
+}
+.fan-mood-item:hover { transform: scale(1.04); }
+.fan-mood-emoji  { font-size: 1.6rem; }
+.fan-mood-pct    { font-size: 1.05rem; font-weight: 800; color: #0f172a; }
+.fan-mood-name   { font-size: .72rem; color: #94a3b8; font-weight: 500; }
+
+/* ── Insights ────────────────────────────────────────────────────── */
+.fan-insights-list { display: flex; flex-direction: column; gap: .65rem; margin-top: .25rem; }
+.fan-insight-item {
+  display: flex;
+  gap: .65rem;
+  align-items: flex-start;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: .75rem;
+  border-left: 3px solid #e2e8f0;
+}
+.fan-insight-item.positive      { border-left-color: #22c55e; background: #f0fdf4; }
+.fan-insight-item.trend         { border-left-color: #3b82f6; background: #eff6ff; }
+.fan-insight-item.recommendation{ border-left-color: #a855f7; background: #faf5ff; }
+.fan-insight-badge { font-size: 1.1rem; flex-shrink: 0; margin-top: .05rem; }
+.fan-insight-title { font-size: .84rem; font-weight: 700; color: #0f172a; margin-bottom: .2rem; }
+.fan-insight-desc  { font-size: .78rem; color: #64748b; line-height: 1.45; }
+
+.fan-report-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  transition: background-color 0.2s;
+  gap: .5rem;
+  width: 100%;
+  margin-top: 1rem;
+  padding: .65rem;
+  background: linear-gradient(135deg, #00A896, #007a6d);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: .85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity .2s, transform .18s;
 }
+.fan-report-btn:hover { opacity: .9; transform: translateY(-1px); }
 
-.an-generate-report-btn:hover {
-  background-color: #f1f5f9;
+/* ── Emergency strip ─────────────────────────────────────────────── */
+.fan-contact-strip {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  background: linear-gradient(135deg, #f0fdfa, #e6faf7);
+  border: 1.5px solid #99f6e4;
+  border-radius: 14px;
+  padding: .85rem 1.25rem;
+  font-size: .84rem;
+  color: #0f766e;
+  font-weight: 500;
+  flex-wrap: wrap;
 }
+.fan-contact-link {
+  margin-left: auto;
+  color: #00A896;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: .82rem;
+}
+.fan-contact-link:hover { text-decoration: underline; }
 
-/* RESPONSIVE LAYOUT */
+/* ══════════════════════════════════════════════════════════════════
+   Responsive
+══════════════════════════════════════════════════════════════════ */
 @media (max-width: 1024px) {
-  .an-content-grid {
-    grid-template-columns: 1fr;
-  }
+  .fan-row-top  { grid-template-columns: 1fr; }
+  .fan-row-mid  { grid-template-columns: 1fr; }
+  .fan-score-card { flex-direction: row; text-align: left; align-items: center; }
 }
 
 @media (max-width: 768px) {
-  .an-summary-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
-  .an-bottom-row {
-    grid-template-columns: 1fr;
-  }
-  
-  .an-header-panel {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .an-filter-row {
-    justify-content: space-between;
-  }
-  
-  /* Mobile Tab displays */
-  .an-mobile-tabs {
-    display: flex;
-    gap: 10px;
-    border-bottom: 2.5px solid #f1f5f9;
-    margin-bottom: 1.2rem;
-  }
-  
-  .an-mob-tab-btn {
-    flex-grow: 1;
-    background: none;
-    border: none;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #64748b;
-    padding: 10px 0;
-    cursor: pointer;
-    text-align: center;
-    position: relative;
-  }
-  
-  .an-mob-tab-btn.active {
-    color: #00A896;
-  }
-  
-  .an-mob-tab-btn.active::after {
-    content: "";
-    position: absolute;
-    bottom: -2.5px;
-    left: 0;
-    width: 100%;
-    height: 2.5px;
-    background-color: #00A896;
-  }
-  
-  .hide-mobile-view {
-    display: none !important;
-  }
+  .fan-wrap   { padding: 1rem; }
+  .fan-row-bot { grid-template-columns: 1fr; }
+  .fan-vitals-grid { grid-template-columns: 1fr 1fr; }
+  .fan-page-h1 { font-size: 1.3rem; }
+  .fan-topbar  { flex-direction: column; }
+  .fan-score-card { flex-direction: column; text-align: center; }
+}
+
+@media (max-width: 480px) {
+  .fan-vitals-grid { grid-template-columns: 1fr; }
+  .fan-chart-tabs  { gap: .3rem; }
+  .fan-chart-tab   { font-size: .7rem; padding: .2rem .55rem; }
 }
