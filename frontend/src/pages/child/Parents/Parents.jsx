@@ -5,7 +5,8 @@ import {
   Trash2, Edit2, X, MessageSquare, UserCheck,
   Clock, AlertTriangle, CheckCircle2, Shield,
   Search, Pill, Stethoscope, Heart, Activity,
-  PhoneCall, ChevronRight, UserPlus, Filter
+  PhoneCall, ChevronRight, UserPlus, Filter,
+  Sparkles, Check, MoreVertical
 } from 'lucide-react';
 import ChildLayout from '../../../layouts/ChildLayout';
 import api from '../../../services/api';
@@ -131,75 +132,79 @@ const Parents = () => {
   const totalAssigned = parents.filter(p => p.assigned_caregiver_id && p.assignment_status === 'approved').length;
 
   return (
-    <ChildLayout title="My Parents & Family">
-      <div className="pm-wrap">
+    <ChildLayout title="My Parents">
+      <div className="pc-page-wrapper">
 
-        {/* ── Top Hero Header ───────────────────────────────────────── */}
-        <div className="pm-hero-bar">
-          <div className="pm-hero-left">
-            <h1 className="pm-hero-title">
-              <span className="pm-hero-emoji">👨‍👩‍👧‍👦</span>
-              My Parents & Family Members
-            </h1>
-            <p className="pm-hero-sub">
-              Manage clinical profiles, care schedules, and direct caregiver connections
+        {/* ── Top Header Hero Section ──────────────────────────────── */}
+        <div className="pc-header-hero">
+          <div className="pc-hero-content">
+            <div className="pc-hero-badge">
+              <Sparkles size={13} className="pc-sparkle-icon" />
+              <span>Family Wellness & Care Hub</span>
+            </div>
+            <h1 className="pc-hero-heading">My Parents & Loved Ones</h1>
+            <p className="pc-hero-subheading">
+              Monitor vital signs, daily care schedules, medications, and assigned certified caregivers in real-time.
             </p>
           </div>
 
-          <div className="pm-hero-stats">
-            <div className="pm-stat-chip">
-              <span className="pm-stat-chip-num">{parents.length}</span>
-              <span className="pm-stat-chip-lbl">Registered</span>
+          <div className="pc-hero-actions">
+            <div className="pc-stats-pill-group">
+              <div className="pc-stat-pill">
+                <span className="pc-stat-pill-value">{parents.length}</span>
+                <span className="pc-stat-pill-label">Total Parents</span>
+              </div>
+              <div className="pc-stat-pill active">
+                <span className="pc-stat-pill-value">{totalAssigned}</span>
+                <span className="pc-stat-pill-label">In Active Care</span>
+              </div>
             </div>
-            <div className="pm-stat-chip active">
-              <span className="pm-stat-chip-num">{totalAssigned}</span>
-              <span className="pm-stat-chip-lbl">Active In-Care</span>
-            </div>
-            <Link to="/add-parent" className="pm-add-main-btn">
-              <Plus size={16} /> Add Family Member
+            <Link to="/add-parent" className="pc-btn-add-parent">
+              <Plus size={18} strokeWidth={2.5} />
+              <span>Add New Parent</span>
             </Link>
           </div>
         </div>
 
-        {/* ── Filter & Search Toolbar ──────────────────────────────── */}
-        <div className="pm-toolbar">
-          <div className="pm-search-wrap">
-            <Search size={16} className="pm-search-icon" />
+        {/* ── Search & Filter Controls ─────────────────────────────── */}
+        <div className="pc-control-bar">
+          <div className="pc-search-box">
+            <Search size={17} className="pc-search-icon" />
             <input
               type="text"
-              placeholder="Search by name, relationship, condition, or caregiver..."
+              placeholder="Search by name, condition, relationship, or caregiver..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="pm-search-input"
+              className="pc-search-input"
             />
             {searchTerm && (
-              <button onClick={() => setSearchTerm('')} className="pm-clear-btn">
+              <button onClick={() => setSearchTerm('')} className="pc-clear-search">
                 <X size={14} />
               </button>
             )}
           </div>
 
-          <div className="pm-filter-tabs">
+          <div className="pc-tab-filters">
             <button
-              className={`pm-filter-tab ${statusFilter === 'all' ? 'active' : ''}`}
+              className={`pc-tab-btn ${statusFilter === 'all' ? 'active' : ''}`}
               onClick={() => setStatusFilter('all')}
             >
-              All ({parents.length})
+              All Profiles ({parents.length})
             </button>
             <button
-              className={`pm-filter-tab ${statusFilter === 'assigned' ? 'active' : ''}`}
+              className={`pc-tab-btn ${statusFilter === 'assigned' ? 'active' : ''}`}
               onClick={() => setStatusFilter('assigned')}
             >
               Active Care ({totalAssigned})
             </button>
             <button
-              className={`pm-filter-tab ${statusFilter === 'pending' ? 'active' : ''}`}
+              className={`pc-tab-btn ${statusFilter === 'pending' ? 'active' : ''}`}
               onClick={() => setStatusFilter('pending')}
             >
               Pending ({parents.filter(p => p.assignment_status === 'pending').length})
             </button>
             <button
-              className={`pm-filter-tab ${statusFilter === 'unassigned' ? 'active' : ''}`}
+              className={`pc-tab-btn ${statusFilter === 'unassigned' ? 'active' : ''}`}
               onClick={() => setStatusFilter('unassigned')}
             >
               Unassigned ({parents.filter(p => !p.assigned_caregiver_id).length})
@@ -207,45 +212,46 @@ const Parents = () => {
           </div>
         </div>
 
-        {/* Error Alert */}
+        {/* ── Error Banner ─────────────────────────────────────────── */}
         {error && (
-          <div className="pm-error-banner">
-            <AlertTriangle size={16} />
+          <div className="pc-alert-banner">
+            <AlertTriangle size={17} />
             <span>{error}</span>
-            <button onClick={() => setError('')} className="pm-error-close"><X size={14} /></button>
+            <button onClick={() => setError('')} className="pc-alert-dismiss"><X size={14} /></button>
           </div>
         )}
 
-        {/* ── Content Area ─────────────────────────────────────────── */}
+        {/* ── Grid of Parents Cards ────────────────────────────────── */}
         {loading ? (
-          <div className="pm-loading-state">
-            <div className="pm-spinner"></div>
-            <p>Loading family profiles...</p>
+          <div className="pc-loading-container">
+            <div className="pc-spinner-ring"></div>
+            <p className="pc-loading-text">Loading parent profiles...</p>
           </div>
         ) : parents.length === 0 ? (
-          <div className="pm-empty-state">
-            <div className="pm-empty-icon-wrap">
-              <UserPlus size={44} className="pm-empty-icon" />
+          <div className="pc-empty-state-card">
+            <div className="pc-empty-icon-circle">
+              <UserPlus size={44} strokeWidth={1.8} />
             </div>
-            <h3 className="pm-empty-title">No Family Members Added Yet</h3>
-            <p className="pm-empty-desc">
-              Add your parents or loved ones to track their daily vitals, assign professional caregivers, and view real-time health updates.
+            <h3 className="pc-empty-title">No Family Profiles Yet</h3>
+            <p className="pc-empty-subtitle">
+              Add your parents to track their daily vitals, assign professional nurses, and receive automated health alerts.
             </p>
-            <Link to="/add-parent" className="pm-empty-btn">
-              <Plus size={16} /> Add Your First Parent
+            <Link to="/add-parent" className="pc-empty-cta-btn">
+              <Plus size={16} strokeWidth={2.5} />
+              <span>Add Your First Parent</span>
             </Link>
           </div>
         ) : filteredParents.length === 0 ? (
-          <div className="pm-empty-search">
-            <Search size={32} />
-            <h4>No matching profiles found</h4>
-            <p>Try refining your search terms or filter selection.</p>
-            <button onClick={() => { setSearchTerm(''); setStatusFilter('all'); }} className="pm-reset-btn">
+          <div className="pc-empty-filter-state">
+            <Search size={32} className="pc-empty-filter-icon" />
+            <h4>No matching parent profiles found</h4>
+            <p>Try refining your search keyword or selecting a different status filter tab.</p>
+            <button onClick={() => { setSearchTerm(''); setStatusFilter('all'); }} className="pc-reset-filters-btn">
               Reset Filters
             </button>
           </div>
         ) : (
-          <div className="pm-grid">
+          <div className="pc-cards-grid">
             {filteredParents.map(parent => {
               const seed = parent.name || 'avatar';
               const hasCaregiver = !!parent.assigned_caregiver_id;
@@ -254,51 +260,51 @@ const Parents = () => {
               const isApproved = hasCaregiver && !isPending && !isRejected;
 
               return (
-                <div key={parent.id} className="pm-card">
+                <div key={parent.id} className="pc-parent-card">
 
-                  {/* ── Card Top Header ── */}
-                  <div className="pm-card-top">
-                    <div className="pm-avatar-wrap">
+                  {/* 1. Header Banner & Identity */}
+                  <div className="pc-card-header">
+                    <div className="pc-avatar-container">
                       <img
                         src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed)}`}
                         alt={parent.name}
-                        className="pm-avatar"
+                        className="pc-avatar-img"
                       />
-                      <span className={`pm-avatar-badge ${isApproved ? 'active' : isPending ? 'pending' : 'idle'}`} />
+                      <span className={`pc-avatar-status-dot ${isApproved ? 'active' : isPending ? 'pending' : 'neutral'}`} />
                     </div>
 
-                    <div className="pm-name-section">
-                      <div className="pm-name-row">
-                        <h3 className="pm-name">{parent.name}</h3>
-                        <div className="pm-card-actions-quick">
+                    <div className="pc-identity-info">
+                      <div className="pc-identity-name-row">
+                        <h3 className="pc-parent-name">{parent.name}</h3>
+                        <div className="pc-card-tool-actions">
                           <button
                             onClick={() => startEdit(parent)}
-                            className="pm-icon-btn edit"
-                            title="Edit Profile"
+                            className="pc-tool-btn edit"
+                            title="Edit Parent Profile"
                           >
-                            <Edit2 size={14} />
+                            <Edit2 size={13} />
                           </button>
                           <button
                             onClick={() => handleDelete(parent.id, parent.name)}
-                            className="pm-icon-btn delete"
+                            className="pc-tool-btn delete"
                             title="Delete Profile"
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={13} />
                           </button>
                         </div>
                       </div>
 
-                      <div className="pm-meta-tags">
-                        <span className="pm-meta-pill primary">
+                      <div className="pc-badge-chips-row">
+                        <span className="pc-chip relationship">
                           {parent.relationship || 'Family Member'}
                         </span>
                         {parent.age && (
-                          <span className="pm-meta-pill neutral">
+                          <span className="pc-chip age">
                             {parent.age} yrs old
                           </span>
                         )}
                         {parent.gender && (
-                          <span className="pm-meta-pill neutral capitalize">
+                          <span className="pc-chip gender">
                             {parent.gender}
                           </span>
                         )}
@@ -306,170 +312,187 @@ const Parents = () => {
                     </div>
                   </div>
 
-                  {/* ── Contact Details ── */}
-                  <div className="pm-card-contact-strip">
-                    <div className="pm-contact-item">
-                      <Phone size={13} className="pm-c-icon" />
+                  {/* 2. Contact & Location Quick Strip */}
+                  <div className="pc-contact-strip">
+                    <div className="pc-contact-pill">
+                      <Phone size={12} className="pc-pill-icon" />
                       {parent.phone ? (
-                        <a href={`tel:${parent.phone}`} className="pm-contact-link">
+                        <a href={`tel:${parent.phone}`} className="pc-phone-link">
                           {parent.phone}
                         </a>
                       ) : (
-                        <span className="pm-contact-muted">No phone added</span>
+                        <span className="pc-muted-text">No phone added</span>
                       )}
                     </div>
-                    <div className="pm-contact-item">
-                      <MapPin size={13} className="pm-c-icon" />
-                      <span className="pm-contact-text" title={parent.address}>
-                        {parent.address || 'No address on file'}
+
+                    <div className="pc-contact-pill" title={parent.address || 'No address'}>
+                      <MapPin size={12} className="pc-pill-icon" />
+                      <span className="pc-address-truncate">
+                        {parent.address || 'No residential address'}
                       </span>
                     </div>
                   </div>
 
-                  {/* ── Caregiver Assignment Strip ── */}
-                  <div className="pm-card-section caregiver-section">
-                    <div className="pm-sec-head">
-                      <span className="pm-sec-label">ASSIGNED CAREGIVER</span>
+                  {/* 3. Assigned Caregiver Section */}
+                  <div className="pc-caregiver-section">
+                    <div className="pc-section-header">
+                      <span className="pc-sec-title">DEDICATED CAREGIVER</span>
                       {isApproved && (
-                        <span className="pm-status-pill approved">
+                        <span className="pc-status-badge approved">
                           <CheckCircle2 size={11} /> Active In-Care
                         </span>
                       )}
                       {isPending && (
-                        <span className="pm-status-pill pending">
+                        <span className="pc-status-badge pending">
                           <Clock size={11} /> Request Pending
                         </span>
                       )}
                       {isRejected && (
-                        <span className="pm-status-pill rejected">
+                        <span className="pc-status-badge rejected">
                           <AlertTriangle size={11} /> Declined
                         </span>
                       )}
                       {!hasCaregiver && (
-                        <span className="pm-status-pill unassigned">
+                        <span className="pc-status-badge unassigned">
                           Unassigned
                         </span>
                       )}
                     </div>
 
                     {parent.caregiver_name ? (
-                      <div className="pm-caregiver-card">
-                        <div className="pm-cg-avatar-wrap">
+                      <div className="pc-caregiver-box">
+                        <div className="pc-cg-avatar-wrapper">
                           <img
                             src={parent.caregiver_avatar_url || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(parent.caregiver_name)}`}
                             alt={parent.caregiver_name}
-                            className="pm-cg-avatar"
+                            className="pc-cg-avatar"
                           />
                         </div>
-                        <div className="pm-cg-info">
-                          <span className="pm-cg-name">{parent.caregiver_name}</span>
-                          <span className="pm-cg-spec">
-                            {parent.caregiver_specialization || 'General Eldercare Specialist'}
+                        <div className="pc-cg-details">
+                          <div className="pc-cg-name-row">
+                            <span className="pc-cg-name">{parent.caregiver_name}</span>
+                            <button
+                              onClick={() => startEdit(parent)}
+                              className="pc-cg-change-link"
+                            >
+                              Change
+                            </button>
+                          </div>
+                          <span className="pc-cg-specialty">
+                            {parent.caregiver_specialization || 'Certified Eldercare Specialist'}
                           </span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="pc-unassigned-box">
+                        <div className="pc-unassigned-text">
+                          <span>No caregiver assigned yet</span>
                         </div>
                         <button
                           onClick={() => startEdit(parent)}
-                          className="pm-cg-change-btn"
-                          title="Change Assigned Caregiver"
+                          className="pc-btn-assign-now"
                         >
-                          Change
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="pm-no-caregiver-box">
-                        <span>No caregiver assigned yet</span>
-                        <button
-                          onClick={() => startEdit(parent)}
-                          className="pm-assign-btn"
-                        >
-                          <Plus size={12} /> Assign Caregiver
+                          <Plus size={12} strokeWidth={2.5} />
+                          <span>Assign</span>
                         </button>
                       </div>
                     )}
 
                     {isRejected && (
-                      <div className="pm-decline-reason">
-                        <strong>Decline Note:</strong> {parent.rejection_reason || 'Caregiver currently at maximum patient capacity.'}
+                      <div className="pc-rejection-note">
+                        <strong>Reason:</strong> {parent.rejection_reason || 'Caregiver currently at maximum capacity.'}
                       </div>
                     )}
                   </div>
 
-                  {/* ── Medical Profile & Conditions ── */}
-                  <div className="pm-card-section medical-section">
-                    <div className="pm-sec-head">
-                      <span className="pm-sec-label">
-                        <HeartPulse size={13} className="pm-sec-icon" />
+                  {/* 4. Clinical & Health Highlights */}
+                  <div className="pc-medical-section">
+                    <div className="pc-section-header">
+                      <span className="pc-sec-title">
+                        <HeartPulse size={12} className="pc-sec-title-icon" />
                         CLINICAL PROFILE
                       </span>
                     </div>
 
-                    <div className="pm-med-grid">
-                      <div className="pm-med-box">
-                        <span className="pm-med-box-title">Conditions</span>
-                        <p className="pm-med-box-val">
-                          {parent.medical_conditions || 'None documented'}
-                        </p>
+                    <div className="pc-medical-tags-container">
+                      <div className="pc-med-field">
+                        <span className="pc-med-label">CONDITIONS:</span>
+                        <div className="pc-chips-flow">
+                          {parent.medical_conditions ? (
+                            parent.medical_conditions.split(',').map((cond, idx) => (
+                              <span key={idx} className="pc-tag condition">
+                                {cond.trim()}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="pc-tag neutral">None listed</span>
+                          )}
+                        </div>
                       </div>
-                      <div className="pm-med-box allergies">
-                        <span className="pm-med-box-title">Allergies</span>
-                        <p className="pm-med-box-val red">
-                          {parent.allergies || 'No known allergies'}
-                        </p>
+
+                      <div className="pc-med-field">
+                        <span className="pc-med-label">ALLERGIES:</span>
+                        <div className="pc-chips-flow">
+                          {parent.allergies ? (
+                            parent.allergies.split(',').map((alg, idx) => (
+                              <span key={idx} className="pc-tag allergy">
+                                {alg.trim()}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="pc-tag neutral">None listed</span>
+                          )}
+                        </div>
                       </div>
+
+                      {parent.current_medications && (
+                        <div className="pc-meds-bar">
+                          <Pill size={13} className="pc-meds-icon" />
+                          <span className="pc-meds-content">
+                            <strong>Meds:</strong> {parent.current_medications}
+                          </span>
+                        </div>
+                      )}
                     </div>
-
-                    {parent.current_medications && (
-                      <div className="pm-meds-strip">
-                        <Pill size={12} className="pm-pill-icon" />
-                        <span className="pm-meds-text">
-                          <strong>Meds:</strong> {parent.current_medications}
-                        </span>
-                      </div>
-                    )}
-
-                    {parent.emergency_contact_phone && (
-                      <div className="pm-emergency-strip">
-                        <PhoneCall size={12} />
-                        <span>
-                          Emergency: <strong>{parent.emergency_contact_name || 'Contact'}</strong> ({parent.emergency_contact_phone})
-                        </span>
-                      </div>
-                    )}
                   </div>
 
-                  {/* ── Card Action Links ── */}
-                  <div className="pm-card-footer">
+                  {/* 5. Card Bottom Action Buttons */}
+                  <div className="pc-card-footer">
                     <Link
                       to={`/health-feed?parent_id=${parent.id}`}
-                      className="pm-action-link primary"
+                      className="pc-action-btn primary"
                     >
-                      <Activity size={14} /> Health Feed
-                    </Link>
-
-                    <Link
-                      to={`/analytics?parent_id=${parent.id}`}
-                      className="pm-action-link secondary"
-                    >
-                      <HeartPulse size={14} /> Analytics
+                      <Activity size={14} />
+                      <span>Health Feed</span>
                     </Link>
 
                     {parent.caregiver_user_id ? (
                       <Link
                         to={`/messages?recipient=${parent.caregiver_user_id}&regardingName=${encodeURIComponent(parent.name)}`}
-                        className="pm-action-link chat"
+                        className="pc-action-btn chat"
                         title={`Chat with ${parent.caregiver_name}`}
                       >
-                        <MessageSquare size={14} /> Chat
+                        <MessageSquare size={14} />
+                        <span>Chat Caregiver</span>
                       </Link>
                     ) : (
                       <Link
                         to="/caregivers-list"
-                        className="pm-action-link browse"
-                        title="Browse Available Caregivers"
+                        className="pc-action-btn browse"
+                        title="Browse Caregivers"
                       >
-                        <UserCheck size={14} /> Browse
+                        <UserCheck size={14} />
+                        <span>Browse Carers</span>
                       </Link>
                     )}
+
+                    <Link
+                      to={`/analytics?parent_id=${parent.id}`}
+                      className="pc-action-btn icon-only"
+                      title="View Health Analytics"
+                    >
+                      <HeartPulse size={15} />
+                    </Link>
                   </div>
 
                 </div>
@@ -478,42 +501,40 @@ const Parents = () => {
           </div>
         )}
 
-        {/* ── Edit Parent Profile Modal ───────────────────────────────── */}
+        {/* ── Edit Parent Profile Modal ─────────────────────────────── */}
         {editingParent && (
-          <div className="pm-modal-overlay">
-            <div className="pm-modal-box">
-              <div className="pm-modal-header">
+          <div className="pc-modal-backdrop">
+            <div className="pc-modal-card">
+              <div className="pc-modal-head">
                 <div>
-                  <h3 className="pm-modal-title">Edit Parent Profile</h3>
-                  <p className="pm-modal-sub">Update contact info, medical details, or assigned caregiver</p>
+                  <h3 className="pc-modal-title">Edit Parent Profile</h3>
+                  <p className="pc-modal-desc">Update personal information, medical background, or assigned caregiver</p>
                 </div>
                 <button
                   onClick={() => setEditingParent(null)}
-                  className="pm-modal-close"
+                  className="pc-modal-btn-close"
                 >
                   <X size={18} />
                 </button>
               </div>
 
-              <form onSubmit={handleEditSubmit} className="pm-edit-form">
+              <form onSubmit={handleEditSubmit} className="pc-modal-form">
                 
-                {/* Personal Information */}
-                <div className="pm-form-group-title">Personal & Contact</div>
+                {/* Step 1: Personal Info */}
+                <div className="pc-form-section-title">Personal & Contact</div>
                 
-                <div className="pm-form-row">
-                  <div className="pm-field full">
-                    <label>Full Legal Name *</label>
-                    <input
-                      type="text"
-                      value={editForm.name || ''}
-                      onChange={e => setEditForm({ ...editForm, name: e.target.value })}
-                      required
-                    />
-                  </div>
+                <div className="pc-form-group">
+                  <label>Full Legal Name *</label>
+                  <input
+                    type="text"
+                    value={editForm.name || ''}
+                    onChange={e => setEditForm({ ...editForm, name: e.target.value })}
+                    required
+                  />
                 </div>
 
-                <div className="pm-form-row">
-                  <div className="pm-field">
+                <div className="pc-form-row three-col">
+                  <div className="pc-form-group">
                     <label>Age</label>
                     <input
                       type="number"
@@ -522,7 +543,7 @@ const Parents = () => {
                       placeholder="e.g. 72"
                     />
                   </div>
-                  <div className="pm-field">
+                  <div className="pc-form-group">
                     <label>Gender</label>
                     <select
                       value={editForm.gender || ''}
@@ -534,7 +555,7 @@ const Parents = () => {
                       <option value="other">Other</option>
                     </select>
                   </div>
-                  <div className="pm-field">
+                  <div className="pc-form-group">
                     <label>Relationship</label>
                     <input
                       type="text"
@@ -545,8 +566,8 @@ const Parents = () => {
                   </div>
                 </div>
 
-                <div className="pm-form-row">
-                  <div className="pm-field">
+                <div className="pc-form-row two-col">
+                  <div className="pc-form-group">
                     <label>Phone Number</label>
                     <input
                       type="text"
@@ -555,20 +576,20 @@ const Parents = () => {
                       placeholder="+1 (555) 000-0000"
                     />
                   </div>
-                  <div className="pm-field full">
+                  <div className="pc-form-group">
                     <label>Residential Address</label>
                     <input
                       type="text"
                       value={editForm.address || ''}
                       onChange={e => setEditForm({ ...editForm, address: e.target.value })}
-                      placeholder="Street address, city, state"
+                      placeholder="Street address, city"
                     />
                   </div>
                 </div>
 
-                {/* Caregiver Assignment */}
-                <div className="pm-form-group-title">Caregiver Assignment</div>
-                <div className="pm-field full pm-caregiver-select-box">
+                {/* Step 2: Caregiver Assignment */}
+                <div className="pc-form-section-title">Caregiver Assignment</div>
+                <div className="pc-form-group pc-caregiver-select-card">
                   <label>Assign Dedicated Caregiver</label>
                   <select
                     value={editForm.assigned_caregiver_id || ''}
@@ -581,26 +602,26 @@ const Parents = () => {
                       </option>
                     ))}
                   </select>
-                  <p className="pm-select-hint">
-                    Caregivers will receive a care assignment request upon selecting them.
-                  </p>
+                  <span className="pc-select-subtext">
+                    Selecting a caregiver sends an instant notification request for their approval.
+                  </span>
                 </div>
 
-                {/* Clinical & Medical Details */}
-                <div className="pm-form-group-title">Clinical Profile</div>
+                {/* Step 3: Medical Background */}
+                <div className="pc-form-section-title">Clinical Profile</div>
 
-                <div className="pm-field full">
-                  <label>Medical Conditions</label>
+                <div className="pc-form-group">
+                  <label>Medical Conditions (Comma separated)</label>
                   <textarea
                     rows="2"
                     value={editForm.medical_conditions || ''}
                     onChange={e => setEditForm({ ...editForm, medical_conditions: e.target.value })}
-                    placeholder="e.g. Hypertension, Type 2 Diabetes, Mild Arthritis"
+                    placeholder="e.g. Hypertension, Diabetes, Arthritis"
                   />
                 </div>
 
-                <div className="pm-form-row">
-                  <div className="pm-field">
+                <div className="pc-form-row two-col">
+                  <div className="pc-form-group">
                     <label>Allergies</label>
                     <input
                       type="text"
@@ -609,19 +630,19 @@ const Parents = () => {
                       placeholder="e.g. Penicillin, Peanuts"
                     />
                   </div>
-                  <div className="pm-field">
+                  <div className="pc-form-group">
                     <label>Current Medications</label>
                     <input
                       type="text"
                       value={editForm.current_medications || ''}
                       onChange={e => setEditForm({ ...editForm, current_medications: e.target.value })}
-                      placeholder="e.g. Lisinopril 10mg, Metformin 500mg"
+                      placeholder="e.g. Metformin 500mg, Lisinopril"
                     />
                   </div>
                 </div>
 
-                <div className="pm-form-row">
-                  <div className="pm-field">
+                <div className="pc-form-row two-col">
+                  <div className="pc-form-group">
                     <label>Emergency Contact Name</label>
                     <input
                       type="text"
@@ -630,7 +651,7 @@ const Parents = () => {
                       placeholder="e.g. Dr. Robert Vance"
                     />
                   </div>
-                  <div className="pm-field">
+                  <div className="pc-form-group">
                     <label>Emergency Contact Phone</label>
                     <input
                       type="text"
@@ -641,20 +662,20 @@ const Parents = () => {
                   </div>
                 </div>
 
-                <div className="pm-modal-actions">
+                <div className="pc-modal-foot">
                   <button
                     type="button"
                     onClick={() => setEditingParent(null)}
-                    className="pm-btn-cancel"
+                    className="pc-btn-modal-cancel"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="pm-btn-save"
+                    className="pc-btn-modal-save"
                     disabled={saving}
                   >
-                    {saving ? 'Saving Changes...' : 'Save Changes'}
+                    {saving ? 'Saving...' : 'Save Profile'}
                   </button>
                 </div>
               </form>
