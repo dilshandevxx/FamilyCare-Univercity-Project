@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
+import GoogleSignInButton from '../../../components/Auth/GoogleSignInButton';
 import './Register.css';
 
 /* ── Legal Modal ──────────────────────────────────────────────────────────── */
@@ -155,9 +156,31 @@ const Register = () => {
   const [openModal, setOpenModal] = useState(null);
 
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register, googleLogin } = useAuth();
 
   const handleRoleChange = (role) => { setSelectedRole(role); setStep(1); setError(''); };
+
+  const handleGoogleSuccess = async (googlePayload) => {
+    setError('');
+    setIsLoading(true);
+    try {
+      const data = await googleLogin({
+        ...googlePayload,
+        relationship: selectedRole === 'family' ? relationship : undefined,
+        specialization: selectedRole === 'caregiver' ? specialization : undefined,
+        experience_years: selectedRole === 'caregiver' ? experienceYears : undefined,
+        hourly_rate: selectedRole === 'caregiver' ? hourlyRate : undefined,
+        certification: selectedRole === 'caregiver' ? certification : undefined,
+        license_id: selectedRole === 'caregiver' ? licenseId : undefined,
+        bio: selectedRole === 'caregiver' ? bio : undefined,
+      });
+      navigate(data.role === 'caregiver' ? '/caregiver/dashboard' : '/dashboard');
+    } catch (err) {
+      setError(err?.response?.data?.error || 'Google registration failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Password strength
   const getStrength = () => {
@@ -322,6 +345,19 @@ const Register = () => {
             {/* ══ STEP 1: Account Info ══ */}
             {step === 1 && (
               <form onSubmit={handleStep1} className="reg-form slide-in">
+
+                {/* Quick Google Sign Up */}
+                <GoogleSignInButton 
+                  mode="register"
+                  role={selectedRole}
+                  onSuccess={handleGoogleSuccess}
+                  onError={(msg) => setError(msg)}
+                />
+
+                <div className="auth-divider" style={{ margin: '1rem 0 1.25rem 0' }}>
+                  <span>or register with email</span>
+                </div>
+
                 <div className="reg-field-grid">
                   <Field label="Full Name" required>
                     <Input type="text" value={name} onChange={e => setName(e.target.value)}

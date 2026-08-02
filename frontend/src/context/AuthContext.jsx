@@ -47,13 +47,21 @@ export const AuthProvider = ({ children }) => {
     } catch {}
   };
 
+  const googleLogin = async (googlePayload) => {
+    const { data } = await api.post('/auth/google', googlePayload);
+    localStorage.setItem('token', data.token);
+    const { data: profile } = await api.get('/users/profile');
+    setUser(profile);
+    return data;
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading, refreshUser }}>
+    <AuthContext.Provider value={{ user, login, register, googleLogin, logout, loading, refreshUser }}>
       {!loading && children}
     </AuthContext.Provider>
   );

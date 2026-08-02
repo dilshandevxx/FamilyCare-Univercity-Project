@@ -263,4 +263,129 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = { register, login, validate2FA, forgotPassword, resetPassword };
+// POST /api/auth/google - Direct Google Identity Services (GIS) ID Token Verification
+const googleAuth = async (req, res) => {
+  const {
+    credential,
+    role,
+    relationship,
+    specialization,
+    experience_years,
+    certification,
+    license_id,
+    hourly_rate,
+    bio,
+  } = req.body;
+
+  if (!credential) {
+    return res.status(400).json({ error: 'Google credential token is required' });
+  }
+
+  try {
+    // Verify credential token with Google's public tokeninfo endpoint
+    const googleRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
+    const googleData = await googleRes.json();
+
+    if (!googleRes.ok || !googleData.email) {
+      return res.status(401).json({ error: googleData.error_description || 'Invalid or expired Google token' });
+    }
+
+    const { email, name, picture, sub: googleId } = googleData;
+    const dbRole = ROLE_MAP[role] || (role === 'caregiver' ? 'caregiver' : 'child');
+
+    // Check if user already exists
+    const [existing] = await pool.query('SELECT * FROM users WHERE email = ? OR google_id = ?', [email, googleId]);
+
+    let user;
+    if (existing.length > 0) {
+      user = existing[0];
+
+      // Update google_id and avatar if missing
+      const updates = [];
+      const params = [];
+      if (!user.google_id && googleId) {
+        updates.push('google_id = ?');
+        params.push(googleId);
+      }
+      if (!user.avatar_url && picture) {
+        updates.push('avatar_url = ?');
+        params.push(picture);
+      }
+      if (user.auth_provider === 'local') {
+        updates.push('auth_provider = ?');
+        params.push('google');
+      }
+      if (updates.length > 0) {
+        params.push(user.id);
+        await pool.query(`UPDATE users SET ${updates.join(', ')} WHERE id = ?`, params);
+        const [updatedRows] = await pool.query('SELECT * FROM users WHERE id = ?', [user.id]);
+        user = updatedRows[0];
+      }
+
+      // If user is caregiver, ensure row exists in caregivers table
+      if (user.role === 'caregiver') {
+        await pool.query(
+          'INSERT IGNORE INTO caregivers (user_id, name, is_available, status) VALUES (?, ?, TRUE, "approved")',
+          [user.id, user.name]
+        );
+      }
+    } else {
+      // Create new user with Google details
+      const [insertResult] = await pool.query(
+        'INSERT INTO users (name, email, password, google_id, role, auth_provider, avatar_url) VALUES (?, ?, NULL, ?, ?, "google", ?)',
+        [name || email.split('@')[0], email, googleId, dbRole, picture || null]
+      );
+
+      const userId = insertResult.insertId;
+
+      if (dbRole === 'child') {
+        await pool.query(
+          'INSERT INTO family_profiles (user_id, relationship) VALUES (?, ?)',
+          [userId, relationship || 'Family Member']
+        );
+      } else if (dbRole === 'caregiver') {
+        await pool.query(
+          `INSERT INTO caregivers 
+            (user_id, name, specialization, experience_years, certification, license_id, hourly_rate, bio, is_available, status)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, TRUE, 'pending')`,
+          [
+            userId,
+            name || email.split('@')[0],
+            specialization || 'General Elder Care',
+            experience_years || '1-3 years',
+            certification || null,
+            license_id || null,
+            hourly_rate ? parseFloat(hourly_rate) : 25.00,
+            bio || 'Dedicated professional caregiver committed to high quality care and wellness.',
+          ]
+        );
+      }
+
+      const [newRows] = await pool.query('SELECT * FROM users WHERE id = ?', [userId]);
+      user = newRows[0];
+    }
+
+    // Generate JWT token
+    const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    });
+
+    res.json({
+      message: 'Google authentication successful',
+      token,
+      role: user.role,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        avatar_url: user.avatar_url,
+      },
+    });
+  } catch (err) {
+    console.error('Google Auth Error:', err);
+    res.status(500).json({ error: 'Failed to authenticate with Google: ' + err.message });
+  }
+};
+
+module.exports = { register, login, validate2FA, forgotPassword, resetPassword, googleAuth };

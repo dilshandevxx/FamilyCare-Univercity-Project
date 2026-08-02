@@ -1,0 +1,81 @@
+.google-auth-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.google-gis-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.google-rendered-btn {
+  width: 100% !important;
+  display: flex;
+  justify-content: center;
+}
+
+.google-custom-btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0.7rem 1.2rem;
+  background: #ffffff;
+  color: #1f2937;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  text-decoration: none;
+}
+
+.google-custom-btn:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.google-custom-btn:active:not(:disabled) {
+  transform: translateY(0);
+  background: #f3f4f6;
+}
+
+.google-custom-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.google-btn-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.google-btn-label {
+  color: #374151;
+  letter-spacing: -0.01em;
+}
+
+.google-btn-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #00A896;
+  border-radius: 50%;
+  animation: google-spin 0.8s linear infinite;
+}
+
+@keyframes google-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
