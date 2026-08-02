@@ -365,14 +365,14 @@ const googleAuth = async (req, res) => {
       // If user is caregiver, ensure row exists in caregivers table
       if (user.role === 'caregiver') {
         await pool.query(
-          'INSERT IGNORE INTO caregivers (user_id, name, is_available, status) VALUES (?, ?, TRUE, "approved")',
+          "INSERT IGNORE INTO caregivers (user_id, name, is_available, status) VALUES (?, ?, TRUE, 'approved')",
           [user.id, user.name]
         );
       }
     } else {
       // Create new user with Google details
       const [insertResult] = await pool.query(
-        'INSERT INTO users (name, email, password, google_id, role, auth_provider, avatar_url) VALUES (?, ?, NULL, ?, ?, "google", ?)',
+        "INSERT INTO users (name, email, password, google_id, role, auth_provider, avatar_url) VALUES (?, ?, NULL, ?, ?, 'google', ?)",
         [name || email.split('@')[0], email, googleId, dbRole, picture || null]
       );
 
