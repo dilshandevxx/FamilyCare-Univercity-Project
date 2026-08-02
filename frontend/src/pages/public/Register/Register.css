@@ -21,29 +21,58 @@
   height: 100vh;
   overflow: hidden;
   position: relative;
-  background: linear-gradient(145deg, #0a2520 0%, #0f3d35 45%, #00a896 100%);
+  background: #041a17;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 3rem 3.5rem;
 }
 
-/* Decorative circles */
-.reg-circle {
+/* ── Photographic Background & Cinematic Gradient ── */
+.reg-hero-img-container {
   position: absolute;
-  border-radius: 50%;
-  background: rgba(0, 201, 181, 0.12);
-  pointer-events: none;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
 }
 
-.reg-circle-1 { width: 460px; height: 460px; top: -150px; left: -130px; }
-.reg-circle-2 { width: 300px; height: 300px; bottom: -80px; right: -80px; opacity: 0.08; }
-.reg-circle-3 { width: 150px; height: 150px; bottom: 35%; left: 18%; opacity: 0.15; }
+.reg-hero-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%;
+  transform: scale(1.05);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: brightness(0.85) contrast(1.08);
+}
+
+.reg-hero-panel:hover .reg-hero-bg-img {
+  transform: scale(1.09);
+}
+
+.reg-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(3, 20, 18, 0.45) 0%,
+    rgba(4, 25, 22, 0.7) 40%,
+    rgba(3, 19, 17, 0.95) 85%,
+    #021210 100%
+  );
+  backdrop-filter: blur(0.5px);
+}
 
 .reg-hero-content {
   position: relative;
   z-index: 2;
-  max-width: 440px;
+  max-width: 460px;
   width: 100%;
 }
 
@@ -51,7 +80,7 @@
 .reg-brand {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
   margin-bottom: 2rem;
   text-decoration: none;
   width: fit-content;
@@ -59,7 +88,7 @@
   transition: opacity 0.18s ease;
 }
 
-.reg-brand:hover { opacity: 0.75; }
+.reg-brand:hover { opacity: 0.85; }
 
 /* ── Back to Home link (form panel) ── */
 .reg-home-link {
@@ -77,41 +106,50 @@
 .reg-home-link:hover { color: #0f172a; }
 
 .reg-brand-icon {
-  width: 34px;
-  height: 34px;
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: 9px;
+  width: 38px;
+  height: 38px;
+  background: rgba(255,255,255,0.14);
+  border: 1px solid rgba(255,255,255,0.28);
+  border-radius: 11px;
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
   flex-shrink: 0;
 }
 
 .reg-brand-name {
-  font-size: 1.1rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  font-weight: 800;
   color: #ffffff;
   letter-spacing: -0.02em;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .reg-hero-title {
   font-size: 2.125rem;
   font-weight: 800;
   color: #ffffff;
-  line-height: 1.2;
+  line-height: 1.22;
   letter-spacing: -0.04em;
   margin: 0 0 0.875rem 0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
 }
 
-.reg-hero-title span { color: #5eead4; }
+.reg-hero-title span {
+  color: #5eead4;
+  background: linear-gradient(120deg, #5eead4 0%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
 .reg-hero-desc {
   font-size: 0.9375rem;
-  color: rgba(255,255,255,0.65);
-  line-height: 1.65;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.6;
   margin: 0 0 2rem 0;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
 }
 
 /* Features */
@@ -132,14 +170,14 @@
   width: 38px;
   height: 38px;
   min-width: 38px;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.18);
-  border-radius: 9px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #5eead4;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
 }
 
 .reg-feature-text { display: flex; flex-direction: column; gap: 0.15rem; padding-top: 2px; }
@@ -147,45 +185,81 @@
 .reg-feature-text strong {
   font-size: 0.875rem;
   font-weight: 700;
-  color: rgba(255,255,255,0.95);
+  color: rgba(255,255,255,0.98);
 }
 
 .reg-feature-text span {
   font-size: 0.8rem;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255,255,255,0.72);
   line-height: 1.4;
 }
 
-/* Avatar row */
-.reg-hero-users {
+/* Trust Box & Metrics */
+.reg-hero-trust-box {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  background: rgba(255,255,255,0.07);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 100px;
-  padding: 0.5rem 0.875rem;
-  width: fit-content;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  padding: 14px 18px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 
-.reg-avatars { display: flex; align-items: center; }
+.reg-trust-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-.reg-avatar {
-  width: 26px;
-  height: 26px;
+.reg-trust-pulse {
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #00C9B5, #0077be);
-  border: 2px solid rgba(255,255,255,0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: white;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
 }
 
-.reg-hero-users p { font-size: 0.8rem; color: rgba(255,255,255,0.7); margin: 0; white-space: nowrap; }
-.reg-hero-users strong { color: #ffffff; }
+.reg-trust-badge strong {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #5eead4;
+  letter-spacing: 0.02em;
+}
+
+.reg-hero-metrics {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.reg-metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.reg-metric strong {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.reg-metric span {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.reg-metric-sep {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.2);
+}
 
 
 /* ═══════════════════════════════════════════════════════════
