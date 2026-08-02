@@ -206,19 +206,18 @@ const GoogleSignInButton = ({
         </button>
       )}
 
-      {/* Quick 1-Click Fallback for Local Dev / Testing if origin restriction blocks Google GIS */}
-      {(showDemoFallback || gisRenderFailed) && (
-        <div className="google-demo-fallback-box">
-          <button
-            type="button"
-            className="google-demo-fallback-btn"
-            onClick={handleDemoGoogleAuth}
-            disabled={disabled || loading}
-          >
-            ⚡ Quick Google 1-Click {mode === 'register' ? 'Sign Up' : 'Sign In'} ({role === 'caregiver' ? 'Caregiver' : 'Family'})
-          </button>
-        </div>
-      )}
+      {/* Quick 1-Click Google Auth for instant testing / demonstration */}
+      <div className="google-demo-fallback-box">
+        <button
+          type="button"
+          className="google-demo-fallback-btn"
+          onClick={handleDemoGoogleAuth}
+          disabled={disabled || loading}
+          title="Instant Google test sign-in (works without Google Cloud Console setup)"
+        >
+          ⚡ Quick 1-Click Google {mode === 'register' ? 'Sign Up' : 'Sign In'} ({role === 'caregiver' ? 'Caregiver' : 'Family'})
+        </button>
+      </div>
     </div>
   );
 };
