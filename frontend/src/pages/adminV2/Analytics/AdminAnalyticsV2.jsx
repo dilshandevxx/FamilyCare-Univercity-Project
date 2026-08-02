@@ -7,6 +7,14 @@ import './AdminAnalyticsV2.css';
 const AdminAnalyticsV2 = () => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState('30D');
+
+  const filterOptions = [
+    { label: '7 Days', value: '7D' },
+    { label: '30 Days', value: '30D' },
+    { label: 'YTD', value: 'YTD' },
+    { label: 'All Time', value: 'ALL' }
+  ];
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -21,7 +29,7 @@ const AdminAnalyticsV2 = () => {
       }
     };
     fetchAnalytics();
-  }, []);
+  }, [timeRange]); // Dependency on timeRange if backend supports it later
 
   if (loading || !data) {
     return (
@@ -84,6 +92,22 @@ const AdminAnalyticsV2 = () => {
     <AdminLayoutV2 title="System Performance Analytics">
       <div className="analytics-v2-container">
         
+        {/* Header and Filter Controls */}
+        <div className="analytics-v2-header-section">
+          <h2 className="analytics-v2-header-title">Analytics Overview</h2>
+          <div className="analytics-filter-bar">
+            {filterOptions.map(option => (
+              <button
+                key={option.value}
+                className={`analytics-filter-btn ${timeRange === option.value ? 'active' : ''}`}
+                onClick={() => setTimeRange(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Core metrics overview */}
         <div className="analytics-v2-metrics-grid">
           <div className="analytics-v2-metric-box">
