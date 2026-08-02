@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const { performance } = require('perf_hooks');
 const pool = require('../config/db');
 const os = require('os');
 
@@ -592,7 +593,18 @@ const updateAdminSettings = async (req, res) => {
 
 const getSystemStatus = async (req, res) => {
   try {
-    const [db] = await pool.query('SELECT 1');
+    const dbStart = performance.now();
+    await pool.query('SELECT 1');
+    const dbEnd = performance.now();
+    const latencyMs = Math.round(dbEnd - dbStart);
+
+    // MySQL connection pool stats
+    let activeConnections = 0;
+    let poolLimit = 10;
+    if (pool.pool) {
+      activeConnections = pool.pool._allConnections.length - pool.pool._freeConnections.length;
+      poolLimit = pool.pool.config.connectionLimit || 10;
+    }
     
     const cpu = getCpuUtilization();
     const totalMem = os.totalmem();
@@ -606,14 +618,20 @@ const getSystemStatus = async (req, res) => {
       uptime: process.uptime(),
       cpu,
       ram,
-      ramDetails
+      ramDetails,
+      activeConnections,
+      poolLimit,
+      latencyMs
     });
   } catch (err) {
     res.json({ 
       dbStatus: 'Unknown',
       cpu: 0,
       ram: 0,
-      ramDetails: '— GB of — GB assigned'
+      ramDetails: '— GB of — GB assigned',
+      activeConnections: 0,
+      poolLimit: 10,
+      latencyMs: 0
     });
   }
 };
