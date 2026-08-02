@@ -310,31 +310,74 @@ const getPendingCaregivers = async (req, res) => {
   }
 };
 
-// ── PUT /api/admin/caregivers/:id/approve ───────────────────────
-const approveCaregiver = async (req, res) => {
+// ── GET /api/admin/caregivers/pending/count ───────────────────────
+// Lightweight badge count — how many caregivers are awaiting approval
+const getPendingCaregiversCount = async (req, res) => {
   try {
-    const [result] = await pool.query(
-      "UPDATE caregivers SET status = 'approved' WHERE id = ?",
-      [req.params.id]
+    const [[{ count }]] = await pool.query(
+      "SELECT COUNT(*) AS count FROM caregivers WHERE status = 'pending'"
     );
-    if (result.affectedRows === 0)
-      return res.status(404).json({ error: 'Caregiver not found' });
-    res.json({ message: 'Caregiver approved' });
+    res.json({ count: Number(count) });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// ── PUT /api/admin/caregivers/:id/reject ────────────────────────
-const rejectCaregiver = async (req, res) => {
+// ── PUT /api/admin/caregivers/:id/approve ───────────────────────────────────
+const approveCaregiver = async (req, res) => {
   try {
     const [result] = await pool.query(
-      "UPDATE caregivers SET status = 'rejected' WHERE id = ?",
+      `UPDATE caregivers
+       SET status = 'approved',
+           approved_at = NOW()
+       WHERE id = ? AND status = 'pending'`,
       [req.params.id]
+    );
+    if (result.affectedRows === 0) {
+      // May already be approved, or not found
+      const [[existing]] = await pool.query('SELECT id, status FROM caregivers WHERE id = ?', [req.params.id]);
+      if (!existing) return res.status(404).json({ error: 'Caregiver not found' });
+      if (existing.status === 'approved') return res.json({ message: 'Caregiver already approved' });
+    }
+
+    // Return the updated caregiver for optimistic UI
+    const [[updated]] = await pool.query(
+      `SELECT c.id, COALESCE(c.name, u.name) AS name, c.status, c.specialization,
+              c.hourly_rate, u.email
+       FROM caregivers c LEFT JOIN users u ON u.id = c.user_id
+       WHERE c.id = ?`,
+      [req.params.id]
+    );
+    res.json({ message: 'Caregiver approved', caregiver: updated });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// ── PUT /api/admin/caregivers/:id/reject ────────────────────────────────────
+const rejectCaregiver = async (req, res) => {
+  const { reason } = req.body; // optional rejection reason
+  try {
+    const [result] = await pool.query(
+      `UPDATE caregivers
+       SET status = 'rejected',
+           rejection_reason = ?,
+           rejected_at = NOW()
+       WHERE id = ?`,
+      [reason || null, req.params.id]
     );
     if (result.affectedRows === 0)
       return res.status(404).json({ error: 'Caregiver not found' });
-    res.json({ message: 'Caregiver rejected' });
+
+    // Return the updated caregiver for optimistic UI
+    const [[updated]] = await pool.query(
+      `SELECT c.id, COALESCE(c.name, u.name) AS name, c.status, c.specialization,
+              c.hourly_rate, u.email
+       FROM caregivers c LEFT JOIN users u ON u.id = c.user_id
+       WHERE c.id = ?`,
+      [req.params.id]
+    );
+    res.json({ message: 'Caregiver rejected', caregiver: updated });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -735,6 +778,7 @@ module.exports = {
   updateUserRole,
   deleteUser,
   getPendingCaregivers,
+  getPendingCaregiversCount,
   approveCaregiver,
   rejectCaregiver,
   getAdminHealthLogs,

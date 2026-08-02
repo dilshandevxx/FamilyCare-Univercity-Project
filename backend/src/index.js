@@ -105,6 +105,21 @@ async function runMigrations() {
       console.log('✅ Migration: added caregivers.status (existing rows set to approved)');
     }
   } catch (err) { console.warn('⚠️  Migration (caregivers.status):', err.message); }
+
+  // ── caregivers audit-trail columns ────────────────────────────
+  const cgAuditCols = [
+    ['approved_at',       'ADD COLUMN approved_at DATETIME NULL'],
+    ['rejected_at',       'ADD COLUMN rejected_at DATETIME NULL'],
+    ['rejection_reason',  'ADD COLUMN rejection_reason TEXT NULL'],
+  ];
+  for (const [col, ddl] of cgAuditCols) {
+    try {
+      if (!(await columnExists('caregivers', col))) {
+        await pool.query(`ALTER TABLE caregivers ${ddl}`);
+        console.log(`✅ Migration: added caregivers.${col}`);
+      }
+    } catch (err) { console.warn(`⚠️  Migration (caregivers.${col}):`, err.message); }
+  }
   // ── settings table ──────────────────────────────────────────────
   try {
     await pool.query(`

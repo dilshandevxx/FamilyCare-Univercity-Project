@@ -20,8 +20,10 @@ const findOrCreateOAuthUser = async (profile, provider, requestedRole = 'child')
       await pool.query('UPDATE users SET google_id = ?, auth_provider = ?, avatar_url = COALESCE(avatar_url, ?) WHERE id = ?', [googleId, provider, avatar, user.id]);
     }
     if (user.role === 'caregiver') {
+      // INSERT IGNORE = no-op if row already exists, so existing 'approved' status is preserved.
+      // If for some reason the caregivers row is missing, it's created as 'pending'.
       await pool.query(
-        'INSERT IGNORE INTO caregivers (user_id, name, is_available, status) VALUES (?, ?, TRUE, "approved")',
+        'INSERT IGNORE INTO caregivers (user_id, name, is_available, status) VALUES (?, ?, TRUE, "pending")',
         [user.id, user.name]
       );
     }

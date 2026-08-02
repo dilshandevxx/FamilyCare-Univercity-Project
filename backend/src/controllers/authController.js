@@ -386,10 +386,11 @@ const googleAuth = async (req, res) => {
         user = updatedRows[0];
       }
 
-      // If user is caregiver, ensure row exists in caregivers table
+      // If user is caregiver, ensure a caregivers row exists — preserve whatever
+      // status is already set; do NOT force 'approved' on login.
       if (user.role === 'caregiver') {
         await pool.query(
-          "INSERT IGNORE INTO caregivers (user_id, name, is_available, status) VALUES (?, ?, TRUE, 'approved')",
+          "INSERT IGNORE INTO caregivers (user_id, name, is_available, status) VALUES (?, ?, TRUE, 'pending')",
           [user.id, user.name]
         );
       }
@@ -408,17 +409,18 @@ const googleAuth = async (req, res) => {
           [userId, relationship || 'Family Member']
         );
       } else if (dbRole === 'caregiver') {
+        // New caregiver via Google — starts PENDING, awaiting admin approval
         await pool.query(
           `INSERT INTO caregivers 
             (user_id, name, specialization, experience_years, certification, license_id, hourly_rate, bio, is_available, status)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, TRUE, 'approved')`,
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, TRUE, 'pending')`,
           [
             userId,
             name || email.split('@')[0],
             specialization || 'General Elder Care',
             experience_years || '1-3 years',
-            certification || 'Certified Caregiver',
-            license_id || 'LIC-G-' + userId,
+            certification || null,
+            license_id || null,
             hourly_rate ? parseFloat(hourly_rate) : 25.00,
             bio || 'Dedicated professional caregiver committed to high quality care and wellness.',
           ]

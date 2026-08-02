@@ -14,6 +14,7 @@ const {
   updateUserRole,
   deleteUser,
   getPendingCaregivers,
+  getPendingCaregiversCount,
   approveCaregiver,
   rejectCaregiver,
   getAdminHealthLogs,
@@ -48,7 +49,8 @@ router.put('/residents/:id',                  updateResident);
 router.put('/residents/:id/assign',           assignCaregiver);
 router.delete('/residents/:id',               deleteResident);
 
-// Caregivers — pending approval must come before /:id routes
+// Caregivers — specific named routes must come before /:id wildcard routes
+router.get('/caregivers/pending/count',       getPendingCaregiversCount);
 router.get('/caregivers/pending',             getPendingCaregivers);
 router.put('/caregivers/:id/approve',         approveCaregiver);
 router.put('/caregivers/:id/reject',          rejectCaregiver);
