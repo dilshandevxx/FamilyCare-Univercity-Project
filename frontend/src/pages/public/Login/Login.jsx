@@ -223,37 +223,35 @@ const Login = () => {
           {/* ── Right Form Side ── */}
           <div className="login-card-form">
 
-            {/* Mode Switcher (Sign In / Register Link) */}
-            <div className="login-mode-tabs">
-              <button type="button" className="login-mode-tab active">
-                Sign In
-              </button>
-              <Link to="/register" className="login-mode-tab">
-                Create Account
-              </Link>
+            {/* Clean Modern Form Header */}
+            <div className="login-form-header">
+              <h1 className="login-form-title">Welcome back</h1>
+              <p className="login-form-subtitle">
+                Please enter your credentials to sign in to your portal.
+              </p>
             </div>
 
-            {/* Role Switcher */}
-            <div className="login-role-switch">
+            {/* Modern Segmented Role Switcher */}
+            <div className="login-segmented-control">
               <button
                 type="button"
-                className={`login-role-btn ${selectedRole === 'family' ? 'active' : ''}`}
+                className={`login-segment-btn ${selectedRole === 'family' ? 'active' : ''}`}
                 onClick={() => { setSelectedRole('family'); setError(''); }}
               >
-                <Heart size={15} />
+                <Heart size={16} className="segment-icon" />
                 <span>Family Member</span>
               </button>
               <button
                 type="button"
-                className={`login-role-btn ${selectedRole === 'caregiver' ? 'active' : ''}`}
+                className={`login-segment-btn ${selectedRole === 'caregiver' ? 'active' : ''}`}
                 onClick={() => { setSelectedRole('caregiver'); setError(''); }}
               >
-                <Stethoscope size={15} />
+                <Stethoscope size={16} className="segment-icon" />
                 <span>Caregiver</span>
               </button>
             </div>
 
-            {/* Error Message */}
+            {/* Error Alert Box */}
             {error && (
               <div className="login-alert-box">
                 <AlertCircle size={16} className="flex-shrink-0" />
@@ -264,9 +262,9 @@ const Login = () => {
             {/* 2FA Mode */}
             {tfaRequired ? (
               <form onSubmit={handleTfaSubmit} className="login-form-inner">
-                <div className="login-form-title">
-                  <h2>Two-Factor Authentication</h2>
-                  <p>Enter the 6-digit verification code from your authenticator application.</p>
+                <div className="login-2fa-header">
+                  <h2>Two-Factor Verification</h2>
+                  <p>Enter the 6-digit code from your authenticator app.</p>
                 </div>
 
                 <div className="login-form-group">
@@ -312,21 +310,21 @@ const Login = () => {
                   onError={(msg) => setError(msg)}
                 />
 
-                <div className="login-sep-line">
-                  <span>or sign in with email</span>
+                <div className="login-divider">
+                  <span>or continue with email</span>
                 </div>
 
                 {/* Email Address */}
                 <div className="login-form-group">
                   <label htmlFor="login-email">Email Address</label>
                   <div className="login-input-container">
-                    <Mail size={17} className="login-input-svg" />
+                    <Mail size={18} className="login-input-svg" />
                     <input
                       id="login-email"
                       type="email"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
-                      placeholder="you@example.com"
+                      placeholder="name@example.com"
                       className="login-input-field"
                       required
                       autoComplete="email"
@@ -338,10 +336,10 @@ const Login = () => {
                 <div className="login-form-group">
                   <div className="login-field-header">
                     <label htmlFor="login-pass">Password</label>
-                    <Link to="/forgot-password" className="login-forgot-btn">Forgot Password?</Link>
+                    <Link to="/forgot-password" className="login-forgot-btn">Forgot password?</Link>
                   </div>
                   <div className="login-input-container">
-                    <Lock size={17} className="login-input-svg" />
+                    <Lock size={18} className="login-input-svg" />
                     <input
                       id="login-pass"
                       type={showPassword ? 'text' : 'password'}
@@ -357,8 +355,9 @@ const Login = () => {
                       className="login-eye-toggle"
                       onClick={() => setShowPassword(!showPassword)}
                       tabIndex={-1}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                     </button>
                   </div>
                 </div>
@@ -371,7 +370,7 @@ const Login = () => {
                       checked={rememberMe} 
                       onChange={e => setRememberMe(e.target.checked)} 
                     />
-                    <span>Keep me logged in on this device</span>
+                    <span>Remember me on this device</span>
                   </label>
                 </div>
 
@@ -382,12 +381,15 @@ const Login = () => {
                   disabled={isLoading}
                 >
                   {isLoading ? <span className="login-spinner" /> : (
-                    <>Sign In as {selectedRole === 'family' ? 'Family Member' : 'Caregiver'} <ArrowRight size={17} /></>
+                    <>
+                      <span>Sign In as {selectedRole === 'family' ? 'Family Member' : 'Caregiver'}</span>
+                      <ArrowRight size={18} />
+                    </>
                   )}
                 </button>
 
                 <div className="login-footer-text">
-                  <span>Don't have an account yet?</span>
+                  <span>Don't have an account?</span>
                   <Link to="/register" className="login-footer-link">
                     Create account
                   </Link>

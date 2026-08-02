@@ -1,40 +1,44 @@
 /* ═══════════════════════════════════════════════════════════════════
-   FamilyCare — Modern Brand Logo Styles
-   World-Class Healthcare Brand Identity • Flat Precision Design
+   FamilyCare — Brand Logo System
+   Horizontal icon-left + wordmark-right  •  Flat precision design
    ═══════════════════════════════════════════════════════════════════ */
 
+/* ── Link wrapper ── */
 .fc-brand-logo-link {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   outline: none;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
+/* ── Outer container ── */
 .fc-brand-logo {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 11px;
   user-select: none;
-  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
 }
 
 .fc-brand-logo-link:hover .fc-brand-logo {
   transform: translateY(-1px);
 }
 
+/* ── Icon mark container ── */
 .fc-logo-mark-wrap {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border-radius: 14px;
-  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+  border-radius: 13px;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .fc-brand-logo-link:hover .fc-logo-mark-wrap {
-  transform: scale(1.05);
+  transform: scale(1.06);
 }
 
 .fc-logo-svg {
@@ -42,11 +46,12 @@
   flex-shrink: 0;
 }
 
+/* ── Text area ── */
 .fc-logo-text-wrap {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  line-height: 1.05;
+  line-height: 1;
 }
 
 .fc-logo-title {
@@ -57,41 +62,40 @@
   line-height: 1;
 }
 
+/* "Family" — primary dark text */
 .fc-name-family {
   font-weight: 800;
-  transition: color 0.18s;
   letter-spacing: -0.5px;
+  transition: color 0.18s ease;
 }
 
-.fc-name-family.text-slate {
-  color: #0f172a;
-}
+.fc-name-family.text-slate { color: #0f172a; }
+.fc-name-family.text-white { color: #ffffff; }
 
-.fc-name-family.text-white {
-  color: #ffffff;
-}
-
+/* "Care" — brand teal accent */
 .fc-name-care {
   color: #00A896;
   font-weight: 800;
   letter-spacing: -0.5px;
-  margin-left: 1px;
 }
 
+/* Accent dot — small teal dot trailing the wordmark */
 .fc-name-dot {
+  display: inline-block;
   width: 5px;
   height: 5px;
   background: #02C39A;
   border-radius: 50%;
   margin-left: 2px;
-  display: inline-block;
   align-self: flex-end;
   margin-bottom: 2px;
+  flex-shrink: 0;
 }
 
+/* Tagline (optional) */
 .fc-logo-tagline {
   font-size: 0.66rem;
-  font-weight: 700;
+  font-weight: 600;
   color: #64748b;
   text-transform: uppercase;
   letter-spacing: 0.8px;
@@ -99,69 +103,48 @@
   white-space: nowrap;
 }
 
-.fc-variant-white .fc-logo-tagline {
-  color: #94a3b8;
-}
+/* ══════════════════════════════════════
+   SIZE VARIANTS
+   ══════════════════════════════════════ */
 
-/* ── Size Variants ── */
-.fc-size-xs .fc-logo-title {
-  font-size: 0.95rem;
-}
-.fc-size-xs .fc-logo-tagline {
-  font-size: 0.55rem;
-  letter-spacing: 0.5px;
-}
-.fc-size-xs .fc-name-dot {
-  width: 3.5px;
-  height: 3.5px;
-}
+/* xs — Tight nav / mobile */
+.fc-size-xs .fc-brand-logo  { gap: 8px; }
+.fc-size-xs .fc-logo-title  { font-size: 0.9rem; }
+.fc-size-xs .fc-logo-tagline{ font-size: 0.54rem; letter-spacing: 0.5px; }
+.fc-size-xs .fc-name-dot    { width: 3.5px; height: 3.5px; }
 
-.fc-size-sm .fc-logo-title {
-  font-size: 1.1rem;
-}
-.fc-size-sm .fc-logo-tagline {
-  font-size: 0.62rem;
-}
-.fc-size-sm .fc-name-dot {
-  width: 4px;
-  height: 4px;
-}
+/* sm — Navbar / sidebar header */
+.fc-size-sm .fc-brand-logo  { gap: 9px; }
+.fc-size-sm .fc-logo-title  { font-size: 1.08rem; }
+.fc-size-sm .fc-logo-tagline{ font-size: 0.6rem; }
+.fc-size-sm .fc-name-dot    { width: 4px; height: 4px; }
 
-.fc-size-md .fc-logo-title {
-  font-size: 1.3rem;
-}
-.fc-size-md .fc-logo-tagline {
-  font-size: 0.68rem;
-}
+/* md — Default / auth panels */
+.fc-size-md .fc-brand-logo  { gap: 10px; }
+.fc-size-md .fc-logo-title  { font-size: 1.28rem; }
+.fc-size-md .fc-logo-tagline{ font-size: 0.68rem; }
 
-.fc-size-lg .fc-logo-title {
-  font-size: 1.65rem;
-  letter-spacing: -0.7px;
-}
-.fc-size-lg .fc-logo-tagline {
-  font-size: 0.76rem;
-}
-.fc-size-lg .fc-name-dot {
-  width: 6px;
-  height: 6px;
-}
+/* lg — Landing hero / modal hero */
+.fc-size-lg .fc-brand-logo  { gap: 13px; }
+.fc-size-lg .fc-logo-title  { font-size: 1.65rem; letter-spacing: -0.7px; }
+.fc-size-lg .fc-logo-tagline{ font-size: 0.76rem; }
+.fc-size-lg .fc-name-dot    { width: 6px; height: 6px; }
 
-.fc-size-xl .fc-logo-title {
-  font-size: 2.2rem;
-  letter-spacing: -0.9px;
-}
-.fc-size-xl .fc-logo-tagline {
-  font-size: 0.88rem;
-}
-.fc-size-xl .fc-name-dot {
-  width: 7px;
-  height: 7px;
-}
+/* xl — Large displays / print */
+.fc-size-xl .fc-brand-logo  { gap: 16px; }
+.fc-size-xl .fc-logo-title  { font-size: 2.2rem; letter-spacing: -0.9px; }
+.fc-size-xl .fc-logo-tagline{ font-size: 0.88rem; }
+.fc-size-xl .fc-name-dot    { width: 7px; height: 7px; }
 
-/* ── Dark Variant (Sidebars / Dark Panels) ── */
-.fc-variant-dark .fc-name-family {
-  color: #ffffff;
-}
-.fc-variant-dark .fc-logo-tagline {
-  color: #94a3b8;
-}
+/* ══════════════════════════════════════
+   COLOUR VARIANTS
+   ══════════════════════════════════════ */
+
+/* White variant (used on dark hero panels) */
+.fc-variant-white .fc-logo-tagline { color: rgba(255,255,255,0.65); }
+
+/* Dark variant (used on coloured sidebars) */
+.fc-variant-dark .fc-name-family  { color: #ffffff; }
+.fc-variant-dark .fc-name-care    { color: #5eead4; }
+.fc-variant-dark .fc-name-dot     { background: #5eead4; }
+.fc-variant-dark .fc-logo-tagline { color: rgba(255,255,255,0.55); }

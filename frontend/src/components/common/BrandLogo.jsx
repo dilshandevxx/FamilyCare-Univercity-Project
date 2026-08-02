@@ -3,20 +3,20 @@ import { Link } from 'react-router-dom';
 import './BrandLogo.css';
 
 /**
- * Modern Clean BrandLogoMark SVG Component for FamilyCare
+ * FamilyCare — Family Silhouette Brand Mark
+ *
+ * A crisp, professional SVG icon featuring a clean family silhouette
+ * (two adults + child) set inside a rounded-square container.
+ * Designed in the style of Linear, Figma, Loom: icon-left + wordmark-right.
  *
  * @param {Object} props
- * @param {number} [props.size=38]
- * @param {string} [props.color='#00A896'] - Base container color
- * @param {string} [props.innerColor='#ffffff'] - Heart & accent color
- * @param {string} [props.accentColor='#00A896'] - Cross cut-out color
- * @param {string} [props.className='']
+ * @param {number} [props.size=40]   — px size of the square icon container
+ * @param {string} [props.color]     — override container fill
+ * @param {string} [props.className]
  */
 export const BrandLogoMark = ({
-  size = 38,
+  size = 40,
   color = '#00A896',
-  innerColor = '#ffffff',
-  accentColor = '#00A896',
   className = ''
 }) => (
   <svg
@@ -26,82 +26,88 @@ export const BrandLogoMark = ({
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className={`fc-logo-svg ${className}`}
+    aria-label="FamilyCare icon"
   >
-    {/* Modern Rounded Squircle Container */}
+    {/* Rounded-square background tile */}
     <rect
-      x="2"
-      y="2"
-      width="44"
-      height="44"
+      x="0" y="0"
+      width="48" height="48"
       rx="13"
       fill={color}
-      className="fc-logo-bg"
     />
 
-    {/* Crisp Inset Stroke for Clean Border Definition */}
+    {/* Subtle inner glow border */}
     <rect
-      x="3.2"
-      y="3.2"
-      width="41.6"
-      height="41.6"
-      rx="11.8"
-      stroke="#ffffff"
-      strokeOpacity="0.22"
-      strokeWidth="1.2"
+      x="1" y="1"
+      width="46" height="46"
+      rx="12"
+      stroke="rgba(255,255,255,0.18)"
+      strokeWidth="1.5"
+      fill="none"
     />
 
-    {/* Master Brand Emblem: Harmonious Heart & Medical Cross */}
-    <g className="fc-logo-emblem">
-      {/* Pure White Solid Heart */}
-      <path
-        d="M24 37.5C24 37.5 9.5 28 9.5 17.5C9.5 12 13.8 8 19 8C21.8 8 23.3 9.4 24 10.5C24.7 9.4 26.2 8 29 8C34.2 8 38.5 12 38.5 17.5C38.5 28 24 37.5 24 37.5Z"
-        fill={innerColor}
-        className="fc-logo-heart"
-      />
+    {/*
+      ── FAMILY SILHOUETTE ──
+      Left adult (parent A) — taller
+      Right adult (parent B) — slightly shorter
+      Child in centre front — smaller
+      All drawn as clean white filled paths, flat & modern
+    */}
 
-      {/* Vertical Cross Bar */}
-      <rect
-        x="21.75"
-        y="13.5"
-        width="4.5"
-        height="12"
-        rx="2.25"
-        fill={accentColor}
-        className="fc-logo-cross"
-      />
+    {/* ── Left Adult (Parent) ── */}
+    {/* Head */}
+    <circle cx="15" cy="16" r="4" fill="white" />
+    {/* Body + shoulders */}
+    <path
+      d="M8 36 C8 29 10.5 26 15 26 C19.5 26 22 29 22 36"
+      fill="white"
+    />
 
-      {/* Horizontal Cross Bar */}
-      <rect
-        x="18"
-        y="17.25"
-        width="12"
-        height="4.5"
-        rx="2.25"
-        fill={accentColor}
-        className="fc-logo-cross"
-      />
+    {/* ── Right Adult (Parent) ── */}
+    {/* Head */}
+    <circle cx="33" cy="17" r="3.5" fill="white" />
+    {/* Body + shoulders */}
+    <path
+      d="M26.5 36 C26.5 30 28.5 27.5 33 27.5 C37.5 27.5 39.5 30 39.5 36"
+      fill="white"
+    />
 
-      {/* Vitality Life-Node Center */}
-      <circle
-        cx="24"
-        cy="19.5"
-        r="1.6"
-        fill={innerColor}
-        className="fc-logo-node"
-      />
-    </g>
+    {/* ── Child (Centre Front) ── */}
+    {/* Head */}
+    <circle cx="24" cy="21.5" r="2.8" fill="white" />
+    {/* Body */}
+    <path
+      d="M19 36 C19 31.5 21 29.5 24 29.5 C27 29.5 29 31.5 29 36"
+      fill="white"
+    />
+
+    {/* Bottom baseline rule — ties the three figures together */}
+    <rect
+      x="8" y="36.5"
+      width="32" height="2"
+      rx="1"
+      fill="rgba(255,255,255,0.35)"
+    />
+
+    {/* Small teal heart accent — top-right corner badge */}
+    <circle cx="38.5" cy="9.5" r="5" fill="rgba(255,255,255,0.18)" />
+    <path
+      d="M38.5 12.4 C38.5 12.4 34.8 10 35 8 C35.1 6.9 36 6.2 37 6.5 C37.6 6.7 38 7.1 38.5 7.7 C39 7.1 39.4 6.7 40 6.5 C41 6.2 41.9 6.9 42 8 C42.2 10 38.5 12.4 38.5 12.4Z"
+      fill="white"
+      opacity="0.9"
+    />
   </svg>
 );
 
 /**
- * Modern Clean BrandLogo Component for FamilyCare
+ * FamilyCare — Full Brand Logo
+ * Horizontal icon-left + wordmark-right layout
  *
- * @param {Object} props
- * @param {'xs' | 'sm' | 'md' | 'lg' | 'xl'} [props.size='md']
- * @param {'default' | 'white' | 'icon-only' | 'dark'} [props.variant='default']
+ * @param {'xs'|'sm'|'md'|'lg'|'xl'} [props.size='md']
+ * @param {'default'|'white'|'dark'|'icon-only'} [props.variant='default']
  * @param {string} [props.tagline]
  * @param {string} [props.to='/']
- * @param {string} [props.className='']
+ * @param {string} [props.className]
  * @param {Function} [props.onClick]
  */
 const BrandLogo = ({
@@ -113,42 +119,43 @@ const BrandLogo = ({
   onClick
 }) => {
   const markSizes = {
-    xs: 26,
-    sm: 32,
-    md: 38,
-    lg: 46,
-    xl: 56
+    xs: 28,
+    sm: 34,
+    md: 40,
+    lg: 48,
+    xl: 58
   };
 
-  const isWhite = variant === 'white';
+  const isWhite    = variant === 'white';
+  const isDark     = variant === 'dark';
   const isIconOnly = variant === 'icon-only';
 
-  const markColor = isWhite ? '#00A896' : '#00A896';
-  const innerColor = '#ffffff';
-  const accentColor = '#00A896';
+  // On coloured/dark backgrounds the mark stays #00A896;
+  // in white-on-dark panels we still use the same teal colour
+  const markColor = '#00A896';
 
   const content = (
     <div
       className={`fc-brand-logo fc-size-${size} fc-variant-${variant} ${className}`}
       onClick={onClick}
     >
+      {/* Icon Mark */}
       <div className="fc-logo-mark-wrap">
         <BrandLogoMark
-          size={markSizes[size] || 38}
+          size={markSizes[size] || 40}
           color={markColor}
-          innerColor={innerColor}
-          accentColor={accentColor}
         />
       </div>
 
+      {/* Wordmark */}
       {!isIconOnly && (
         <div className="fc-logo-text-wrap">
           <div className="fc-logo-title">
-            <span className={`fc-name-family ${isWhite ? 'text-white' : 'text-slate'}`}>
+            <span className={`fc-name-family ${isWhite || isDark ? 'text-white' : 'text-slate'}`}>
               Family
             </span>
             <span className="fc-name-care">Care</span>
-            <span className="fc-name-dot"></span>
+            <span className="fc-name-dot" aria-hidden="true" />
           </div>
           {tagline && <span className="fc-logo-tagline">{tagline}</span>}
         </div>
@@ -158,7 +165,13 @@ const BrandLogo = ({
 
   if (to) {
     return (
-      <Link to={to} className="fc-brand-logo-link" onClick={onClick} title="FamilyCare — Home">
+      <Link
+        to={to}
+        className="fc-brand-logo-link"
+        onClick={onClick}
+        title="FamilyCare — Home"
+        aria-label="FamilyCare home"
+      >
         {content}
       </Link>
     );

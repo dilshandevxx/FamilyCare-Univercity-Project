@@ -1,8 +1,28 @@
-<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="2" y="2" width="44" height="44" rx="13" fill="#00A896"/>
-  <rect x="3.2" y="3.2" width="41.6" height="41.6" rx="11.8" stroke="#ffffff" stroke-opacity="0.22" stroke-width="1.2"/>
-  <path d="M24 37.5C24 37.5 9.5 28 9.5 17.5C9.5 12 13.8 8 19 8C21.8 8 23.3 9.4 24 10.5C24.7 9.4 26.2 8 29 8C34.2 8 38.5 12 38.5 17.5C38.5 28 24 37.5 24 37.5Z" fill="#ffffff"/>
-  <rect x="21.75" y="13.5" width="4.5" height="12" rx="2.25" fill="#00A896"/>
-  <rect x="18" y="17.25" width="12" height="4.5" rx="2.25" fill="#00A896"/>
-  <circle cx="24" cy="19.5" r="1.6" fill="#ffffff"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <!-- Rounded-square background -->
+  <rect width="48" height="48" rx="13" fill="#00A896"/>
+  <!-- Inner glow border -->
+  <rect x="1" y="1" width="46" height="46" rx="12" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" fill="none"/>
+
+  <!-- Left Adult — head -->
+  <circle cx="15" cy="16" r="4" fill="white"/>
+  <!-- Left Adult — body -->
+  <path d="M8 36 C8 29 10.5 26 15 26 C19.5 26 22 29 22 36" fill="white"/>
+
+  <!-- Right Adult — head -->
+  <circle cx="33" cy="17" r="3.5" fill="white"/>
+  <!-- Right Adult — body -->
+  <path d="M26.5 36 C26.5 30 28.5 27.5 33 27.5 C37.5 27.5 39.5 30 39.5 36" fill="white"/>
+
+  <!-- Child — head -->
+  <circle cx="24" cy="21.5" r="2.8" fill="white"/>
+  <!-- Child — body -->
+  <path d="M19 36 C19 31.5 21 29.5 24 29.5 C27 29.5 29 31.5 29 36" fill="white"/>
+
+  <!-- Baseline rule -->
+  <rect x="8" y="36.5" width="32" height="2" rx="1" fill="rgba(255,255,255,0.35)"/>
+
+  <!-- Heart badge — top right -->
+  <circle cx="38.5" cy="9.5" r="5" fill="rgba(255,255,255,0.18)"/>
+  <path d="M38.5 12.4C38.5 12.4 34.8 10 35 8C35.1 6.9 36 6.2 37 6.5C37.6 6.7 38 7.1 38.5 7.7C39 7.1 39.4 6.7 40 6.5C41 6.2 41.9 6.9 42 8C42.2 10 38.5 12.4 38.5 12.4Z" fill="white" opacity="0.9"/>
 </svg>
