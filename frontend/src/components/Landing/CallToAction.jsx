@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthModal } from '../../context/AuthModalContext';
 
 const useInView = (threshold = 0.2) => {
   const ref = useRef(null);
@@ -17,6 +18,7 @@ const useInView = (threshold = 0.2) => {
 
 const CallToAction = () => {
   const navigate = useNavigate();
+  const { openRegister } = useAuthModal();
   const [showReassurance, setShowReassurance] = useState(false);
   const [sectionRef, inView] = useInView(0.15);
 
@@ -76,7 +78,7 @@ const CallToAction = () => {
               <button
                 className="btn btn-primary cta-btn-primary"
                 style={{ padding: '15px 40px', position: 'relative', overflow: 'hidden' }}
-                onClick={() => navigate('/register')}
+                onClick={() => openRegister('family')}
               >
                 <span className="cta-btn-shine" />
                 Get Started

@@ -1,9 +1,11 @@
 import React, { useRef } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthModal } from '../../context/AuthModalContext';
 
 const Hero = () => {
   const navigate = useNavigate();
+  const { openRegister } = useAuthModal();
   const imageRef = useRef(null);
 
   const handleImageMouseMove = (e) => {
@@ -269,7 +271,7 @@ const Hero = () => {
             </p>
 
             <div className="hero-cta-row" style={{ display:'flex', gap:'1rem', flexWrap:'wrap', marginBottom:'3rem' }}>
-              <button className="hero-btn-primary" onClick={() => navigate('/register')}>
+              <button className="hero-btn-primary" onClick={() => openRegister('family')}>
                 Get Started <ArrowRight size={17} className="hero-btn-arrow" />
               </button>
               <button className="hero-btn-secondary" onClick={() => navigate('/features')}>

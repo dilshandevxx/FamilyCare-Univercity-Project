@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useAuthModal } from '../context/AuthModalContext';
 import { Menu, X, ChevronRight } from 'lucide-react';
 
 const NAV_LINKS = [
@@ -12,6 +13,7 @@ const NAV_LINKS = [
 
 const Navbar = () => {
   const { user, logout } = useAuth();
+  const { openLogin, openRegister } = useAuthModal();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -30,7 +32,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
     setMenuOpen(false);
   };
 
@@ -83,11 +85,23 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Link to="/login" className="nav-link-login">Log in</Link>
-                <Link to="/register" className="btn-modern btn-modern-primary">
+                <button 
+                  type="button" 
+                  onClick={() => openLogin('family')} 
+                  className="nav-link-login"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', font: 'inherit' }}
+                >
+                  Log in
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => openRegister('family')} 
+                  className="btn-modern btn-modern-primary"
+                  style={{ border: 'none', cursor: 'pointer' }}
+                >
                   <span>Sign Up</span>
                   <ChevronRight size={16} className="btn-icon" />
-                </Link>
+                </button>
               </>
             )}
           </div>
@@ -156,12 +170,22 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <Link to="/register" className="btn-modern btn-modern-primary w-full justify-center mb-3" onClick={() => setMenuOpen(false)}>
+              <button 
+                type="button" 
+                className="btn-modern btn-modern-primary w-full justify-center mb-3" 
+                onClick={() => { setMenuOpen(false); openRegister('family'); }}
+                style={{ border: 'none', cursor: 'pointer' }}
+              >
                 Get Started
-              </Link>
-              <Link to="/login" className="btn-modern btn-modern-outline w-full justify-center mb-6" onClick={() => setMenuOpen(false)}>
+              </button>
+              <button 
+                type="button" 
+                className="btn-modern btn-modern-outline w-full justify-center mb-6" 
+                onClick={() => { setMenuOpen(false); openLogin('family'); }}
+                style={{ border: 'none', cursor: 'pointer' }}
+              >
                 Log In
-              </Link>
+              </button>
               <Link to="/admin/login" className="mobile-admin-link" onClick={() => setMenuOpen(false)}>
                 Admin Portal →
               </Link>
