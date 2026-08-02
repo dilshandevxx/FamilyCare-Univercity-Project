@@ -48,7 +48,7 @@ const UserManagementV2Content = () => {
         joined: new Date(c.created_at || c.createdAt || Date.now()).toLocaleDateString(),
         associatedElder: 'N/A',
         relationship: 'Professional',
-        phone: c.phone || 'N/A',
+        phone: c.phone && c.phone.trim() ? c.phone : 'N/A',
         backgroundCheck: 'Pending',
         certifications: c.certification || c.certifications?.join(', ') || 'CNA',
         notes: `Experience: ${c.experience_years || c.experienceYears || 5} years. ${c.bio ? `Bio: ${c.bio}` : ''}`
