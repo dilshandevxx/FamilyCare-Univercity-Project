@@ -126,32 +126,45 @@ const AVATAR_POOL = [32, 44, 5, 11, 26, 68, 47, 57, 33, 16, 21, 43, 65, 23, 53, 
 
 function mapCaregiver(c) {
   const tags = [];
-  const rawExp = c.experience_years ? String(c.experience_years) : '';
+  const rawExp = c.experience_years ? String(c.experience_years).trim() : '';
   const numExp = parseInt(rawExp, 10);
   const expYears = !isNaN(numExp) ? numExp : 1;
 
-  if (c.experience_years) tags.push({ label: `${c.experience_years} Years Exp.` });
-  if (c.certification)    tags.push({ label: c.certification });
-  if (c.languages)        tags.push({ label: c.languages });
+  if (rawExp) {
+    if (/year/i.test(rawExp)) {
+      tags.push({ label: rawExp });
+    } else {
+      tags.push({ label: `${rawExp} Years Exp.` });
+    }
+  }
+  if (c.certification) tags.push({ label: c.certification });
+  if (c.languages)     tags.push({ label: c.languages });
 
-  const imgIdx = AVATAR_POOL[(c.id - 1) % AVATAR_POOL.length] || 1;
+  const imgIdx = AVATAR_POOL[((c.id || 1) - 1) % AVATAR_POOL.length] || 1;
   const rateVal = c.hourly_rate != null ? Number(c.hourly_rate) : null;
   const priceDisplay = (rateVal && rateVal > 0) ? `$${rateVal.toFixed(0)}` : '$25';
 
+  const avatarUrl = c.avatar_url 
+    ? (c.avatar_url.startsWith('http') ? c.avatar_url : `http://localhost:5000${c.avatar_url}`)
+    : `https://i.pravatar.cc/300?img=${imgIdx}`;
+
   return {
-    id:           c.id,
-    name:         c.name,
-    title:        c.specialization ? c.specialization : 'Elder & Health Caregiver',
-    price:        priceDisplay,
-    hourlyRate:   (rateVal && rateVal > 0) ? rateVal : 25,
-    rating:       c.rating ? Number(c.rating).toFixed(1) : '4.9',
-    reviews:      c.total_reviews || 18,
+    id:              c.id,
+    name:            c.name || 'Caregiver',
+    title:           c.specialization ? c.specialization : 'Elder & Health Caregiver',
+    price:           priceDisplay,
+    hourlyRate:      (rateVal && rateVal > 0) ? rateVal : 25,
+    rating:          c.rating ? Number(c.rating).toFixed(1) : '4.9',
+    reviews:         c.total_reviews || 18,
     experienceYears: expYears,
     tags,
-    bio:          c.bio || 'Compassionate and certified caregiver dedicated to personalized elder care and daily wellness assistance.',
-    image:        c.avatar_url || `https://i.pravatar.cc/300?img=${imgIdx}`,
-    available:    c.is_available !== 0 && c.is_available !== false,
-    location:     c.location || 'In-home & Facility',
+    bio:             c.bio || 'Compassionate and certified caregiver dedicated to personalized elder care and daily wellness assistance.',
+    image:           avatarUrl,
+    available:       c.is_available !== 0 && c.is_available !== false,
+    location:        c.location || 'In-home & Facility',
+    active_residents: c.active_residents || 0,
+    max_capacity:    c.max_capacity || 4,
+    status:          c.status || 'approved',
   };
 }
 
@@ -176,7 +189,7 @@ const Caregivers = () => {
         }
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
+        if (Array.isArray(data)) {
           setCaregivers(data.map(mapCaregiver));
         }
       } catch (err) {
@@ -189,7 +202,12 @@ const Caregivers = () => {
   }, []);
 
   const filtered = caregivers.filter(c => {
-    if (searchQuery && !c.name.toLowerCase().includes(searchQuery.toLowerCase()) && !c.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    const nameStr = (c.name || '').toLowerCase();
+    const titleStr = (c.title || '').toLowerCase();
+    const bioStr = (c.bio || '').toLowerCase();
+    const query = searchQuery.toLowerCase().trim();
+
+    if (query && !nameStr.includes(query) && !titleStr.includes(query) && !bioStr.includes(query)) return false;
     if (ratingFilter === '4.5 & up' && !(c.rating && Number(c.rating) >= 4.5)) return false;
     if (ratingFilter === '4.0 & up' && !(c.rating && Number(c.rating) >= 4.0)) return false;
     if (experienceFilter === '5+ Years'  && !(c.experienceYears >= 5))  return false;

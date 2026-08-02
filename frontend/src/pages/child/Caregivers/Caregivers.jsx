@@ -101,13 +101,18 @@ const CaregiversList = () => {
           ];
         } else {
           // Normalize caregiver fields
-          cgData = cgData.map((cg, index) => ({
-            ...cg,
-            rating: Number(cg.rating || (4.6 + ((index * 7) % 5) * 0.1)).toFixed(1),
-            total_reviews: cg.total_reviews || (25 + index * 8),
-            availability: (cg.is_available ? 'Immediate' : 'Weekdays') || cg.availability || 'Weekdays',
-            avatar: cg.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cg.name || 'Caregiver' + index)}`
-          }));
+          cgData = cgData.map((cg, index) => {
+            const avatarUrl = cg.avatar_url 
+              ? (cg.avatar_url.startsWith('http') ? cg.avatar_url : `http://localhost:5000${cg.avatar_url}`)
+              : `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(cg.name || 'Caregiver' + index)}`;
+            return {
+              ...cg,
+              rating: Number(cg.rating || (4.6 + ((index * 7) % 5) * 0.1)).toFixed(1),
+              total_reviews: cg.total_reviews || (25 + index * 8),
+              availability: (cg.is_available ? 'Immediate' : 'Weekdays') || cg.availability || 'Weekdays',
+              avatar: avatarUrl
+            };
+          });
         }
 
         setCaregivers(cgData);

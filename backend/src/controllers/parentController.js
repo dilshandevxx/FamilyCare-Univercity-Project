@@ -283,11 +283,13 @@ const assignCaregiver = async (req, res) => {
   const { id } = req.params;
   const { assigned_caregiver_id } = req.body;
   try {
+    const parsedCaregiverId = assigned_caregiver_id ? parseInt(assigned_caregiver_id, 10) : null;
+    const newStatus = parsedCaregiverId ? 'pending' : null;
     await pool.query(
-      'UPDATE parents SET assigned_caregiver_id = ? WHERE id = ? AND child_id = ?',
-      [assigned_caregiver_id || null, id, req.user.id]
+      'UPDATE parents SET assigned_caregiver_id = ?, assignment_status = ?, rejection_reason = NULL WHERE id = ? AND child_id = ?',
+      [parsedCaregiverId, newStatus, id, req.user.id]
     );
-    res.json({ message: 'Caregiver assigned successfully' });
+    res.json({ message: 'Caregiver assignment updated successfully' });
   } catch (err) {
     console.error('Error assigning caregiver:', err);
     res.status(500).json({ error: err.message });

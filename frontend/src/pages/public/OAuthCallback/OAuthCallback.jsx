@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuth } from '../../../context/AuthContext';
 import api from '../../../services/api';
 
 const TEAL = '#00A896';
@@ -7,6 +8,7 @@ const TEAL = '#00A896';
 const OAuthCallback = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { refreshUser } = useAuth();
 
   useEffect(() => {
     const token = searchParams.get('token');
@@ -21,6 +23,7 @@ const OAuthCallback = () => {
     localStorage.setItem('token', token);
 
     // Fetch full profile then redirect
+    refreshUser?.();
     api.get('/users/profile')
       .then(() => {
         if (role === 'admin') navigate('/admin/dashboard');
@@ -31,7 +34,7 @@ const OAuthCallback = () => {
         localStorage.removeItem('token');
         navigate('/login?error=oauth_failed');
       });
-  }, []);
+  }, [navigate, refreshUser, searchParams]);
 
   return (
     <div style={{

@@ -3,6 +3,12 @@ const pool = require('../config/db');
 // GET /api/caregivers/public - no auth required
 const getPublicCaregivers = async (req, res) => {
   try {
+    // Auto-sync any caregiver users that might be missing a caregivers row
+    await pool.query(`
+      INSERT IGNORE INTO caregivers (user_id, name, status)
+      SELECT id, name, 'pending' FROM users WHERE role = 'caregiver'
+    `);
+
     const [rows] = await pool.query(`
       SELECT c.id, c.user_id, COALESCE(c.name, u.name) AS name, c.specialization, c.experience_years,
              c.certification, c.license_id, c.hourly_rate, c.bio,
@@ -14,6 +20,7 @@ const getPublicCaregivers = async (req, res) => {
              u.avatar_url, u.email, u.phone
       FROM caregivers c
       LEFT JOIN users u ON u.id = c.user_id
+      WHERE c.status != 'rejected' OR c.status IS NULL
       ORDER BY c.id DESC
     `);
     res.json(rows);
@@ -48,6 +55,12 @@ const getPublicCaregiverById = async (req, res) => {
 // GET /api/caregivers
 const getCaregivers = async (req, res) => {
   try {
+    // Auto-sync any caregiver users that might be missing a caregivers row
+    await pool.query(`
+      INSERT IGNORE INTO caregivers (user_id, name, status)
+      SELECT id, name, 'pending' FROM users WHERE role = 'caregiver'
+    `);
+
     const [rows] = await pool.query(`
       SELECT c.id, c.user_id, COALESCE(c.name, u.name) AS name, c.specialization, c.experience_years,
              c.certification, c.license_id, c.hourly_rate, c.bio,
@@ -59,6 +72,7 @@ const getCaregivers = async (req, res) => {
              u.avatar_url, u.email, u.phone
       FROM caregivers c
       LEFT JOIN users u ON u.id = c.user_id
+      WHERE c.status != 'rejected' OR c.status IS NULL
       ORDER BY c.id DESC
     `);
     res.json(rows);

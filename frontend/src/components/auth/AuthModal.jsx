@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useAuthModal } from '../../context/AuthModalContext';
+import GoogleSignInButton from './GoogleSignInButton';
 import api from '../../services/api';
 import './AuthModal.css';
 
@@ -32,7 +33,7 @@ const SPECIALIZATION_OPTIONS = [
 
 const AuthModal = () => {
   const { isOpen, mode, role, setMode, setRole, closeAuthModal } = useAuthModal();
-  const { login, register } = useAuth();
+  const { login, register, googleLogin } = useAuth();
   const navigate = useNavigate();
 
   // Common form fields
@@ -204,6 +205,30 @@ const AuthModal = () => {
       redirectByRole(data.user?.role || role);
     } catch (err) {
       setError(err?.response?.data?.error || 'Registration failed. Please check your information and try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle Google Sign-In & Sign-Up Success
+  const handleGoogleSuccess = async (googlePayload) => {
+    setError('');
+    setLoading(true);
+    try {
+      const data = await googleLogin({
+        ...googlePayload,
+        relationship: role === 'family' ? relationship : undefined,
+        specialization: role === 'caregiver' ? specialization : undefined,
+        experience_years: role === 'caregiver' ? parseInt(experienceYears, 10) || 0 : undefined,
+        hourly_rate: role === 'caregiver' ? parseFloat(hourlyRate) || 25 : undefined,
+        certification: role === 'caregiver' ? certification : undefined,
+        license_id: role === 'caregiver' ? licenseId : undefined,
+        bio: role === 'caregiver' ? bio : undefined,
+      });
+      closeAuthModal();
+      redirectByRole(data.role);
+    } catch (err) {
+      setError(err?.response?.data?.error || 'Google authentication failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -476,19 +501,13 @@ const AuthModal = () => {
                ════════════════════════════════════════════ */
             <form onSubmit={handleLoginSubmit} className="auth-form-wrapper">
               
-              {/* Social Login Buttons */}
-              <div className="auth-social-grid">
-                <a href="http://localhost:5000/api/auth/google" className="auth-social-btn">
-                  <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="18" height="18" />
-                  <span>Google</span>
-                </a>
-                <a href="http://localhost:5000/api/auth/facebook" className="auth-social-btn">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2">
-                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                  </svg>
-                  <span>Facebook</span>
-                </a>
-              </div>
+              {/* Google Sign In */}
+              <GoogleSignInButton 
+                mode="login"
+                role={role}
+                onSuccess={handleGoogleSuccess}
+                onError={(msg) => setError(msg)}
+              />
 
               <div className="auth-divider">
                 <span>or continue with email</span>
@@ -602,19 +621,13 @@ const AuthModal = () => {
               {/* Step 1: Basic Information */}
               {step === 1 && (
                 <>
-                  {/* Social Buttons */}
-                  <div className="auth-social-grid">
-                    <a href="http://localhost:5000/api/auth/google" className="auth-social-btn">
-                      <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="18" height="18" />
-                      <span>Google</span>
-                    </a>
-                    <a href="http://localhost:5000/api/auth/facebook" className="auth-social-btn">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2">
-                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                      </svg>
-                      <span>Facebook</span>
-                    </a>
-                  </div>
+                  {/* Google Sign Up */}
+                  <GoogleSignInButton 
+                    mode="register"
+                    role={role}
+                    onSuccess={handleGoogleSuccess}
+                    onError={(msg) => setError(msg)}
+                  />
 
                   <div className="auth-divider">
                     <span>or sign up with details</span>

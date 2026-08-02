@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, validate2FA, forgotPassword, resetPassword } = require('../controllers/authController');
+const { register, login, validate2FA, forgotPassword, resetPassword, googleAuth } = require('../controllers/authController');
 const { passport, generateToken } = require('../config/passport');
 const rateLimit = require('express-rate-limit');
 
@@ -17,12 +17,16 @@ const authLimiter = rateLimit({
 
 router.post('/register', register);
 router.post('/login', authLimiter, login);
+router.post('/google', googleAuth);
 router.post('/2fa/validate', authLimiter, validate2FA);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 
-// ── Google OAuth ──────────────────────────────────────────────
-router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+// ── Google OAuth (Redirect Flow) ──────────────────────────────
+router.get('/google', (req, res, next) => {
+  const state = req.query.role || 'family';
+  passport.authenticate('google', { scope: ['profile', 'email'], state })(req, res, next);
+});
 
 router.get('/google/callback',
   passport.authenticate('google', { session: false, failureRedirect: `${CLIENT_URL}/login?error=oauth_failed` }),

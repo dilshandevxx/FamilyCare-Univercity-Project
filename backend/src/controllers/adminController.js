@@ -243,6 +243,13 @@ const updateUserRole = async (req, res) => {
 
   try {
     await pool.query('UPDATE users SET role = ? WHERE id = ?', [role, req.params.id]);
+    if (role === 'caregiver') {
+      const [[u]] = await pool.query('SELECT name FROM users WHERE id = ?', [req.params.id]);
+      await pool.query(
+        "INSERT IGNORE INTO caregivers (user_id, name, status) VALUES (?, ?, 'approved')",
+        [req.params.id, u?.name || 'Caregiver']
+      );
+    }
     res.json({ message: 'User role updated' });
   } catch (err) {
     res.status(500).json({ error: err.message });
