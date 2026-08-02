@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-import GoogleSignInButton from '../../../components/Auth/GoogleSignInButton';
+import GoogleSignInButton from '../../../components/auth/GoogleSignInButton';
 import './Register.css';
 
 /* ── Legal Modal ──────────────────────────────────────────────────────────── */

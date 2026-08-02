@@ -262,12 +262,13 @@ const AuthModal = () => {
           onClick={closeAuthModal} 
           aria-label="Close modal"
         >
-          <X size={20} />
+          <X size={18} />
         </button>
 
         {/* ── LEFT HERO SIDEBAR ── */}
         <div className="auth-modal-hero">
           <div className="auth-hero-backdrop-glow"></div>
+          <div className="auth-hero-backdrop-glow-2"></div>
           
           <div className="auth-hero-header">
             <div className="auth-hero-logo">
@@ -281,7 +282,7 @@ const AuthModal = () => {
           <div className="auth-hero-body">
             <div className="auth-hero-pill">
               <span className="auth-hero-dot"></span>
-              {role === 'family' ? 'Family Care Portal' : 'Caregiver Network'}
+              {role === 'family' ? 'Family Portal' : 'Caregiver Network'}
             </div>
 
             <h2 className="auth-hero-title">
@@ -294,27 +295,27 @@ const AuthModal = () => {
 
             <p className="auth-hero-desc">
               {role === 'family'
-                ? 'Join thousands of families monitoring vitals, managing medication, and coordinating verified care.'
-                : 'Manage patient care plans, log real-time vitals, and connect seamlessly with families.'}
+                ? 'Join thousands of families monitoring vitals, managing medication, and coordinating verified care in real-time.'
+                : 'Manage patient care plans, log real-time vitals, and connect seamlessly with verified families.'}
             </p>
 
             {/* Value Props List */}
             <div className="auth-hero-features">
               <div className="auth-feature-item">
                 <div className="auth-feature-icon">
-                  <ShieldCheck size={16} />
+                  <ShieldCheck size={15} />
                 </div>
                 <span>HIPAA & Bank-Grade 256-bit Encryption</span>
               </div>
               <div className="auth-feature-item">
                 <div className="auth-feature-icon">
-                  <CheckCircle2 size={16} />
+                  <CheckCircle2 size={15} />
                 </div>
                 <span>Verified, Background-Checked Providers</span>
               </div>
               <div className="auth-feature-item">
                 <div className="auth-feature-icon">
-                  <Sparkles size={16} />
+                  <Sparkles size={15} />
                 </div>
                 <span>Real-Time Health Monitoring & Instant Alerts</span>
               </div>
@@ -324,18 +325,18 @@ const AuthModal = () => {
           {/* Social Proof Metric */}
           <div className="auth-hero-footer">
             <div className="auth-stat-item">
-              <strong>100+</strong>
+              <strong>5,000+</strong>
               <span>Families</span>
             </div>
             <div className="auth-stat-divider"></div>
             <div className="auth-stat-item">
-              <strong>4.9★</strong>
+              <strong>4.95★</strong>
               <span>Rating</span>
             </div>
             <div className="auth-stat-divider"></div>
             <div className="auth-stat-item">
               <strong>100%</strong>
-              <span>Secure</span>
+              <span>Encrypted</span>
             </div>
           </div>
         </div>
@@ -371,7 +372,7 @@ const AuthModal = () => {
                 className={`auth-role-btn ${role === 'family' ? 'active' : ''}`}
                 onClick={() => { setRole('family'); setStep(1); setError(''); }}
               >
-                <Heart size={15} />
+                <Heart size={16} />
                 <span>Family Member</span>
               </button>
               <button
@@ -379,7 +380,7 @@ const AuthModal = () => {
                 className={`auth-role-btn ${role === 'caregiver' ? 'active' : ''}`}
                 onClick={() => { setRole('caregiver'); setStep(1); setError(''); }}
               >
-                <Stethoscope size={15} />
+                <Stethoscope size={16} />
                 <span>Caregiver</span>
               </button>
             </div>
@@ -558,6 +559,7 @@ const AuthModal = () => {
                     className="auth-eye-btn"
                     onClick={() => setShowPassword(!showPassword)}
                     tabIndex={-1}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -699,16 +701,19 @@ const AuthModal = () => {
                         className="auth-eye-btn"
                         onClick={() => setShowPassword(!showPassword)}
                         tabIndex={-1}
+                        aria-label={showPassword ? "Hide password" : "Show password"}
                       >
                         {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                       </button>
                     </div>
                     {password && (
                       <div className="auth-strength-meter">
-                        <div 
-                          className="auth-strength-fill" 
-                          style={{ width: `${strength.score}%`, backgroundColor: strength.color }}
-                        />
+                        <div className="auth-strength-track">
+                          <div 
+                            className="auth-strength-fill" 
+                            style={{ width: `${strength.score}%`, backgroundColor: strength.color }}
+                          />
+                        </div>
                         <span style={{ color: strength.color }}>{strength.label}</span>
                       </div>
                     )}

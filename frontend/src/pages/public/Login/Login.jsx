@@ -5,7 +5,7 @@ import {
   ArrowRight, ArrowLeft, CheckCircle2, Sparkles, AlertCircle, Home
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
-import GoogleSignInButton from '../../../components/Auth/GoogleSignInButton';
+import GoogleSignInButton from '../../../components/auth/GoogleSignInButton';
 import api from '../../../services/api';
 import './Login.css';
 
