@@ -2,6 +2,23 @@ const bcrypt = require('bcryptjs');
 const pool = require('../config/db');
 const os = require('os');
 
+let lastCpuInfo = os.cpus();
+function getCpuUtilization() {
+  const currentCpuInfo = os.cpus();
+  let idleDiff = 0;
+  let totalDiff = 0;
+  currentCpuInfo.forEach((cpu, i) => {
+    const lastCpu = lastCpuInfo[i];
+    for (const type in cpu.times) {
+      const diff = cpu.times[type] - lastCpu.times[type];
+      totalDiff += diff;
+      if (type === 'idle') idleDiff += diff;
+    }
+  });
+  lastCpuInfo = currentCpuInfo;
+  return totalDiff === 0 ? 0 : Math.round(100 - ((idleDiff / totalDiff) * 100));
+}
+
 // ── GET /api/admin/residents ─────────────────────────────────────
 // All residents (parents) with their assigned caregiver name + user info
 const getResidents = async (req, res) => {
@@ -576,9 +593,28 @@ const updateAdminSettings = async (req, res) => {
 const getSystemStatus = async (req, res) => {
   try {
     const [db] = await pool.query('SELECT 1');
-    res.json({ db: 'online', uptime: process.uptime() });
+    
+    const cpu = getCpuUtilization();
+    const totalMem = os.totalmem();
+    const freeMem = os.freemem();
+    const usedMem = totalMem - freeMem;
+    const ram = Math.round((usedMem / totalMem) * 100);
+    const ramDetails = `${(usedMem / 1024 ** 3).toFixed(1)} GB of ${(totalMem / 1024 ** 3).toFixed(1)} GB assigned`;
+
+    res.json({ 
+      dbStatus: 'Healthy', 
+      uptime: process.uptime(),
+      cpu,
+      ram,
+      ramDetails
+    });
   } catch (err) {
-    res.json({ db: 'offline' });
+    res.json({ 
+      dbStatus: 'Unknown',
+      cpu: 0,
+      ram: 0,
+      ramDetails: '— GB of — GB assigned'
+    });
   }
 };
 
