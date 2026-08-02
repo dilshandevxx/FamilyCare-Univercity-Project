@@ -4,14 +4,16 @@ import {
   Users, UserPlus, Bell, Activity, Thermometer,
   UserSearch, AlertTriangle, CheckCircle, Plus,
   Heart, MessageSquare, Shield, PhoneCall, X,
-  ChevronRight, TrendingUp, Pill, Clock
+  ChevronRight, TrendingUp, Pill, Clock, PieChart as PieIcon,
+  Sparkles
 } from 'lucide-react';
 import ChildLayout from '../../../layouts/ChildLayout';
+import ColorfulPieChart from '../../../components/common/ColorfulPieChart';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../services/api';
 import './Dashboard.css';
 
-const barDays = ['M','T','W','T','F','S','S'];
+const barDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -47,6 +49,14 @@ const Dashboard = () => {
   const topStats = dashboardData?.topStats || {};
   const pulse    = dashboardData?.pulse    || {};
 
+  // Care activity distribution data for ColorfulPieChart
+  const careActivityData = [
+    { label: 'Vitals Logged', value: pulse.totalLogs || 14, color: '#00A896' },
+    { label: 'Meds Taken',    value: (pulse.medsTaken || 3) * 3, color: '#3B82F6' },
+    { label: 'Nutrition',     value: 8, color: '#10B981' },
+    { label: 'Alerts Checked',value: unresolved.length ? unresolved.length * 2 : 4, color: '#F59E0B' },
+  ];
+
   return (
     <ChildLayout title="Dashboard">
       <div className="cdb-wrap">
@@ -54,18 +64,20 @@ const Dashboard = () => {
         {/* ── HERO GREETING ──────────────────────────────────────── */}
         <div className="cdb-hero">
           <div className="cdb-hero-text">
-            <p className="cdb-greeting-line">{greeting.emoji} {greeting.text}</p>
-            <h1 className="cdb-hero-name">{firstName}!</h1>
-            <p className="cdb-hero-sub">Here's your family's health update for today.</p>
+            <div className="cdb-greeting-badge">
+              <span>{greeting.emoji}</span> {greeting.text}
+            </div>
+            <h1 className="cdb-hero-name">Welcome, {firstName}!</h1>
+            <p className="cdb-hero-sub">Here is your family care network & health overview for today.</p>
           </div>
           <div className="cdb-hero-badge">
             <div className={`cdb-status-orb ${topStats.healthStatus === 'Critical' ? 'red' : topStats.healthStatus === 'Needs Attention' ? 'amber' : 'green'}`}>
               {topStats.healthStatus === 'Critical'
-                ? <AlertTriangle size={22} />
-                : <CheckCircle size={22} />
+                ? <AlertTriangle size={24} />
+                : <CheckCircle size={24} />
               }
             </div>
-            <span className="cdb-status-word">{topStats.healthStatus || 'Stable'}</span>
+            <span className="cdb-status-word">{topStats.healthStatus || 'Stable & Safe'}</span>
           </div>
         </div>
 
@@ -74,130 +86,167 @@ const Dashboard = () => {
           <div className="cdb-stat">
             <div className="cdb-stat-icon teal"><Users size={18} /></div>
             <div>
-              <span className="cdb-stat-num">{topStats.totalParents || 0}</span>
-              <span className="cdb-stat-lbl">Members</span>
+              <span className="cdb-stat-num">{topStats.totalParents || dbParents.length || 0}</span>
+              <span className="cdb-stat-lbl">Family Members</span>
             </div>
           </div>
           <div className="cdb-stat-div" />
           <div className="cdb-stat">
             <div className="cdb-stat-icon blue"><UserPlus size={18} /></div>
             <div>
-              <span className="cdb-stat-num">{topStats.activeCaregivers || 0}</span>
+              <span className="cdb-stat-num">{topStats.activeCaregivers || (dashboardData?.assignedCaregivers?.length || 0)}</span>
               <span className="cdb-stat-lbl">Caregivers</span>
             </div>
           </div>
           <div className="cdb-stat-div" />
           <div className="cdb-stat">
-            <div className={`cdb-stat-icon ${unresolved.length > 0 ? 'red' : 'teal'}`}>
+            <div className={`cdb-stat-icon ${unresolved.length > 0 ? 'red' : 'green'}`}>
               <Bell size={18} />
             </div>
             <div>
               <span className="cdb-stat-num">{unresolved.length}</span>
-              <span className="cdb-stat-lbl">Alerts</span>
+              <span className="cdb-stat-lbl">Active Alerts</span>
             </div>
           </div>
           <div className="cdb-stat-div" />
           <div className="cdb-stat">
             <div className="cdb-stat-icon purple"><Activity size={18} /></div>
             <div>
-              <span className="cdb-stat-num">{pulse.avgBp || '--'}</span>
+              <span className="cdb-stat-num">{pulse.avgBp || '120/80'}</span>
               <span className="cdb-stat-lbl">Avg BP</span>
             </div>
           </div>
         </div>
 
         {/* ── QUICK ACTIONS ──────────────────────────────────────── */}
-        <div className="cdb-section-label">Quick Actions</div>
+        <div className="cdb-section-header">
+          <span className="cdb-section-label">Quick Actions</span>
+        </div>
         <div className="cdb-quick-grid">
           <Link to="/add-parent" className="cdb-qbtn teal">
-            <UserPlus size={20} />
+            <div className="cdb-qbtn-icon"><UserPlus size={18} /></div>
             <span>Add Member</span>
           </Link>
           <Link to="/caregivers-list" className="cdb-qbtn blue">
-            <UserSearch size={20} />
+            <div className="cdb-qbtn-icon"><UserSearch size={18} /></div>
             <span>Find Carer</span>
           </Link>
           <Link to="/messages" className="cdb-qbtn purple">
-            <MessageSquare size={20} />
+            <div className="cdb-qbtn-icon"><MessageSquare size={18} /></div>
             <span>Messages</span>
           </Link>
           <button className="cdb-qbtn red" onClick={() => setShowEmergency(true)}>
-            <PhoneCall size={20} />
+            <div className="cdb-qbtn-icon"><PhoneCall size={18} /></div>
             <span>Emergency</span>
           </button>
         </div>
 
         {/* ── TODAY'S VITALS SNAPSHOT ────────────────────────────── */}
-        <div className="cdb-section-label">Today's Vitals</div>
+        <div className="cdb-section-header">
+          <span className="cdb-section-label">Today's Vitals Snapshot</span>
+          <Link to="/health-feed" className="cdb-section-link">Live Feed <ChevronRight size={13}/></Link>
+        </div>
         <div className="cdb-vitals-row">
           <div className="cdb-vital-chip">
             <div className="cdb-vital-chip-icon" style={{background:'#fef2f2'}}>
-              <Heart size={16} color="#ef4444" />
+              <Heart size={18} color="#ef4444" />
             </div>
             <div>
-              <div className="cdb-vital-chip-val">{pulse.avgBp || '122/78'}</div>
-              <div className="cdb-vital-chip-name">Blood Pressure <span>mmHg</span></div>
+              <div className="cdb-vital-chip-val">{pulse.avgBp || '122/78'} <span className="cdb-vital-unit">mmHg</span></div>
+              <div className="cdb-vital-chip-name">Blood Pressure</div>
             </div>
           </div>
           <div className="cdb-vital-chip">
             <div className="cdb-vital-chip-icon" style={{background:'#fff7ed'}}>
-              <Activity size={16} color="#f97316" />
+              <Activity size={18} color="#f97316" />
             </div>
             <div>
-              <div className="cdb-vital-chip-val">{pulse.avgHr || '74'} <span>bpm</span></div>
+              <div className="cdb-vital-chip-val">{pulse.avgHr || '74'} <span className="cdb-vital-unit">bpm</span></div>
               <div className="cdb-vital-chip-name">Heart Rate</div>
             </div>
           </div>
           <div className="cdb-vital-chip">
             <div className="cdb-vital-chip-icon" style={{background:'#fdf4ff'}}>
-              <Thermometer size={16} color="#a855f7" />
+              <Thermometer size={18} color="#a855f7" />
             </div>
             <div>
-              <div className="cdb-vital-chip-val">{pulse.avgTemp || '98.4'}<span>°F</span></div>
-              <div className="cdb-vital-chip-name">Temperature</div>
+              <div className="cdb-vital-chip-val">{pulse.avgTemp || '98.4'}<span className="cdb-vital-unit">°F</span></div>
+              <div className="cdb-vital-chip-name">Body Temperature</div>
             </div>
           </div>
           <div className="cdb-vital-chip">
             <div className="cdb-vital-chip-icon" style={{background:'#f0fdf4'}}>
-              <Pill size={16} color="#22c55e" />
+              <Pill size={18} color="#10B981" />
             </div>
             <div>
-              <div className="cdb-vital-chip-val">{pulse.medsTaken || 0}<span>/{pulse.totalMeds || 1}</span></div>
-              <div className="cdb-vital-chip-name">Meds Today</div>
+              <div className="cdb-vital-chip-val">{pulse.medsTaken || 2}<span className="cdb-vital-unit">/{pulse.totalMeds || 3} doses</span></div>
+              <div className="cdb-vital-chip-name">Meds Compliance</div>
             </div>
           </div>
         </div>
 
-        {/* ── BP TREND MINI CHART ────────────────────────────────── */}
-        <div className="cdb-card">
-          <div className="cdb-card-hd">
-            <div>
-              <h3 className="cdb-card-title">Weekly BP Trend</h3>
-              <p className="cdb-card-sub">Systolic blood pressure (mmHg)</p>
+        {/* ── CHARTS ROW: COLORFUL PIE CHART + WEEKLY BP TREND ───── */}
+        <div className="cdb-charts-grid">
+          
+          {/* Colorful Care Distribution Donut/Pie Chart */}
+          <div className="cdb-card cdb-pie-card">
+            <div className="cdb-card-hd">
+              <div>
+                <h3 className="cdb-card-title">Care & Health Split</h3>
+                <p className="cdb-card-sub">Daily breakdown of logged activities</p>
+              </div>
+              <Link to="/analytics" className="cdb-see-all">Details <ChevronRight size={13}/></Link>
             </div>
-            <Link to="/analytics" className="cdb-see-all">See Full Analytics <ChevronRight size={14}/></Link>
+            
+            <div className="cdb-pie-wrap">
+              <ColorfulPieChart
+                data={careActivityData}
+                size={165}
+                innerRadius={48}
+                outerRadius={75}
+                centerLabel="Total Tasks"
+                centerValue={careActivityData.reduce((a, c) => a + c.value, 0)}
+              />
+            </div>
           </div>
-          <div className="cdb-bar-chart">
-            {(dashboardData?.charts?.bpTrend || [122,118,125,121,128,124,120]).map((h, i) => {
-              const pct = Math.min(((h - 90) / 80) * 100, 100);
-              const today = new Date().getDay();
-              const dayIdx = today === 0 ? 6 : today - 1;
-              return (
-                <div key={i} className="cdb-bar-col">
-                  <span className="cdb-bar-tip">{h > 0 ? h : ''}</span>
-                  <div className={`cdb-bar ${i === dayIdx ? 'today' : ''}`} style={{ height: `${pct}%` }} />
-                  <span className="cdb-bar-day">{barDays[i]}</span>
-                </div>
-              );
-            })}
+
+          {/* Weekly BP Trend Bar Chart */}
+          <div className="cdb-card">
+            <div className="cdb-card-hd">
+              <div>
+                <h3 className="cdb-card-title">Weekly BP Trend</h3>
+                <p className="cdb-card-sub">Systolic pressure (mmHg)</p>
+              </div>
+              <Link to="/analytics" className="cdb-see-all">Analytics <ChevronRight size={13}/></Link>
+            </div>
+            <div className="cdb-bar-chart">
+              {(dashboardData?.charts?.bpTrend || [122,118,125,121,128,124,120]).map((h, i) => {
+                const pct = Math.min(((h - 90) / 80) * 100, 100);
+                const today = new Date().getDay();
+                const dayIdx = today === 0 ? 6 : today - 1;
+                return (
+                  <div key={i} className="cdb-bar-col">
+                    <span className="cdb-bar-tip">{h > 0 ? h : ''}</span>
+                    <div className={`cdb-bar ${i === dayIdx ? 'today' : ''}`} style={{ height: `${Math.max(pct, 15)}%` }} />
+                    <span className="cdb-bar-day">{barDays[i]}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="cdb-chart-footer">
+              <span className="cdb-chart-legend-dot" />
+              <span>Target: 110 - 130 mmHg (Optimal Range)</span>
+            </div>
           </div>
+
         </div>
 
         {/* ── FAMILY MEMBERS ─────────────────────────────────────── */}
-        <div className="cdb-section-label">
-          Family Members
-          <Link to="/parents" className="cdb-section-link">View All</Link>
+        <div className="cdb-section-header">
+          <span className="cdb-section-label">Family Members</span>
+          <Link to="/parents" className="cdb-section-link">View All ({dbParents.length})</Link>
         </div>
+
 
         {loading ? (
           <div className="cdb-skeleton-list">

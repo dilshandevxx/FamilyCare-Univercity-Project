@@ -10,19 +10,21 @@ import {
   Bell,
   Settings,
   LogOut,
+  ShieldCheck,
+  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import './ChildSidebar.css';
 
 const navItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-  { icon: Users,           label: 'My Parents', path: '/parents' },
-  { icon: UserPlus,        label: 'Add Parent', path: '/add-parent' },
-  { icon: HeartPulse,      label: 'Caregivers', path: '/caregivers-list' },
+  { icon: LayoutDashboard, label: 'Dashboard',   path: '/dashboard' },
+  { icon: Users,           label: 'My Parents',  path: '/parents' },
+  { icon: UserPlus,        label: 'Add Parent',  path: '/add-parent' },
+  { icon: HeartPulse,      label: 'Caregivers',  path: '/caregivers-list' },
   { icon: Activity,        label: 'Health Feed', path: '/health-feed' },
-  { icon: BarChart2,       label: 'Analytics', path: '/analytics' },
-  { icon: Bell,            label: 'Alerts', path: '/alerts' },
-  { icon: Settings,        label: 'Settings', path: '/settings' },
+  { icon: BarChart2,       label: 'Analytics',   path: '/analytics', badge: 'New' },
+  { icon: Bell,            label: 'Alerts',      path: '/alerts' },
+  { icon: Settings,        label: 'Settings',    path: '/settings' },
 ];
 
 const ChildSidebar = () => {
@@ -36,42 +38,60 @@ const ChildSidebar = () => {
 
   return (
     <aside className="child-sidebar">
+      {/* Brand Header */}
       <div className="cs-header">
-        <span className="cs-logo">FamilyCare</span>
+        <div className="cs-brand-wrap">
+          <div className="cs-brand-icon">
+            <ShieldCheck size={20} color="#ffffff" />
+          </div>
+          <div>
+            <span className="cs-logo">FamilyCare</span>
+            <span className="cs-tagline">Family Portal</span>
+          </div>
+        </div>
       </div>
 
+      {/* User Profile Block */}
       <div className="cs-user-block">
-        <div className="cs-avatar">
+        <div className="cs-avatar-wrap">
           <img
             src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(user?.name || 'User')}`}
             alt="user"
+            className="cs-avatar-img"
           />
+          <span className="cs-online-dot" />
         </div>
         <div className="cs-user-info">
           <p className="cs-user-name">{user?.name || 'Family Member'}</p>
-          <p className="cs-user-role">Family Member</p>
+          <span className="cs-user-badge">
+            <Sparkles size={10} /> Active Plan
+          </span>
         </div>
       </div>
 
-      <div className="cs-premium">Premium Plan</div>
-
+      {/* Navigation Tabs */}
       <nav className="cs-nav">
-        {navItems.map(({ icon: Icon, label, path }) => (
+        <span className="cs-nav-section-title">Menu</span>
+        {navItems.map(({ icon: Icon, label, path, badge }) => (
           <NavLink
             key={path}
             to={path}
             className={({ isActive }) => `cs-link${isActive ? ' active' : ''}`}
           >
-            <Icon size={18} />
-            <span>{label}</span>
+            <div className="cs-link-icon-wrap">
+              <Icon size={18} />
+            </div>
+            <span className="cs-link-text">{label}</span>
+            {badge && <span className="cs-nav-pill">{badge}</span>}
           </NavLink>
         ))}
       </nav>
 
+      {/* Footer / Logout */}
       <div className="cs-footer">
         <button className="cs-btn-logout" onClick={handleLogout}>
           <LogOut size={16} />
-          Logout
+          <span>Log out</span>
         </button>
       </div>
     </aside>
@@ -79,3 +99,4 @@ const ChildSidebar = () => {
 };
 
 export default ChildSidebar;
+
