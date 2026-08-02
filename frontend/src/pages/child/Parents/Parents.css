@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════
    FamilyCare — My Parents & Family Dashboard
-   Premium Healthcare UI/UX • Zero Gradients • Modern Flat Aesthetic
+   Premium Flat Healthcare Aesthetic • Zero Gradients • Uniform Cards
 ═══════════════════════════════════════════════════════════════════ */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap');
@@ -13,7 +13,7 @@
   color: #0f172a;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.75rem;
 }
 
 /* ════════════════════════════════════════════════════════════════════
@@ -235,12 +235,13 @@
 }
 
 /* ════════════════════════════════════════════════════════════════════
-   3. PARENTS CARDS GRID
+   3. PARENTS CARDS GRID (UNIFORM HEIGHT & SEPARATION)
 ════════════════════════════════════════════════════════════════════ */
 .pc-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+  align-items: stretch;
 }
 
 /* ── Individual Parent Card ── */
@@ -248,20 +249,21 @@
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 22px;
-  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04);
+  box-shadow: 0 4px 18px -2px rgba(15, 23, 42, 0.04);
   display: flex;
   flex-direction: column;
+  height: 100%;
   overflow: hidden;
   transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s;
 }
 
 .pc-parent-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   border-color: #cbd5e1;
-  box-shadow: 0 12px 28px -4px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 14px 30px -4px rgba(15, 23, 42, 0.08);
 }
 
-/* ── 1. Card Header & Identity ── */
+/* ── 1. Card Header & Identity (Standardized) ── */
 .pc-card-header {
   padding: 1.4rem 1.4rem 1rem;
   display: flex;
@@ -385,15 +387,17 @@
   text-transform: capitalize;
 }
 
-/* ── 2. Contact & Location Quick Strip ── */
+/* ── 2. Contact & Location Quick Strip (Fixed Height) ── */
 .pc-contact-strip {
-  padding: 0.65rem 1.4rem;
+  padding: 0.7rem 1.4rem;
   background: #f8fafc;
   border-top: 1px solid #f1f5f9;
   border-bottom: 1px solid #f1f5f9;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  justify-content: center;
+  gap: 6px;
+  min-height: 66px;
 }
 
 .pc-contact-pill {
@@ -429,13 +433,15 @@
   font-style: italic;
 }
 
-/* ── 3. Caregiver Section ── */
+/* ── 3. Caregiver Section (Uniform Box Height) ── */
 .pc-caregiver-section {
   padding: 1rem 1.4rem;
   border-bottom: 1px solid #f1f5f9;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 0.65rem;
+  min-height: 108px;
 }
 
 .pc-section-header {
@@ -482,6 +488,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  height: 54px;
+  box-sizing: border-box;
 }
 
 .pc-cg-avatar-wrapper {
@@ -543,12 +551,14 @@
   background: #f8fafc;
   border: 1.5px dashed #cbd5e1;
   border-radius: 14px;
-  padding: 0.7rem 0.9rem;
+  padding: 0.65rem 0.85rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 0.78rem;
   color: #64748b;
+  height: 54px;
+  box-sizing: border-box;
 }
 
 .pc-btn-assign-now {
@@ -579,13 +589,16 @@
   color: #9f1239;
 }
 
-/* ── 4. Clinical & Medical Section ── */
+/* ── 4. Clinical & Medical Section (Flex 1 for uniform alignment) ── */
 .pc-medical-section {
   padding: 1rem 1.4rem;
   border-bottom: 1px solid #f1f5f9;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  flex: 1;
+  min-height: 145px;
+  justify-content: flex-start;
 }
 
 .pc-medical-tags-container {
@@ -663,7 +676,7 @@
   text-overflow: ellipsis;
 }
 
-/* ── 5. Card Bottom Action Buttons ── */
+/* ── 5. Card Bottom Action Buttons (Pinned to Bottom) ── */
 .pc-card-footer {
   margin-top: auto;
   padding: 1rem 1.4rem;
@@ -671,6 +684,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  height: 64px;
+  box-sizing: border-box;
 }
 
 .pc-action-btn {
@@ -1068,5 +1083,8 @@
   }
   .pc-form-row {
     flex-direction: column;
+  }
+  .pc-cards-grid {
+    grid-template-columns: 1fr;
   }
 }

@@ -189,7 +189,7 @@ const Parents = () => {
               className={`pc-tab-btn ${statusFilter === 'all' ? 'active' : ''}`}
               onClick={() => setStatusFilter('all')}
             >
-              All Profiles ({parents.length})
+              All ({parents.length})
             </button>
             <button
               className={`pc-tab-btn ${statusFilter === 'assigned' ? 'active' : ''}`}
@@ -328,7 +328,7 @@ const Parents = () => {
                     <div className="pc-contact-pill" title={parent.address || 'No address'}>
                       <MapPin size={12} className="pc-pill-icon" />
                       <span className="pc-address-truncate">
-                        {parent.address || 'No residential address'}
+                        {parent.address || 'No address added'}
                       </span>
                     </div>
                   </div>
@@ -339,12 +339,12 @@ const Parents = () => {
                       <span className="pc-sec-title">DEDICATED CAREGIVER</span>
                       {isApproved && (
                         <span className="pc-status-badge approved">
-                          <CheckCircle2 size={11} /> Active In-Care
+                          <CheckCircle2 size={11} /> Active
                         </span>
                       )}
                       {isPending && (
                         <span className="pc-status-badge pending">
-                          <Clock size={11} /> Request Pending
+                          <Clock size={11} /> Pending
                         </span>
                       )}
                       {isRejected && (
@@ -379,14 +379,14 @@ const Parents = () => {
                             </button>
                           </div>
                           <span className="pc-cg-specialty">
-                            {parent.caregiver_specialization || 'Certified Eldercare Specialist'}
+                            {parent.caregiver_specialization || 'Certified Caregiver'}
                           </span>
                         </div>
                       </div>
                     ) : (
                       <div className="pc-unassigned-box">
                         <div className="pc-unassigned-text">
-                          <span>No caregiver assigned yet</span>
+                          <span>No caregiver assigned</span>
                         </div>
                         <button
                           onClick={() => startEdit(parent)}
@@ -400,7 +400,7 @@ const Parents = () => {
 
                     {isRejected && (
                       <div className="pc-rejection-note">
-                        <strong>Reason:</strong> {parent.rejection_reason || 'Caregiver currently at maximum capacity.'}
+                        <strong>Reason:</strong> {parent.rejection_reason || 'Caregiver at full capacity.'}
                       </div>
                     )}
                   </div>
@@ -473,7 +473,7 @@ const Parents = () => {
                         title={`Chat with ${parent.caregiver_name}`}
                       >
                         <MessageSquare size={14} />
-                        <span>Chat Caregiver</span>
+                        <span>Chat</span>
                       </Link>
                     ) : (
                       <Link
@@ -482,7 +482,7 @@ const Parents = () => {
                         title="Browse Caregivers"
                       >
                         <UserCheck size={14} />
-                        <span>Browse Carers</span>
+                        <span>Browse</span>
                       </Link>
                     )}
 
