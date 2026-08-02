@@ -225,13 +225,91 @@ const Caregivers = () => {
       
       {/* ── Hero ── */}
       <header className="cg-hero">
-        <div className="container">
-          <h1 className="cg-hero-title">Find Your <span className="text-teal">Caregiver</span></h1>
+        {/* Decorative ambient blobs */}
+        <div className="cg-hero-blob cg-hero-blob--tl" aria-hidden="true" />
+        <div className="cg-hero-blob cg-hero-blob--br" aria-hidden="true" />
+
+        <div className="container cg-hero-inner">
+
+          {/* Trust pill badge */}
+          <div className="cg-hero-pill">
+            <span className="cg-hero-pill-dot" aria-hidden="true" />
+            <Shield size={13} />
+            <span>All caregivers are background-verified & certified</span>
+          </div>
+
+          {/* Main headline */}
+          <h1 className="cg-hero-title">
+            Find Your{' '}
+            <span className="cg-hero-title-accent">
+              Caregiver
+              <svg className="cg-hero-underline" viewBox="0 0 220 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M2 7.5 C55 2 110 2 218 7.5" stroke="#00A896" strokeWidth="3.5" strokeLinecap="round"/>
+              </svg>
+            </span>
+          </h1>
+
+          {/* Subtitle */}
           <p className="cg-hero-subtitle">
-            Connect with verified specialists who bring expertise, empathy, and warmth to your home. We believe every family deserves a sanctuary of support.
+            Connect with verified specialists who bring expertise, empathy, and warmth to your home.{' '}
+            <strong>Every family deserves a sanctuary of support.</strong>
           </p>
+
+          {/* CTA Buttons */}
+          <div className="cg-hero-actions">
+            <button className="cg-hero-cta-primary" onClick={() => setShowTalkModal(true)}>
+              <span>Talk to a Specialist</span>
+              <span className="cg-hero-cta-arrow">→</span>
+            </button>
+            <button className="cg-hero-cta-secondary" onClick={() => setShowHowModal(true)}>
+              How it works
+            </button>
+          </div>
+
+          {/* Live trust stats */}
+          <div className="cg-hero-stats">
+            <div className="cg-hero-stat">
+              <strong>500+</strong>
+              <span>Verified caregivers</span>
+            </div>
+            <div className="cg-hero-stat-sep" aria-hidden="true" />
+            <div className="cg-hero-stat">
+              <strong>4.9★</strong>
+              <span>Average rating</span>
+            </div>
+            <div className="cg-hero-stat-sep" aria-hidden="true" />
+            <div className="cg-hero-stat">
+              <strong>24 hrs</strong>
+              <span>Specialist response</span>
+            </div>
+            <div className="cg-hero-stat-sep" aria-hidden="true" />
+            <div className="cg-hero-stat">
+              <strong>100%</strong>
+              <span>Background checked</span>
+            </div>
+          </div>
+
+          {/* Floating avatar stack — social proof */}
+          <div className="cg-hero-social-proof">
+            <div className="cg-hero-avatar-stack">
+              {[32, 44, 5, 11, 26].map((seed, i) => (
+                <img
+                  key={i}
+                  src={`https://i.pravatar.cc/48?img=${seed}`}
+                  alt={`Caregiver ${i + 1}`}
+                  className="cg-hero-avatar"
+                  style={{ zIndex: 5 - i }}
+                />
+              ))}
+            </div>
+            <span className="cg-hero-proof-text">
+              Trusted by <strong>2,400+ families</strong> this month
+            </span>
+          </div>
+
         </div>
       </header>
+
 
       <main className="container cg-main">
         {/* ── Filters ── */}

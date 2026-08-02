@@ -78,26 +78,271 @@
 
 /* ── Hero ── */
 .cg-hero {
-  padding: 4rem 0 3rem;
+  position: relative;
+  padding: 5.5rem 0 4rem;
   text-align: center;
-  background: var(--cg-gray-50);
+  background: #ffffff;
+  border-bottom: 1px solid #f1f5f9;
+  overflow: hidden;
 }
-.cg-hero-title {
-  font-size: 3rem;
-  font-weight: 800;
-  letter-spacing: -1px;
-  margin-bottom: 1rem;
-  animation: cgFadeUp 0.6s ease-out forwards;
+
+/* Ambient decoration blobs (flat, extremely subtle) */
+.cg-hero-blob {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
 }
-.cg-hero-subtitle {
-  font-size: 1.15rem;
-  color: var(--cg-gray-500);
-  max-width: 650px;
-  margin: 0 auto;
-  line-height: 1.6;
+.cg-hero-blob--tl {
+  width: 420px;
+  height: 420px;
+  top: -180px;
+  left: -140px;
+  background: rgba(0, 168, 150, 0.055);
+  filter: blur(90px);
+}
+.cg-hero-blob--br {
+  width: 380px;
+  height: 380px;
+  bottom: -160px;
+  right: -120px;
+  background: rgba(0, 168, 150, 0.045);
+  filter: blur(80px);
+}
+
+.cg-hero-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Trust pill */
+.cg-hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f0fdfa;
+  border: 1.5px solid #99f6e4;
+  color: #0f766e;
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  margin-bottom: 1.65rem;
   opacity: 0;
-  animation: cgFadeUp 0.6s 0.1s ease-out forwards;
+  animation: cgFadeUp 0.5s 0.05s ease-out forwards;
 }
+
+.cg-hero-pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+  display: inline-block;
+  flex-shrink: 0;
+  animation: cgPillPulse 2s infinite ease-in-out;
+}
+
+@keyframes cgPillPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.55; transform: scale(0.82); }
+}
+
+/* Main title */
+.cg-hero-title {
+  font-size: clamp(2.4rem, 5vw, 3.75rem);
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  color: #0f172a;
+  line-height: 1.12;
+  margin: 0 0 1.25rem 0;
+  opacity: 0;
+  animation: cgFadeUp 0.55s 0.12s ease-out forwards;
+}
+
+.cg-hero-title-accent {
+  position: relative;
+  color: #00A896;
+  display: inline-block;
+}
+
+/* Curved underline SVG beneath "Caregiver" */
+.cg-hero-underline {
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 100%;
+  height: 10px;
+  pointer-events: none;
+  overflow: visible;
+  opacity: 0;
+  animation: cgFadeIn 0.6s 0.5s ease-out forwards;
+}
+
+/* Subtitle */
+.cg-hero-subtitle {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: #475569;
+  max-width: 600px;
+  margin: 0 auto 2rem auto;
+  line-height: 1.65;
+  opacity: 0;
+  animation: cgFadeUp 0.55s 0.2s ease-out forwards;
+}
+
+.cg-hero-subtitle strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+/* CTA Buttons */
+.cg-hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 2.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  opacity: 0;
+  animation: cgFadeUp 0.55s 0.28s ease-out forwards;
+}
+
+.cg-hero-cta-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.8rem 2rem;
+  background: #00A896;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.97rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 168, 150, 0.28);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cg-hero-cta-primary:hover {
+  background: #008C7D;
+  box-shadow: 0 8px 24px rgba(0, 168, 150, 0.38);
+  transform: translateY(-2px);
+}
+.cg-hero-cta-arrow {
+  font-size: 1.1rem;
+  transition: transform 0.2s ease;
+}
+.cg-hero-cta-primary:hover .cg-hero-cta-arrow {
+  transform: translateX(3px);
+}
+
+.cg-hero-cta-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.8rem 1.65rem;
+  background: #ffffff;
+  color: #334155;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.97rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.cg-hero-cta-secondary:hover {
+  border-color: #00A896;
+  color: #00A896;
+  background: #f0fdfa;
+  transform: translateY(-1px);
+}
+
+/* Stats row */
+.cg-hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1rem 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  opacity: 0;
+  animation: cgFadeUp 0.55s 0.36s ease-out forwards;
+}
+
+.cg-hero-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 2rem;
+}
+.cg-hero-stat strong {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.cg-hero-stat span {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 500;
+  margin-top: 3px;
+  white-space: nowrap;
+}
+
+.cg-hero-stat-sep {
+  width: 1px;
+  height: 32px;
+  background: #e2e8f0;
+  flex-shrink: 0;
+}
+
+/* Social proof avatar stack */
+.cg-hero-social-proof {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+  animation: cgFadeUp 0.55s 0.44s ease-out forwards;
+}
+
+.cg-hero-avatar-stack {
+  display: flex;
+  align-items: center;
+}
+
+.cg-hero-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2.5px solid #ffffff;
+  object-fit: cover;
+  margin-left: -10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.cg-hero-avatar:first-child {
+  margin-left: 0;
+}
+
+.cg-hero-proof-text {
+  font-size: 0.88rem;
+  color: #475569;
+  font-weight: 500;
+}
+.cg-hero-proof-text strong {
+  color: #0f172a;
+  font-weight: 700;
+}
+
 
 /* ── Main Layout ── */
 .cg-main {
