@@ -56,7 +56,8 @@
   border: none;
 }
 .cg-btn-primary {
-   $args[0] ;
+  background: var(--cg-teal);
+  color: white;
   box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
 }
 .cg-btn-primary:hover {
@@ -79,7 +80,7 @@
 .cg-hero {
   padding: 4rem 0 3rem;
   text-align: center;
-  background: radial-gradient(circle at top center, rgba(13, 148, 136, 0.05) 0%, transparent 70%);
+  background: var(--cg-gray-50);
 }
 .cg-hero-title {
   font-size: 3rem;

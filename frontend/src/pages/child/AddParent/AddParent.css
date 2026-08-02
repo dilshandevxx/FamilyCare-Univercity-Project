@@ -429,7 +429,13 @@
 .ap-success-icon-wrap {
   width: 100px;
   height: 100px;
-   $args[0] ;
+  background: #f0fdfa;
+  color: #00A896;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
 }
 
 .ap-success-title {
@@ -486,7 +492,8 @@
 }
 
 .ap-btn-primary {
-   $args[0] ;
+  background: #00A896;
+  color: white;
   border: none;
 }
 

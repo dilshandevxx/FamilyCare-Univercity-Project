@@ -293,11 +293,12 @@ const FeaturesPage = () => {
           border: none;
         }
         .feat-btn-primary {
-          background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+          background: #0D9488;
           color: white;
           box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
         }
         .feat-btn-primary:hover {
+          background: #0F766E;
           transform: translateY(-2px);
           box-shadow: 0 8px 25px rgba(13, 148, 136, 0.35);
         }
@@ -338,7 +339,7 @@ const FeaturesPage = () => {
         .feat-hero__bg-gradient {
           position: absolute;
           inset: 0;
-          background: radial-gradient(circle at top center, rgba(13, 148, 136, 0.08) 0%, transparent 60%);
+          background: #f8fafc;
           z-index: 0;
         }
         .feat-hero__container {
@@ -376,9 +377,7 @@ const FeaturesPage = () => {
           color: #0f172a;
         }
         .feat-text-gradient {
-          background: linear-gradient(135deg, #0D9488 0%, #059669 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          color: #0D9488;
         }
 
         .feat-hero__subtitle {
@@ -602,7 +601,7 @@ const FeaturesPage = () => {
           transform: translateY(0);
         }
         .feat-cta-card {
-          background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%);
+          background: #0D9488;
           border-radius: 32px;
           padding: 5rem 2rem;
           text-align: center;

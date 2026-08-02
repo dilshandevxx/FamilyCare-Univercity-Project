@@ -474,7 +474,7 @@
 
 /* Red Critical Widget */
 .al-widget.widget-critical-bg {
-   $args[0] ;
+  background: #fef2f2;
 }
 
 .al-widget.widget-critical-bg .al-stat-row h2 {

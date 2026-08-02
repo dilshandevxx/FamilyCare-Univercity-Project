@@ -757,7 +757,8 @@
   height: 46px;
   border: none;
   border-radius: 12px;
-   $args[0] ;
+  background: #00A896;
+  color: #ffffff;
   font-size: 0.92rem;
   font-weight: 700;
   font-family: inherit;

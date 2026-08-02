@@ -70,14 +70,12 @@
         background-color:#fff;
       }
 
-      /* Animated dot-grid texture */
+      /* Dot-grid texture */
       section.hero::before {
         content:'';
         position:absolute; inset:0;
-        background-image:transparent 1px,transparent 1px);
-        background-size:32px 32px;
+        background: transparent;
         pointer-events:none; z-index:0;
-        animation:hero-dot-grid-shift 20s ease-in-out infinite;
       }
 
       /* ── Background blobs ── */
@@ -87,17 +85,17 @@
       }
       .hero-blob--1 {
         width:700px; height:700px; top:-200px; right:-180px;
-        background:transparent 0%,transparent 65%);
+        background: rgba(0, 168, 150, 0.08);
         animation:hero-blob-1 14s ease-in-out infinite;
       }
       .hero-blob--2 {
         width:500px; height:500px; bottom:-120px; left:-120px;
-        background:transparent 0%,transparent 65%);
+        background: rgba(2, 128, 144, 0.06);
         animation:hero-blob-2 18s ease-in-out infinite;
       }
       .hero-blob--3 {
         width:300px; height:300px; top:40%; left:35%;
-        background:transparent 0%,transparent 65%);
+        background: rgba(0, 168, 150, 0.05);
         animation:hero-blob-2 10s ease-in-out infinite reverse;
       }
 
@@ -289,7 +287,7 @@
         .lnd-feat-blob {
           position:absolute; top:-200px; right:-200px;
           width:600px; height:600px; border-radius:50%;
-          background:transparent 0%,transparent 65%);
+          background: rgba(13, 148, 136, 0.06);
           pointer-events:none;
           animation:lnd-blob-drift 14s ease-in-out infinite;
         }
@@ -426,7 +424,7 @@
         .ps-bg-blob {
           position:absolute; bottom:-200px; right:-200px;
           width:600px; height:600px; border-radius:50%;
-          background:transparent 0%,transparent 65%);
+          background: rgba(13, 148, 136, 0.05);
           pointer-events:none; filter:blur(40px);
           animation:ps-circle-pulse 12s ease-in-out infinite;
         }
@@ -494,13 +492,13 @@
         }
         .tm-orb--1 {
           width:400px; height:400px;
-          background:transparent 0%,transparent 70%);
+          background: rgba(13, 148, 136, 0.06);
           top:-100px; left:-100px;
           animation:tm-orb-float 10s ease-in-out infinite;
         }
         .tm-orb--2 {
           width:300px; height:300px;
-          background:transparent 0%,transparent 70%);
+          background: rgba(13, 148, 136, 0.04);
           bottom:-80px; right:-80px;
           animation:tm-orb-float 13s ease-in-out infinite reverse;
         }
@@ -562,7 +560,7 @@
           position:absolute; top:50%; left:50%;
           transform:translate(-50%,-50%);
           width:500px; height:200px; border-radius:50%;
-          background:transparent 0%,transparent 70%);
+          background: rgba(13, 148, 136, 0.1);
           pointer-events:none;
           animation:cta-glow-pulse 4s ease-in-out infinite;
         }
@@ -757,9 +755,7 @@
   letter-spacing: -1.5px;
 }
 .hm-title-highlight {
-  background: #00A896;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--color-primary);
 }
 
 .hm-subtitle {

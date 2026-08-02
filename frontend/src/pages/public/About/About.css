@@ -468,7 +468,9 @@
 .about-cta-section { padding: 0 6% 110px; }
 
 .about-cta-box {
-   $args[0] ;
+  background: #0f172a;
+  border-radius: 24px;
+  padding: 80px 60px;
   position: relative;
   overflow: hidden;
   animation: abFadeUp 0.8s ease-out both;

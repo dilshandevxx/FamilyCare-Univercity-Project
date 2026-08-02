@@ -28,7 +28,8 @@
   height: 520px;
   top: -160px;
   left: -120px;
-  background: radial-gradient(circle, rgba(0, 201, 181, 0.26) 0%, rgba(0, 201, 181, 0) 70%);
+  background: rgba(0, 201, 181, 0.08);
+  filter: blur(80px);
 }
 
 .login-bg-glow--2 {
@@ -36,7 +37,8 @@
   height: 650px;
   bottom: -220px;
   right: -160px;
-  background: radial-gradient(circle, rgba(13, 148, 136, 0.28) 0%, rgba(13, 148, 136, 0) 70%);
+  background: rgba(13, 148, 136, 0.08);
+  filter: blur(90px);
 }
 
 .login-bg-glow--3 {
@@ -45,7 +47,8 @@
   top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, rgba(0,0,0,0) 70%);
+  background: rgba(56, 189, 248, 0.04);
+  filter: blur(70px);
 }
 
 /* ── Top Bar ── */
@@ -247,9 +250,6 @@
 
 .text-teal-gradient {
   color: #5eead4;
-  background: #00A896;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 .login-hero-description {
@@ -610,7 +610,8 @@
   height: 48px;
   border: none;
   border-radius: 12px;
-   $args[0] ;
+  background: #00A896;
+  color: #ffffff;
   font-size: 0.94rem;
   font-weight: 700;
   font-family: inherit;
