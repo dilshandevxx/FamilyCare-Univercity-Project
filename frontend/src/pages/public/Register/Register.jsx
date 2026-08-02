@@ -250,47 +250,92 @@ const Register = () => {
           </div>
 
           <div className="reg-hero-content">
-            <div style={{ marginBottom: '1.5rem' }}>
+            <div className="reg-hero-brand-row">
               <BrandLogo to="/" size="md" variant="white" />
             </div>
 
-            <h2 className="reg-hero-title">
-              {selectedRole === 'family' ? (
-                <>Everything you need<br/>to care <span>brilliantly.</span></>
-              ) : (
-                <>Empower your career<br/>with <span>trusted families.</span></>
-              )}
-            </h2>
-            <p className="reg-hero-desc">
-              {selectedRole === 'family'
-                ? 'Join thousands of families who trust FamilyCare to keep their loved ones safe, healthy, and connected.'
-                : 'Connect with families in need of high-quality, compassionate care. Manage schedules and care plans seamlessly.'}
-            </p>
+            <div className="reg-hero-main-block">
+              <h2 className="reg-hero-title">
+                {selectedRole === 'family' ? (
+                  <>Everything you need to <br/>care <span>brilliantly.</span></>
+                ) : (
+                  <>Empower your career with <br/><span>trusted families.</span></>
+                )}
+              </h2>
 
-            <div className="reg-features">
-              {FEATURES.map((f, i) => (
-                <div key={i} className="reg-feature-item">
-                  <div className="reg-feature-icon">{f.icon}</div>
-                  <div className="reg-feature-text">
-                    <strong>{f.title}</strong>
-                    <span>{f.desc}</span>
+              {/* The One Meaningful Modern Thing: Live Health & Care Snapshot Card */}
+              {selectedRole === 'family' ? (
+                <div className="auth-live-card">
+                  <div className="auth-live-card-header">
+                    <div className="auth-live-avatar-wrap">
+                      <img
+                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=Eleanor"
+                        alt="Eleanor Vance"
+                        className="auth-live-avatar"
+                      />
+                      <span className="auth-live-pulse-dot" />
+                    </div>
+                    <div className="auth-live-info">
+                      <h4 className="auth-live-name">Eleanor Vance</h4>
+                      <span className="auth-live-role">Mother • Daily Health Record</span>
+                    </div>
+                    <span className="auth-live-status-pill">● Normal</span>
+                  </div>
+
+                  <div className="auth-live-metrics-grid">
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Blood Pressure</span>
+                      <span className="auth-metric-num">120/80 <small>mmHg</small></span>
+                    </div>
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Heart Rate</span>
+                      <span className="auth-metric-num">72 <small>bpm</small></span>
+                    </div>
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Blood Sugar</span>
+                      <span className="auth-metric-num">98 <small>mg/dL</small></span>
+                    </div>
                   </div>
                 </div>
-              ))}
+              ) : (
+                <div className="auth-live-card">
+                  <div className="auth-live-card-header">
+                    <div className="auth-live-avatar-wrap">
+                      <img
+                        src="https://api.dicebear.com/7.x/bottts/svg?seed=SarahChen"
+                        alt="Nurse Sarah"
+                        className="auth-live-avatar"
+                      />
+                      <span className="auth-live-pulse-dot" />
+                    </div>
+                    <div className="auth-live-info">
+                      <h4 className="auth-live-name">Nurse Sarah Chen</h4>
+                      <span className="auth-live-role">Registered Geriatric Nurse</span>
+                    </div>
+                    <span className="auth-live-status-pill">● Active Duty</span>
+                  </div>
+
+                  <div className="auth-live-metrics-grid">
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Assigned Elders</span>
+                      <span className="auth-metric-num">4 Residents</span>
+                    </div>
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Today's Visits</span>
+                      <span className="auth-metric-num">3 / 4 Done</span>
+                    </div>
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Care Rating</span>
+                      <span className="auth-metric-num">4.98 ★</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div className="reg-hero-trust-box">
-              <div className="reg-trust-badge">
-                <span className="reg-trust-pulse"></span>
-                <strong>HIPAA Verified Care Network</strong>
-              </div>
-              <div className="reg-hero-metrics">
-                <div className="reg-metric"><strong>5,000+</strong><span>Families</span></div>
-                <div className="reg-metric-sep"></div>
-                <div className="reg-metric"><strong>4.95★</strong><span>Rating</span></div>
-                <div className="reg-metric-sep"></div>
-                <div className="reg-metric"><strong>100%</strong><span>Secure</span></div>
-              </div>
+            <div className="reg-hero-trust-simple">
+              <ShieldCheck size={14} className="reg-trust-icon" />
+              <span>HIPAA Compliant &amp; 256-Bit Encrypted Healthcare Network</span>
             </div>
           </div>
         </div>

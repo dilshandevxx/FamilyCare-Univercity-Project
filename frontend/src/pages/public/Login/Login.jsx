@@ -128,53 +128,95 @@ const Login = () => {
               <div className="login-hero-overlay"></div>
             </div>
             
-            <div className="login-hero-tag">
-              <span className="login-tag-dot"></span>
-              {selectedRole === 'family' ? 'Family Member Portal' : 'Caregiver Portal'}
+            <div className="login-hero-top">
+              <div className="login-hero-pill">
+                <span className="login-tag-dot"></span>
+                <span>{selectedRole === 'family' ? 'Family Care Portal' : 'Caregiver Network'}</span>
+              </div>
             </div>
 
             <div className="login-hero-center-content">
-              <h1 className="login-hero-heading">
+              <h2 className="login-hero-heading">
                 {selectedRole === 'family' ? (
-                  <>Welcome back to <br/><span className="text-teal-gradient">peace of mind.</span></>
+                  <>Peace of mind for <br/><span className="text-teal-accent">your loved ones.</span></>
                 ) : (
-                  <>Welcome back to <br/><span className="text-teal-gradient">care coordination.</span></>
+                  <>Empowering <br/><span className="text-teal-accent">compassionate care.</span></>
                 )}
-              </h1>
+              </h2>
 
-              <p className="login-hero-description">
-                {selectedRole === 'family'
-                  ? 'Stay connected to your elderly loved ones with live health updates, verified caregivers, and instant care logs.'
-                  : 'Access your assigned residents, record vital metrics, review schedules, and coordinate with families effortlessly.'}
-              </p>
+              {/* The One Meaningful Modern Thing: Live Health & Care Snapshot Card */}
+              {selectedRole === 'family' ? (
+                <div className="auth-live-card">
+                  <div className="auth-live-card-header">
+                    <div className="auth-live-avatar-wrap">
+                      <img
+                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=Eleanor"
+                        alt="Eleanor Vance"
+                        className="auth-live-avatar"
+                      />
+                      <span className="auth-live-pulse-dot" />
+                    </div>
+                    <div className="auth-live-info">
+                      <h4 className="auth-live-name">Eleanor Vance</h4>
+                      <span className="auth-live-role">Mother • Vitals Logged 5m ago</span>
+                    </div>
+                    <span className="auth-live-status-pill">● Normal</span>
+                  </div>
 
-              <div className="login-hero-trust-badge">
-                <div className="login-trust-icon-box">
-                  <div className="login-trust-online-dot"></div>
-                  <ShieldCheck size={18} />
+                  <div className="auth-live-metrics-grid">
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Blood Pressure</span>
+                      <span className="auth-metric-num">120/80 <small>mmHg</small></span>
+                    </div>
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Heart Rate</span>
+                      <span className="auth-metric-num">72 <small>bpm</small></span>
+                    </div>
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Blood Sugar</span>
+                      <span className="auth-metric-num">98 <small>mg/dL</small></span>
+                    </div>
+                  </div>
                 </div>
-                <div className="login-trust-info">
-                  <strong>HIPAA & 256-Bit Encrypted</strong>
-                  <span>Verified medical-grade care network</span>
+              ) : (
+                <div className="auth-live-card">
+                  <div className="auth-live-card-header">
+                    <div className="auth-live-avatar-wrap">
+                      <img
+                        src="https://api.dicebear.com/7.x/bottts/svg?seed=SarahChen"
+                        alt="Nurse Sarah"
+                        className="auth-live-avatar"
+                      />
+                      <span className="auth-live-pulse-dot" />
+                    </div>
+                    <div className="auth-live-info">
+                      <h4 className="auth-live-name">Nurse Sarah Chen</h4>
+                      <span className="auth-live-role">Registered Geriatric Nurse</span>
+                    </div>
+                    <span className="auth-live-status-pill">● Active Duty</span>
+                  </div>
+
+                  <div className="auth-live-metrics-grid">
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Assigned Elders</span>
+                      <span className="auth-metric-num">4 Residents</span>
+                    </div>
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Today's Visits</span>
+                      <span className="auth-metric-num">3 / 4 Done</span>
+                    </div>
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Care Rating</span>
+                      <span className="auth-metric-num">4.98 ★</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
-            <div className="login-hero-stats">
-              <div className="login-stat">
-                <strong>5,000+</strong>
-                <span>Families</span>
-              </div>
-              <div className="login-stat-sep"></div>
-              <div className="login-stat">
-                <strong>4.95★</strong>
-                <span>Rating</span>
-              </div>
-              <div className="login-stat-sep"></div>
-              <div className="login-stat">
-                <strong>100%</strong>
-                <span>Secure</span>
-              </div>
+            <div className="login-hero-footer-trust">
+              <ShieldCheck size={14} className="login-trust-icon" />
+              <span>HIPAA Compliant &amp; 256-Bit Encrypted Healthcare Network</span>
             </div>
           </div>
 
