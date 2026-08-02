@@ -31,6 +31,7 @@ export const adminService = {
 
   // Health Logs
   getHealthLogs: (params) => api.get('/admin/health-logs', { params }),
+  getHealthLogById: (id) => api.get(`/admin/health-logs/${id}`),
 
   // Alerts
   getAlerts: () => api.get('/admin/alerts'),

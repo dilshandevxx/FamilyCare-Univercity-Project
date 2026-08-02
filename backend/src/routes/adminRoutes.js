@@ -17,6 +17,7 @@ const {
   approveCaregiver,
   rejectCaregiver,
   getAdminHealthLogs,
+  getAdminHealthLogById,
   getAdminAlerts,
   resolveAdminAlert,
   deleteAdminAlert,
@@ -59,6 +60,7 @@ router.delete('/users/:id',                   deleteUser);
 
 // Health logs (admin view — all residents)
 router.get('/health-logs',                    getAdminHealthLogs);
+router.get('/health-logs/:id',                getAdminHealthLogById);
 
 // Alerts (admin view — all residents, no child scoping)
 router.get('/alerts',                         getAdminAlerts);

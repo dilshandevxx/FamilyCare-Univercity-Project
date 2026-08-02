@@ -332,12 +332,16 @@ const getAdminHealthLogs = async (req, res) => {
   try {
     let query = `
       SELECT
-        hl.id, hl.logged_at,
+        hl.id, hl.parent_id, hl.logged_at,
         hl.blood_pressure, hl.heart_rate, hl.temperature,
         hl.meds_taken, hl.meds_notes, hl.clinical_notes,
         hl.mood, hl.overall_condition, hl.notes,
         hl.breakfast_status, hl.lunch_status, hl.dinner_status,
+        hl.attachment_url,
         p.name AS elder_name,
+        p.age AS elder_age,
+        p.gender AS elder_gender,
+        p.room_number AS elder_room,
         u.name AS caregiver_name
       FROM health_logs hl
       LEFT JOIN parents p ON p.id = hl.parent_id
@@ -361,6 +365,42 @@ const getAdminHealthLogs = async (req, res) => {
 
     const [rows] = await pool.query(query, params);
     res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// ── GET /api/admin/health-logs/:id ───────────────────────────────
+// Fetch detailed single health log record for admin view modal
+const getAdminHealthLogById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [[log]] = await pool.query(
+      `SELECT
+        hl.id, hl.parent_id, hl.logged_at,
+        hl.blood_pressure, hl.heart_rate, hl.temperature,
+        hl.meds_taken, hl.meds_notes, hl.clinical_notes,
+        hl.mood, hl.overall_condition, hl.notes,
+        hl.breakfast_status, hl.lunch_status, hl.dinner_status,
+        hl.attachment_url,
+        p.name AS elder_name,
+        p.age AS elder_age,
+        p.gender AS elder_gender,
+        p.room_number AS elder_room,
+        p.care_status AS elder_care_status,
+        p.medical_conditions,
+        p.allergies,
+        u.name AS caregiver_name,
+        u.email AS caregiver_email
+      FROM health_logs hl
+      LEFT JOIN parents p ON p.id = hl.parent_id
+      LEFT JOIN users   u ON u.id = hl.logged_by
+      WHERE hl.id = ?`,
+      [id]
+    );
+
+    if (!log) return res.status(404).json({ error: 'Health record not found' });
+    res.json(log);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -615,6 +655,7 @@ module.exports = {
   approveCaregiver,
   rejectCaregiver,
   getAdminHealthLogs,
+  getAdminHealthLogById,
   getAdminAlerts,
   resolveAdminAlert,
   deleteAdminAlert,
