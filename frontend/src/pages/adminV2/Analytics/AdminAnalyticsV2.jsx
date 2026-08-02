@@ -9,6 +9,7 @@ const AdminAnalyticsV2 = () => {
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('30D');
   const [barTooltip, setBarTooltip] = useState({ visible: false, x: 0, y: 0, content: '' });
+  const [donutHover, setDonutHover] = useState(null);
 
   const filterOptions = [
     { label: '7 Days', value: '7D' },
@@ -266,9 +267,9 @@ const AdminAnalyticsV2 = () => {
             
             <div className="chart-wrapper flex-row">
               {logs_by_condition.length > 0 ? (
-                <>
+                <div style={{ position: 'relative', width: '130px', height: '130px' }}>
                   {/* SVG Donut Chart */}
-                  <svg viewBox="0 0 200 200" className="donut-chart-svg" style={{ width: '130px', transform: 'rotate(-90deg)' }}>
+                  <svg viewBox="0 0 200 200" className="donut-chart-svg" style={{ width: '130px', height: '130px', transform: 'rotate(-90deg)' }}>
                     {logs_by_condition.map((item, i) => {
                       const percentage = item.count / totalLogs;
                       const dashArrayLength = 2 * Math.PI * 70; // Circumference where r=70 is approx 439.8
@@ -282,31 +283,63 @@ const AdminAnalyticsV2 = () => {
                       return (
                         <circle 
                           key={item.type}
+                          className="donut-slice"
                           cx="100" cy="100" r="70" 
                           fill="none" 
                           stroke={getConditionColor(item.type)} 
                           strokeWidth="20" 
                           strokeDasharray={strokeDasharray} 
-                          strokeDashoffset={strokeDashoffset} 
+                          strokeDashoffset={strokeDashoffset}
+                          onMouseEnter={() => setDonutHover({ type: item.type, pct: Math.round(percentage * 100) })}
+                          onMouseLeave={() => setDonutHover(null)}
                         />
                       );
                     })}
                   </svg>
                   
-                  <div className="donut-legend-info">
-                    {logs_by_condition.map(item => (
-                      <div className="legend-item" key={item.type}>
-                        <span className={`legend-color ${getConditionClass(item.type)}`} />
-                        <span className="legend-label">{getConditionLabel(item.type)}</span>
-                        <span className="legend-pct">{Math.round((item.count / totalLogs) * 100)}%</span>
-                      </div>
-                    ))}
+                  {/* Central Dynamic Label */}
+                  <div className="donut-center-label">
+                    {donutHover ? (
+                      <>
+                        <span className="donut-center-pct" style={{ color: getConditionColor(donutHover.type) }}>
+                          {donutHover.pct}%
+                        </span>
+                        <span className="donut-center-text">
+                          {getConditionLabel(donutHover.type)}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="donut-center-pct">{totalLogs}</span>
+                        <span className="donut-center-text">Total</span>
+                      </>
+                    )}
                   </div>
-                </>
+                </div>
               ) : (
                 <div className="analytics-empty-state">
                   <PieChart size={40} strokeWidth={1.5} />
                   <p>No log records found</p>
+                </div>
+              )}
+              
+              {/* Legend alongside the donut (only if data exists) */}
+              {logs_by_condition.length > 0 && (
+                <div className="donut-legend-info">
+                  {logs_by_condition.map(item => (
+                    <div 
+                      className="legend-item" 
+                      key={item.type}
+                      style={{ 
+                        opacity: donutHover && donutHover.type !== item.type ? 0.4 : 1,
+                        transition: 'opacity 0.2s'
+                      }}
+                    >
+                      <span className={`legend-color ${getConditionClass(item.type)}`} />
+                      <span className="legend-label">{getConditionLabel(item.type)}</span>
+                      <span className="legend-pct">{Math.round((item.count / totalLogs) * 100)}%</span>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
