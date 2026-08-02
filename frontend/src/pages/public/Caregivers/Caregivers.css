@@ -56,8 +56,7 @@
   border: none;
 }
 .cg-btn-primary {
-  background: linear-gradient(135deg, var(--cg-teal) 0%, var(--cg-teal-dark) 100%);
-  color: white;
+   $args[0] ;
   box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25);
 }
 .cg-btn-primary:hover {

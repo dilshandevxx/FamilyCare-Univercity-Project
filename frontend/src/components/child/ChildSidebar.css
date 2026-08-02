@@ -95,9 +95,9 @@
 }
 
 .cs-link.active {
-  background: linear-gradient(135deg, #00a896 0%, #028090 100%);
+  background: #00a896;
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 168, 150, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 168, 150, 0.18);
 }
 
 .cs-footer {

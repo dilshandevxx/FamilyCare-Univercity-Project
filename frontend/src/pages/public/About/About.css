@@ -9,7 +9,7 @@
 /* ── HERO ─────────────────────────────────────────────────── */
 .about-hero {
   padding: 130px 6% 90px;
-  background: linear-gradient(135deg, #f0fdfa 0%, #f8fafc 60%, #fff7ed 100%);
+  background: #00A896;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -164,7 +164,7 @@
 
 .about-vision-card {
   flex: 1 1 420px;
-  background: linear-gradient(140deg, #0a4f3e 0%, #0d6b55 100%);
+  background: #00A896;
   padding: 44px 40px;
   border-radius: 28px;
   color: white;
@@ -419,7 +419,7 @@
 .about-team-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(13, 148, 136, 0.7) 0%, transparent 50%);
+  background: #00A896;
   opacity: 0;
   transition: opacity 0.3s;
   display: flex;
@@ -468,11 +468,7 @@
 .about-cta-section { padding: 0 6% 110px; }
 
 .about-cta-box {
-  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
-  border-radius: 36px;
-  padding: 80px 60px;
-  text-align: center;
-  color: white;
+   $args[0] ;
   position: relative;
   overflow: hidden;
   animation: abFadeUp 0.8s ease-out both;

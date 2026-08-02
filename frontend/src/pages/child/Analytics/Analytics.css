@@ -74,7 +74,7 @@
 
 /* ── Toast ────────────────────────────────────────────────────────── */
 .fan-toast {
-  background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+  background: #f0fdf4;
   border: 1px solid #86efac;
   color: #15803d;
   border-radius: 12px;
@@ -465,7 +465,7 @@
   width: 100%;
   margin-top: 1rem;
   padding: .65rem;
-  background: linear-gradient(135deg, #00A896, #007a6d);
+  background: #00A896;
   color: white;
   border: none;
   border-radius: 12px;
@@ -481,7 +481,7 @@
   display: flex;
   align-items: center;
   gap: .75rem;
-  background: linear-gradient(135deg, #f0fdfa, #e6faf7);
+  background: #f0fdfa;
   border: 1.5px solid #99f6e4;
   border-radius: 14px;
   padding: .85rem 1.25rem;

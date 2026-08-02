@@ -474,8 +474,7 @@
 
 /* Red Critical Widget */
 .al-widget.widget-critical-bg {
-  background: linear-gradient(135deg, #fee2e2 0%, #fca5a5 100%);
-  border-color: #fca5a5;
+   $args[0] ;
 }
 
 .al-widget.widget-critical-bg .al-stat-row h2 {
@@ -575,7 +574,7 @@
   overflow: hidden;
   height: 150px;
   position: relative;
-  background-image: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+  background-image: none;
 }
 
 .al-map-placeholder {
