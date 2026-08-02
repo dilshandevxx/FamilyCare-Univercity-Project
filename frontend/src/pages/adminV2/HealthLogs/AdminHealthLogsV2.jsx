@@ -54,11 +54,22 @@ const AdminHealthLogsV2 = () => {
     }
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setSelectedLog(null);
     setModalLoading(false);
     setModalError(null);
-  };
+  }, []);
+
+  // Handle escape key to dismiss modal
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && selectedLog) {
+        handleCloseModal();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedLog, handleCloseModal]);
 
   const filteredLogs = logs.filter(l => {
     const term = search.toLowerCase().trim();
