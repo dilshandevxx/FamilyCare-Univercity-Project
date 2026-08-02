@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import GoogleSignInButton from '../../../components/auth/GoogleSignInButton';
+import familyHeroImg from '../../../assets/auth_family_hero.png';
+import caregiverHeroImg from '../../../assets/auth_caregiver_hero.png';
 import api from '../../../services/api';
 import './Login.css';
 
@@ -115,62 +117,61 @@ const Login = () => {
 
           {/* ── Left Hero Side ── */}
           <div className="login-card-hero">
-            <div className="login-hero-glow"></div>
+            <div className="login-hero-img-container">
+              <img 
+                src={selectedRole === 'family' ? familyHeroImg : caregiverHeroImg} 
+                alt={selectedRole === 'family' ? "Family Member" : "Caregiver"} 
+                className="login-hero-bg-img"
+              />
+              <div className="login-hero-overlay"></div>
+            </div>
             
             <div className="login-hero-tag">
               <span className="login-tag-dot"></span>
               {selectedRole === 'family' ? 'Family Member Portal' : 'Caregiver Portal'}
             </div>
 
-            <h1 className="login-hero-heading">
-              {selectedRole === 'family' ? (
-                <>Welcome back to <br/><span className="text-teal-gradient">peace of mind.</span></>
-              ) : (
-                <>Welcome back to <br/><span className="text-teal-gradient">care coordination.</span></>
-              )}
-            </h1>
+            <div className="login-hero-center-content">
+              <h1 className="login-hero-heading">
+                {selectedRole === 'family' ? (
+                  <>Welcome back to <br/><span className="text-teal-gradient">peace of mind.</span></>
+                ) : (
+                  <>Welcome back to <br/><span className="text-teal-gradient">care coordination.</span></>
+                )}
+              </h1>
 
-            <p className="login-hero-description">
-              {selectedRole === 'family'
-                ? 'Stay connected to your elderly loved ones with live health updates, verified caregivers, and instant care logs.'
-                : 'Access your assigned residents, record vital metrics, review schedules, and coordinate with families effortlessly.'}
-            </p>
+              <p className="login-hero-description">
+                {selectedRole === 'family'
+                  ? 'Stay connected to your elderly loved ones with live health updates, verified caregivers, and instant care logs.'
+                  : 'Access your assigned residents, record vital metrics, review schedules, and coordinate with families effortlessly.'}
+              </p>
 
-            <div className="login-value-props">
-              <div className="login-prop-item">
-                <div className="login-prop-icon">
-                  <ShieldCheck size={16} />
+              <div className="login-hero-trust-badge">
+                <div className="login-trust-icon-box">
+                  <div className="login-trust-online-dot"></div>
+                  <ShieldCheck size={18} />
                 </div>
-                <span>End-to-End Encrypted Health Records</span>
-              </div>
-              <div className="login-prop-item">
-                <div className="login-prop-icon">
-                  <CheckCircle2 size={16} />
+                <div className="login-trust-info">
+                  <strong>HIPAA & 256-Bit Encrypted</strong>
+                  <span>Verified medical-grade care network</span>
                 </div>
-                <span>Real-Time Notifications & Care Alerts</span>
-              </div>
-              <div className="login-prop-item">
-                <div className="login-prop-icon">
-                  <Sparkles size={16} />
-                </div>
-                <span>Seamless Global Family Coordination</span>
               </div>
             </div>
 
             <div className="login-hero-stats">
               <div className="login-stat">
-                <strong>100+</strong>
-                <span>Active Families</span>
+                <strong>5,000+</strong>
+                <span>Families</span>
               </div>
               <div className="login-stat-sep"></div>
               <div className="login-stat">
-                <strong>4.9★</strong>
-                <span>Satisfaction</span>
+                <strong>4.95★</strong>
+                <span>Rating</span>
               </div>
               <div className="login-stat-sep"></div>
               <div className="login-stat">
-                <strong>24/7</strong>
-                <span>Monitoring</span>
+                <strong>100%</strong>
+                <span>Secure</span>
               </div>
             </div>
           </div>

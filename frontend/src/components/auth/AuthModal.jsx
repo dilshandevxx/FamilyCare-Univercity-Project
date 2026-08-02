@@ -8,6 +8,8 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useAuthModal } from '../../context/AuthModalContext';
 import GoogleSignInButton from './GoogleSignInButton';
+import familyHeroImg from '../../assets/auth_family_hero.png';
+import caregiverHeroImg from '../../assets/auth_caregiver_hero.png';
 import api from '../../services/api';
 import './AuthModal.css';
 
@@ -267,13 +269,20 @@ const AuthModal = () => {
 
         {/* ── LEFT HERO SIDEBAR ── */}
         <div className="auth-modal-hero">
-          <div className="auth-hero-backdrop-glow"></div>
-          <div className="auth-hero-backdrop-glow-2"></div>
+          {/* Dynamic Background Image with Smooth Gradient Overlay */}
+          <div className="auth-hero-img-container">
+            <img 
+              src={role === 'family' ? familyHeroImg : caregiverHeroImg} 
+              alt={role === 'family' ? "Family Care" : "Caregiver Support"}
+              className="auth-hero-bg-img"
+            />
+            <div className="auth-hero-overlay"></div>
+          </div>
           
           <div className="auth-hero-header">
             <div className="auth-hero-logo">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path d="M12 21C12 21 3 14 3 8.5C3 5.46 5.46 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.54 3 23 5.46 23 8.5C23 14 14 21 12 21Z" fill="#00C9B5"/>
+                <path d="M12 21C12 21 3 14 3 8.5C3 5.46 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.54 3 23 5.46 23 8.5C23 14 14 21 12 21Z" fill="#00C9B5"/>
               </svg>
             </div>
             <span className="auth-hero-brand">FamilyCare</span>
@@ -299,25 +308,15 @@ const AuthModal = () => {
                 : 'Manage patient care plans, log real-time vitals, and connect seamlessly with verified families.'}
             </p>
 
-            {/* Value Props List */}
-            <div className="auth-hero-features">
-              <div className="auth-feature-item">
-                <div className="auth-feature-icon">
-                  <ShieldCheck size={15} />
-                </div>
-                <span>HIPAA & Bank-Grade 256-bit Encryption</span>
+            {/* Floating Glassmorphic Trust Card */}
+            <div className="auth-hero-trust-badge">
+              <div className="auth-trust-avatar-group">
+                <div className="auth-trust-dot"></div>
+                <ShieldCheck size={18} />
               </div>
-              <div className="auth-feature-item">
-                <div className="auth-feature-icon">
-                  <CheckCircle2 size={15} />
-                </div>
-                <span>Verified, Background-Checked Providers</span>
-              </div>
-              <div className="auth-feature-item">
-                <div className="auth-feature-icon">
-                  <Sparkles size={15} />
-                </div>
-                <span>Real-Time Health Monitoring & Instant Alerts</span>
+              <div className="auth-trust-text">
+                <strong>HIPAA & 256-Bit Encrypted</strong>
+                <span>Verified medical-grade care network</span>
               </div>
             </div>
           </div>
@@ -336,7 +335,7 @@ const AuthModal = () => {
             <div className="auth-stat-divider"></div>
             <div className="auth-stat-item">
               <strong>100%</strong>
-              <span>Encrypted</span>
+              <span>Secure</span>
             </div>
           </div>
         </div>

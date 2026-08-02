@@ -155,7 +155,7 @@
 /* ── Hero Side ── */
 .login-card-hero {
   position: relative;
-  background: linear-gradient(150deg, #052622 0%, #0a3d35 48%, #008779 100%);
+  background: #041a17;
   padding: 3.25rem 2.75rem;
   color: #ffffff;
   display: flex;
@@ -165,23 +165,55 @@
   user-select: none;
 }
 
-.login-hero-glow {
+/* Photographic Background & Cinematic Gradient */
+.login-hero-img-container {
   position: absolute;
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  top: -80px;
-  left: -80px;
-  background: radial-gradient(circle, rgba(0, 201, 181, 0.35) 0%, rgba(0, 201, 181, 0) 70%);
-  pointer-events: none;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.login-hero-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 25%;
+  transform: scale(1.05);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: brightness(0.85) contrast(1.08);
+}
+
+.login-card-hero:hover .login-hero-bg-img {
+  transform: scale(1.09);
+}
+
+.login-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(3, 20, 18, 0.45) 0%,
+    rgba(4, 25, 22, 0.7) 40%,
+    rgba(3, 19, 17, 0.95) 85%,
+    #021210 100%
+  );
+  backdrop-filter: blur(0.5px);
 }
 
 .login-hero-tag {
+  position: relative;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(0, 201, 181, 0.18);
-  border: 1px solid rgba(0, 201, 181, 0.35);
+  background: rgba(0, 201, 181, 0.22);
+  border: 1px solid rgba(0, 201, 181, 0.45);
   color: #5eead4;
   padding: 5px 12px;
   border-radius: 20px;
@@ -190,7 +222,8 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
   width: fit-content;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .login-tag-dot {
@@ -199,6 +232,13 @@
   border-radius: 50%;
   background: #00C9B5;
   box-shadow: 0 0 8px #00C9B5;
+  animation: authPulse 2s infinite ease-in-out;
+}
+
+.login-hero-center-content {
+  position: relative;
+  z-index: 2;
+  margin: 1.5rem 0;
 }
 
 .login-hero-heading {
@@ -207,7 +247,8 @@
   line-height: 1.25;
   letter-spacing: -0.03em;
   color: #ffffff;
-  margin: 1.5rem 0 1rem 0;
+  margin: 0 0 0.85rem 0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
 }
 
 .text-teal-gradient {
@@ -219,38 +260,66 @@
 
 .login-hero-description {
   font-size: 0.92rem;
-  color: rgba(255, 255, 255, 0.82);
+  color: rgba(255, 255, 255, 0.88);
   line-height: 1.6;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
 }
 
-.login-value-props {
-  display: flex;
-  flex-direction: column;
-  gap: 0.95rem;
-  margin-bottom: 2.25rem;
-}
-
-.login-prop-item {
+/* Glassmorphic Trust Card */
+.login-hero-trust-badge {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 0.86rem;
-  color: rgba(255, 255, 255, 0.92);
-  font-weight: 500;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 12px 16px;
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 
-.login-prop-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 9px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+.login-trust-icon-box {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(0, 201, 181, 0.2);
+  border: 1px solid rgba(0, 201, 181, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #5eead4;
   flex-shrink: 0;
+}
+
+.login-trust-online-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  border: 1.5px solid #031815;
+}
+
+.login-trust-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-trust-info strong {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.login-trust-info span {
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .login-hero-stats {
@@ -259,8 +328,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 12px 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 14px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .login-stat {
@@ -270,24 +343,24 @@
 }
 
 .login-stat strong {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: #ffffff;
   letter-spacing: -0.02em;
 }
 
 .login-stat span {
-  font-size: 0.72rem;
-  color: rgba(255, 255, 255, 0.65);
-  font-weight: 500;
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
 }
 
 .login-stat-sep {
   width: 1px;
-  height: 26px;
-  background: rgba(255, 255, 255, 0.15);
+  height: 22px;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* ── Form Side ── */

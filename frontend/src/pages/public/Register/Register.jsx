@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import GoogleSignInButton from '../../../components/auth/GoogleSignInButton';
+import familyHeroImg from '../../../assets/auth_family_hero.png';
+import caregiverHeroImg from '../../../assets/auth_caregiver_hero.png';
 import './Register.css';
 
 /* ── Legal Modal ──────────────────────────────────────────────────────────── */
@@ -236,6 +238,16 @@ const Register = () => {
 
         {/* ══ LEFT: Hero Panel ══════════════════════════════════════════════ */}
         <div className="reg-hero-panel">
+          {/* Dynamic Background Image with Smooth Gradient Overlay */}
+          <div className="reg-hero-img-container">
+            <img 
+              src={selectedRole === 'family' ? familyHeroImg : caregiverHeroImg} 
+              alt={selectedRole === 'family' ? "Family Portal" : "Caregiver Portal"}
+              className="reg-hero-bg-img"
+            />
+            <div className="reg-hero-overlay"></div>
+          </div>
+
           <div className="reg-hero-content">
             <Link to="/" className="reg-brand">
               <div className="reg-brand-icon">
@@ -247,11 +259,16 @@ const Register = () => {
             </Link>
 
             <h2 className="reg-hero-title">
-              Everything you need<br/>
-              to care <span>brilliantly.</span>
+              {selectedRole === 'family' ? (
+                <>Everything you need<br/>to care <span>brilliantly.</span></>
+              ) : (
+                <>Empower your career<br/>with <span>trusted families.</span></>
+              )}
             </h2>
             <p className="reg-hero-desc">
-              Join thousands of families who trust FamilyCare to keep their loved ones safe, healthy, and connected.
+              {selectedRole === 'family'
+                ? 'Join thousands of families who trust FamilyCare to keep their loved ones safe, healthy, and connected.'
+                : 'Connect with families in need of high-quality, compassionate care. Manage schedules and care plans seamlessly.'}
             </p>
 
             <div className="reg-features">
@@ -266,18 +283,20 @@ const Register = () => {
               ))}
             </div>
 
-            <div className="reg-hero-users">
-              <div className="reg-avatars">
-                {['A','B','C','D','E'].map((l, i) => (
-                  <div key={i} className="reg-avatar" style={{ marginLeft: i > 0 ? '-10px' : 0 }}>{l}</div>
-                ))}
+            <div className="reg-hero-trust-box">
+              <div className="reg-trust-badge">
+                <span className="reg-trust-pulse"></span>
+                <strong>HIPAA Verified Care Network</strong>
               </div>
-              <p><strong>Many</strong> families on FamilyCare</p>
+              <div className="reg-hero-metrics">
+                <div className="reg-metric"><strong>5,000+</strong><span>Families</span></div>
+                <div className="reg-metric-sep"></div>
+                <div className="reg-metric"><strong>4.95★</strong><span>Rating</span></div>
+                <div className="reg-metric-sep"></div>
+                <div className="reg-metric"><strong>100%</strong><span>Secure</span></div>
+              </div>
             </div>
           </div>
-          <div className="reg-circle reg-circle-1"></div>
-          <div className="reg-circle reg-circle-2"></div>
-          <div className="reg-circle reg-circle-3"></div>
         </div>
 
         {/* ══ RIGHT: Form Panel ════════════════════════════════════════════ */}
