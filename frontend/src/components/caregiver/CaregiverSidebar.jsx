@@ -25,7 +25,7 @@ const CaregiverSidebar = () => {
   return (
     <div className="sidebar-container">
       <div className="sidebar-header">
-        <BrandLogo to="/caregiver/dashboard" size="md" tagline="Caregiver Portal" />
+        <BrandLogo to="/" size="md" tagline="Caregiver Portal" />
       </div>
 
       <nav className="sidebar-nav">

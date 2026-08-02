@@ -62,7 +62,7 @@ const AdminSidebarV2 = () => {
   return (
     <div className="admin-v2-sidebar">
       <div className="admin-v2-sidebar-header">
-        <BrandLogo to="/admin/dashboard" size="md" tagline="Admin Console" />
+        <BrandLogo to="/" size="md" tagline="Admin Console" />
       </div>
 
       <nav className="admin-v2-nav">

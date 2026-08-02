@@ -40,7 +40,7 @@ const ChildSidebar = () => {
     <aside className="child-sidebar">
       {/* Brand Header */}
       <div className="cs-header">
-        <BrandLogo to="/dashboard" size="md" tagline="Family Portal" />
+        <BrandLogo to="/" size="md" tagline="Family Portal" />
       </div>
 
       {/* User Profile Block */}

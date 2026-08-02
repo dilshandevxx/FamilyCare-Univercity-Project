@@ -83,7 +83,7 @@ const BrandLogo = ({
   size = 'md',
   variant = 'default',
   tagline = '',
-  to,
+  to = '/',
   className = '',
   onClick
 }) => {

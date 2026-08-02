@@ -45,7 +45,7 @@ const AdminSidebar = () => {
   return (
     <div className="admin-sidebar">
       <div className="admin-sidebar-header">
-        <BrandLogo to="/admin/dashboard" size="md" tagline="Admin Console" />
+        <BrandLogo to="/" size="md" tagline="Admin Console" />
       </div>
 
       <nav className="admin-nav">

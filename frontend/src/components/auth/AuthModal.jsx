@@ -11,6 +11,7 @@ import GoogleSignInButton from './GoogleSignInButton';
 import familyHeroImg from '../../assets/auth_family_hero.png';
 import caregiverHeroImg from '../../assets/auth_caregiver_hero.png';
 import api from '../../services/api';
+import BrandLogo from '../common/BrandLogo';
 import './AuthModal.css';
 
 const RELATIONSHIP_OPTIONS = [
@@ -280,12 +281,7 @@ const AuthModal = () => {
           </div>
           
           <div className="auth-hero-header">
-            <div className="auth-hero-logo">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                <path d="M12 21C12 21 3 14 3 8.5C3 5.46 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.54 3 23 5.46 23 8.5C23 14 14 21 12 21Z" fill="#00C9B5"/>
-              </svg>
-            </div>
-            <span className="auth-hero-brand">FamilyCare</span>
+            <BrandLogo to="/" size="sm" variant="white" onClick={() => { closeAuthModal(); navigate('/'); }} />
           </div>
 
           <div className="auth-hero-body">
