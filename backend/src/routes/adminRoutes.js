@@ -26,6 +26,7 @@ const {
   updateAdminSettings,
   getSystemStatus,
   sendBroadcast,
+  streamSystemLogs,
 } = require('../controllers/adminController');
 
 // All admin routes require a valid JWT + admin role
@@ -33,6 +34,7 @@ router.use(protect, adminOnly);
 
 // System Monitoring & Broadcast
 router.get('/system-status',                  getSystemStatus);
+router.get('/system-logs/stream',             streamSystemLogs);
 router.post('/broadcast',                     sendBroadcast);
 
 // Dashboard stats

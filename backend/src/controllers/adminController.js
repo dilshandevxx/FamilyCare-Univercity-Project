@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const { performance } = require('perf_hooks');
 const pool = require('../config/db');
 const os = require('os');
+const { logEmitter } = require('../middleware/logStreamer');
 
 let lastCpuInfo = os.cpus();
 function getCpuUtilization() {
@@ -646,6 +647,26 @@ const sendBroadcast = async (req, res) => {
   }
 };
 
+const streamSystemLogs = (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  // Send an initial connected message
+  res.write(`data: ${JSON.stringify({ time: new Date().toISOString().split('T')[1].slice(0, 8), type: 'info', event: 'SSE connection established' })}\n\n`);
+
+  const logListener = (logData) => {
+    res.write(`data: ${JSON.stringify(logData)}\n\n`);
+  };
+
+  logEmitter.on('log', logListener);
+
+  req.on('close', () => {
+    logEmitter.off('log', logListener);
+  });
+};
+
 module.exports = {
   getResidents,
   addResident,
@@ -671,4 +692,5 @@ module.exports = {
   updateAdminSettings,
   getSystemStatus,
   sendBroadcast,
+  streamSystemLogs,
 };
