@@ -679,9 +679,6 @@ const getAnalytics = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-    res.status(500).json({ error: err.message });
-  }
-};
 // ── GET /api/health/visit-history ────────────────────────────────
 // Paginated visit history for the logged-in caregiver
 const getVisitHistory = async (req, res) => {
