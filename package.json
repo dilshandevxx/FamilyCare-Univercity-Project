@@ -8,7 +8,9 @@
     "dev:frontend": "cd frontend && npm run dev",
     "install:backend": "cd backend && npm install",
     "install:frontend": "cd frontend && npm install",
-    "install:all": "npm run install:backend && npm run install:frontend"
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "migrate": "cd backend && npm run migrate",
+    "migrate:backend": "cd backend && npm run migrate"
   },
   "dependencies": {
     "lucide-react": "^1.14.0"
