@@ -1,64 +1,31 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Search, Heart, User, Clock, ClipboardList, X, Activity, Thermometer, Info, FileText, Loader2 } from 'lucide-react';
+import { Search, Heart, User, Clock, ClipboardList, X, Activity, Thermometer, Info, FileText, Loader2, Paperclip, AlertCircle, Utensils, Pill, Smile } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
-import api from '../../../services/api';
+import adminService from '../../../services/adminService';
+import { mapHealthLogToUIModel } from '../../../utils/healthDataMapper';
+import { INITIAL_HEALTH_LOG_STATE } from '../../../types/healthLog';
 import './AdminHealthLogsV2.css';
-
-const deriveFlag = (log) => {
-  if (log.flag) return log.flag;
-  const cond = (log.overall_condition || '').toLowerCase();
-  if (cond.includes('critical') || cond.includes('poor')) return 'Critical';
-  if (cond.includes('fair') || cond.includes('concern')) return 'Warning';
-  return 'Normal';
-};
-
-const formatDate = (iso) => {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  const now = new Date();
-  const diffD = Math.floor((now - d) / 86400000);
-  if (diffD === 0) return `Today, ${d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
-  if (diffD === 1) return `Yesterday, ${d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ` ${d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}`;
-};
 
 const AdminHealthLogsV2 = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  
+  // Modal state
   const [selectedLog, setSelectedLog] = useState(null);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [modalError, setModalError] = useState(null);
 
   const fetchLogs = useCallback(async () => {
     setLoading(true);
     try {
-      const { data } = await api.get('/admin/health-logs', { params: { limit: 200 } });
-      setLogs(data.map(l => {
-        const flag = deriveFlag(l);
-        const condition = flag === 'Critical' ? 'critical' : flag === 'Warning' ? 'needs-attention' : 'stable';
-        
-        return {
-          id: l.id,
-          parentName: l.elder_name || 'Unknown',
-          caregiver: l.caregiver_name || 'Unknown',
-          bp: l.blood_pressure || 'N/A',
-          hr: l.heart_rate || 'N/A',
-          temp: l.temperature || 'N/A',
-          spo2: l.oxygen_level || 'N/A',
-          bloodSugar: l.blood_sugar || 'N/A',
-          hydration: l.hydration_level || 'N/A',
-          sleep: l.sleep_quality || 'N/A',
-          weight: l.weight || 'N/A',
-          meds: l.medication_status || 'N/A',
-          meal: l.meal_consumption || 'N/A',
-          notes: l.notes || 'No notes provided.',
-          date: formatDate(l.logged_at),
-          mood: l.mood || 'N/A',
-          condition
-        };
-      }));
+      const { data } = await adminService.getHealthLogs({ limit: 200 });
+      const mapped = Array.isArray(data) ? data.map(mapHealthLogToUIModel) : [];
+      setLogs(mapped);
     } catch (err) {
-      console.error('Failed to fetch logs', err);
+      console.error('Failed to fetch health logs:', err);
+      setLogs([]);
     } finally {
       setLoading(false);
     }
@@ -68,10 +35,39 @@ const AdminHealthLogsV2 = () => {
     fetchLogs();
   }, [fetchLogs]);
 
+  // Trigger modal and fetch comprehensive record by ID
+  const handleOpenRecord = async (logItem) => {
+    setSelectedLog(logItem);
+    setModalLoading(true);
+    setModalError(null);
+
+    try {
+      const { data } = await adminService.getHealthLogById(logItem.id);
+      if (data) {
+        setSelectedLog(mapHealthLogToUIModel(data));
+      }
+    } catch (err) {
+      console.warn('Could not load extended log details from server, using cached row:', err);
+      // Keep optimistic logItem mapped state as graceful fallback
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setSelectedLog(null);
+    setModalLoading(false);
+    setModalError(null);
+  };
+
   const filteredLogs = logs.filter(l => {
-    const matchesSearch = l.parentName.toLowerCase().includes(search.toLowerCase()) || 
-                          l.caregiver.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || l.condition === statusFilter;
+    const term = search.toLowerCase().trim();
+    const matchesSearch = !term || 
+      (l.elderName && l.elderName.toLowerCase().includes(term)) || 
+      (l.caregiverName && l.caregiverName.toLowerCase().includes(term)) ||
+      (l.clinicalNotes && l.clinicalNotes.toLowerCase().includes(term));
+
+    const matchesStatus = statusFilter === 'all' || l.conditionBadge === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -83,7 +79,7 @@ const AdminHealthLogsV2 = () => {
         <div className="health-v2-header">
           <div className="health-v2-title">
             <h2>Health Records Directory</h2>
-            <p>Review real-time health statuses, vitals, and caregiver clinical notes.</p>
+            <p>Review real-time health statuses, vitals, and caregiver clinical observations.</p>
           </div>
           
           <div className="health-v2-header-actions">
@@ -123,23 +119,23 @@ const AdminHealthLogsV2 = () => {
             </div>
           ) : (
             filteredLogs.map(l => (
-              <div key={l.id} className={`health-v2-card status-${l.condition}`}>
+              <div key={l.id} className={`health-v2-card status-${l.conditionBadge}`}>
                 <div className="health-v2-card-glow"></div>
                 
                 <div className="health-v2-card-header">
                   <div className="health-v2-avatar-name">
                     <div className="health-v2-avatar">
-                      {l.parentName.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                      {(l.elderName || 'FC').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                     </div>
                     <div>
-                      <h4>{l.parentName}</h4>
+                      <h4>{l.elderName}</h4>
                       <p className="health-v2-meta">
-                        <Clock size={12} className="inline-icon" /> {l.date}
+                        <Clock size={12} className="inline-icon" /> {l.formattedDate}
                       </p>
                     </div>
                   </div>
-                  <span className={`health-v2-status-pill status-${l.condition}`}>
-                    {l.condition === 'needs-attention' ? 'Attention' : l.condition}
+                  <span className={`health-v2-status-pill status-${l.conditionBadge}`}>
+                    {l.conditionBadge === 'needs-attention' ? 'Attention' : l.conditionBadge}
                   </span>
                 </div>
 
@@ -147,27 +143,27 @@ const AdminHealthLogsV2 = () => {
                   <div className="vital-indicator">
                     <Activity size={14} color="#00A896" />
                     <span className="label">BP:</span>
-                    <span className="value">{l.bp}</span>
+                    <span className="value">{l.bloodPressure || '—'}</span>
                   </div>
                   <div className="vital-indicator">
                     <Heart size={14} color="#EF4444" />
                     <span className="label">HR:</span>
-                    <span className="value">{l.hr}</span>
+                    <span className="value">{l.heartRate ? `${l.heartRate} bpm` : '—'}</span>
                   </div>
                   <div className="vital-indicator">
                     <Thermometer size={14} color="#EA580C" />
                     <span className="label">Temp:</span>
-                    <span className="value">{l.temp !== 'N/A' ? `${l.temp}°` : 'N/A'}</span>
+                    <span className="value">{l.temperature ? `${l.temperature}°` : '—'}</span>
                   </div>
                 </div>
 
                 <div className="health-v2-caregiver-info">
                   <User size={14} />
-                  <span>Logged by: <strong>{l.caregiver}</strong></span>
+                  <span>Logged by: <strong>{l.caregiverName}</strong></span>
                 </div>
 
                 <div className="health-v2-card-footer">
-                  <button className="view-log-btn" onClick={() => setSelectedLog(l)}>
+                  <button className="view-log-btn" onClick={() => handleOpenRecord(l)}>
                     <ClipboardList size={16} />
                     View Health Record
                   </button>
@@ -179,9 +175,9 @@ const AdminHealthLogsV2 = () => {
 
         {/* Health Record Details Modal */}
         {selectedLog && (
-          <div className="health-v2-modal-overlay" onClick={() => setSelectedLog(null)}>
+          <div className="health-v2-modal-overlay" onClick={handleCloseModal}>
             <div className="health-v2-modal" onClick={e => e.stopPropagation()}>
-              <button className="health-v2-modal-close" onClick={() => setSelectedLog(null)}>
+              <button className="health-v2-modal-close" onClick={handleCloseModal} aria-label="Close modal">
                 <X size={20} />
               </button>
 
@@ -190,81 +186,87 @@ const AdminHealthLogsV2 = () => {
                   <FileText size={28} color="white" />
                 </div>
                 <div>
-                  <h2 className="health-v2-modal-title">{selectedLog.parentName}</h2>
-                  <p className="health-v2-modal-desc">{selectedLog.date} &nbsp;•&nbsp; Logged by {selectedLog.caregiver}</p>
+                  <h2 className="health-v2-modal-title">{selectedLog.elderName}</h2>
+                  <p className="health-v2-modal-desc">
+                    {selectedLog.formattedDate} &nbsp;•&nbsp; Logged by {selectedLog.caregiverName}
+                  </p>
                 </div>
               </div>
 
               <div className="health-v2-modal-body">
+                {modalLoading && (
+                  <div className="modal-loading-banner">
+                    <Loader2 size={16} className="animate-spin" />
+                    <span>Syncing latest record details...</span>
+                  </div>
+                )}
+
+                {/* Primary Vitals Grid */}
                 <div className="v2-vitals-grid">
                   <div className="vital-box">
-                    <span className="label">BP</span>
-                    <span className="value">{selectedLog.bp}</span>
+                    <span className="label">Blood Pressure</span>
+                    <span className="value">{selectedLog.bloodPressure || '—'}</span>
                   </div>
                   <div className="vital-box">
                     <span className="label">Heart Rate</span>
-                    <span className="value">{selectedLog.hr !== 'N/A' ? `${selectedLog.hr} bpm` : 'N/A'}</span>
+                    <span className="value">{selectedLog.heartRate ? `${selectedLog.heartRate} bpm` : '—'}</span>
                   </div>
                   <div className="vital-box">
                     <span className="label">Temperature</span>
-                    <span className="value">{selectedLog.temp !== 'N/A' ? `${selectedLog.temp} °F` : 'N/A'}</span>
-                  </div>
-                  <div className="vital-box">
-                    <span className="label">SpO2</span>
-                    <span className="value">{selectedLog.spo2 !== 'N/A' ? `${selectedLog.spo2}%` : 'N/A'}</span>
-                  </div>
-                  <div className="vital-box">
-                    <span className="label">Blood Sugar</span>
-                    <span className="value">{selectedLog.bloodSugar}</span>
-                  </div>
-                  <div className="vital-box">
-                    <span className="label">Weight</span>
-                    <span className="value">{selectedLog.weight}</span>
+                    <span className="value">{selectedLog.temperature ? `${selectedLog.temperature} °F` : '—'}</span>
                   </div>
                 </div>
 
+                {/* Tracking & Observation Stats */}
                 <div className="health-v2-tracking-grid">
                   <div className="chart-stat">
                     <span className="label">Condition Severity</span>
-                    <span className={`value-pill status-${selectedLog.condition}`}>{selectedLog.condition.toUpperCase().replace('-', ' ')}</span>
-                  </div>
-                  
-                  <div className="chart-stat">
-                    <span className="label">Medication Status</span>
-                    <span className={`value ${selectedLog.meds === 'Taken on time' ? 'text-teal' : selectedLog.meds === 'Refused' ? 'text-coral' : 'text-warning'}`}>
-                      {selectedLog.meds}
+                    <span className={`value-pill status-${selectedLog.conditionBadge}`}>
+                      {selectedLog.overallCondition}
                     </span>
                   </div>
-
-                  <div className="chart-stat">
-                    <span className="label">Hydration Intake</span>
-                    <span className="value">{selectedLog.hydration}</span>
-                  </div>
-
-                  <div className="chart-stat">
-                    <span className="label">Sleep Quality</span>
-                    <span className="value">{selectedLog.sleep}</span>
-                  </div>
                   
                   <div className="chart-stat">
-                    <span className="label">Meal Consumption</span>
-                    <span className="value">{selectedLog.meal}</span>
+                    <span className="label">Medication Administration</span>
+                    <span className="value">{selectedLog.medicationDisplay || '—'}</span>
                   </div>
-                  
+
                   <div className="chart-stat">
-                    <span className="label">Mood/Behavior</span>
-                    <span className="value">{selectedLog.mood}</span>
+                    <span className="label">Mood / Demeanor</span>
+                    <span className="value">{selectedLog.mood || '—'}</span>
+                  </div>
+
+                  <div className="chart-stat">
+                    <span className="label">Meals Logged</span>
+                    <span className="value">{selectedLog.mealsSummary || '—'}</span>
                   </div>
                 </div>
 
+                {/* Clinical Notes Section */}
                 <div className="clinical-notes-box">
                   <h5>Clinical Caregiver Notes</h5>
-                  <p>{selectedLog.notes}</p>
+                  <p>{selectedLog.clinicalNotes || 'No notes provided for this record.'}</p>
                 </div>
+
+                {/* Optional Attachment View */}
+                {selectedLog.attachmentUrl && (
+                  <div className="health-attachment-box">
+                    <Paperclip size={16} color="#00A896" />
+                    <span>Attached Document / Report:</span>
+                    <a 
+                      href={selectedLog.attachmentUrl.startsWith('http') ? selectedLog.attachmentUrl : `${import.meta.env.VITE_API_URL || ''}${selectedLog.attachmentUrl}`} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="attachment-link"
+                    >
+                      View Attachment
+                    </a>
+                  </div>
+                )}
               </div>
 
               <div className="health-v2-modal-actions">
-                <button className="health-v2-modal-close-btn" onClick={() => setSelectedLog(null)}>
+                <button className="health-v2-modal-close-btn" onClick={handleCloseModal}>
                   Close Record
                 </button>
               </div>
@@ -278,3 +280,4 @@ const AdminHealthLogsV2 = () => {
 };
 
 export default AdminHealthLogsV2;
+
