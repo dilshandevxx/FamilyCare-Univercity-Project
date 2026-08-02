@@ -1,19 +1,26 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { 
+  Mail, Lock, Eye, EyeOff, ShieldCheck, Heart, Stethoscope, 
+  ArrowRight, ArrowLeft, CheckCircle2, Sparkles, AlertCircle, Home
+} from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import api from '../../../services/api';
 import './Login.css';
 
 const Login = () => {
   const [selectedRole, setSelectedRole] = useState('family');
-  const [email, setEmail]               = useState('');
-  const [password, setPassword]         = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading]       = useState(false);
-  const [error, setError]               = useState('');
-  const [tfaRequired, setTfaRequired]   = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  // 2FA state
+  const [tfaRequired, setTfaRequired] = useState(false);
   const [tfaPartialToken, setTfaPartialToken] = useState('');
-  const [tfaOtp, setTfaOtp]             = useState('');
+  const [tfaOtp, setTfaOtp] = useState('');
 
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -39,7 +46,7 @@ const Login = () => {
         setIsLoading(false);
         return;
       }
-      setError(resp?.error || 'Invalid email or password. Please try again.');
+      setError(resp?.error || 'Invalid email or password. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
@@ -64,237 +71,282 @@ const Login = () => {
   };
 
   return (
-    <div className="login-root">
+    <div className="login-page-root">
+      
+      {/* Background Animated Lights */}
+      <div className="login-bg-glow login-bg-glow--1"></div>
+      <div className="login-bg-glow login-bg-glow--2"></div>
+      <div className="login-bg-glow login-bg-glow--3"></div>
 
-      {/* ─── LEFT: Form Panel ─── */}
-      <div className="login-form-panel">
-        <div className="login-form-inner">
+      {/* Top Navbar Brand */}
+      <header className="login-topbar">
+        <Link to="/" className="login-topbar-brand">
+          <div className="login-brand-logo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 21C12 21 3 14 3 8.5C3 5.46 5.46 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.54 3 23 5.46 23 8.5C23 14 14 21 12 21Z" fill="#00C9B5"/>
+            </svg>
+          </div>
+          <span className="login-brand-title">FamilyCare</span>
+        </Link>
 
-          {/* Brand — click to go home */}
-          <Link to="/" className="login-brand">
-            <div className="login-brand-icon">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-              </svg>
+        <Link to="/" className="login-home-btn">
+          <Home size={15} />
+          <span>Back to Home</span>
+        </Link>
+      </header>
+
+      {/* Main Centered Auth Container */}
+      <main className="login-container">
+        <div className="login-card">
+
+          {/* ── Left Hero Side ── */}
+          <div className="login-card-hero">
+            <div className="login-hero-glow"></div>
+            
+            <div className="login-hero-tag">
+              <span className="login-tag-dot"></span>
+              {selectedRole === 'family' ? 'Family Member Portal' : 'Caregiver Portal'}
             </div>
-            <span className="login-brand-name">FamilyCare</span>
-          </Link>
 
-          {/* Heading */}
-          <div className="login-heading">
-            <h1>Sign in to your account</h1>
-            <p>
+            <h1 className="login-hero-heading">
+              {selectedRole === 'family' ? (
+                <>Welcome back to <br/><span className="text-teal-gradient">peace of mind.</span></>
+              ) : (
+                <>Welcome back to <br/><span className="text-teal-gradient">care coordination.</span></>
+              )}
+            </h1>
+
+            <p className="login-hero-description">
               {selectedRole === 'family'
-                ? 'Welcome back! Sign in to your family account.'
-                : 'Welcome back! Sign in to your caregiver account.'}
+                ? 'Stay connected to your elderly loved ones with live health updates, verified caregivers, and instant care logs.'
+                : 'Access your assigned residents, record vital metrics, review schedules, and coordinate with families effortlessly.'}
             </p>
-          </div>
 
-          {/* Role Switcher — animated sliding pill */}
-          <div className={`login-role-switcher ${selectedRole}`}>
-            <div className={`login-role-pill${selectedRole === 'caregiver' ? ' right' : ''}`} />
-            <button
-              type="button"
-              className={`login-role-opt${selectedRole === 'family' ? ' selected' : ''}`}
-              onClick={() => setSelectedRole('family')}
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-              </svg>
-              Family Member
-            </button>
-            <button
-              type="button"
-              className={`login-role-opt${selectedRole === 'caregiver' ? ' selected' : ''}`}
-              onClick={() => setSelectedRole('caregiver')}
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-              </svg>
-              Caregiver
-            </button>
-          </div>
-          <p className="login-role-tagline">
-            {selectedRole === 'family'
-              ? 'Monitor care, track health & stay connected'
-              : 'Manage residents, log health data & communicate'}
-          </p>
-
-          {/* Error */}
-          {error && (
-            <div className="login-error-box">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-              {error}
-            </div>
-          )}
-
-          {tfaRequired ? (
-            <form onSubmit={handleTfaSubmit} className="login-form">
-              <div className="login-field">
-                <label>Two-Factor Code</label>
-                <p className="login-field-hint">Enter the 6-digit code from your authenticator app.</p>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={7}
-                  value={tfaOtp}
-                  onChange={e => setTfaOtp(e.target.value.replace(/[^0-9]/g, ''))}
-                  placeholder="0  0  0  0  0  0"
-                  className="login-input tfa-input"
-                  autoFocus
-                  required
-                />
+            <div className="login-value-props">
+              <div className="login-prop-item">
+                <div className="login-prop-icon">
+                  <ShieldCheck size={16} />
+                </div>
+                <span>End-to-End Encrypted Health Records</span>
               </div>
-              <button type="submit" className="login-submit-btn" disabled={isLoading || tfaOtp.length < 6}>
-                {isLoading ? 'Verifying…' : 'Verify Code'}
-              </button>
-              <button type="button" className="login-back-btn" onClick={() => { setTfaRequired(false); setTfaOtp(''); setError(''); }}>
-                ← Back to login
-              </button>
-            </form>
-          ) : (
-            <form onSubmit={handleSubmit} className="login-form">
+              <div className="login-prop-item">
+                <div className="login-prop-icon">
+                  <CheckCircle2 size={16} />
+                </div>
+                <span>Real-Time Notifications & Care Alerts</span>
+              </div>
+              <div className="login-prop-item">
+                <div className="login-prop-icon">
+                  <Sparkles size={16} />
+                </div>
+                <span>Seamless Global Family Coordination</span>
+              </div>
+            </div>
 
-              <div className="login-field">
-                <label htmlFor="email">Email Address</label>
-                <div className="login-input-wrap">
-                  <svg className="login-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
-                  </svg>
+            <div className="login-hero-stats">
+              <div className="login-stat">
+                <strong>100+</strong>
+                <span>Active Families</span>
+              </div>
+              <div className="login-stat-sep"></div>
+              <div className="login-stat">
+                <strong>4.9★</strong>
+                <span>Satisfaction</span>
+              </div>
+              <div className="login-stat-sep"></div>
+              <div className="login-stat">
+                <strong>24/7</strong>
+                <span>Monitoring</span>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Right Form Side ── */}
+          <div className="login-card-form">
+
+            {/* Mode Switcher (Sign In / Register Link) */}
+            <div className="login-mode-tabs">
+              <button type="button" className="login-mode-tab active">
+                Sign In
+              </button>
+              <Link to="/register" className="login-mode-tab">
+                Create Account
+              </Link>
+            </div>
+
+            {/* Role Switcher */}
+            <div className="login-role-switch">
+              <button
+                type="button"
+                className={`login-role-btn ${selectedRole === 'family' ? 'active' : ''}`}
+                onClick={() => { setSelectedRole('family'); setError(''); }}
+              >
+                <Heart size={15} />
+                <span>Family Member</span>
+              </button>
+              <button
+                type="button"
+                className={`login-role-btn ${selectedRole === 'caregiver' ? 'active' : ''}`}
+                onClick={() => { setSelectedRole('caregiver'); setError(''); }}
+              >
+                <Stethoscope size={15} />
+                <span>Caregiver</span>
+              </button>
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div className="login-alert-box">
+                <AlertCircle size={16} className="flex-shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            {/* 2FA Mode */}
+            {tfaRequired ? (
+              <form onSubmit={handleTfaSubmit} className="login-form-inner">
+                <div className="login-form-title">
+                  <h2>Two-Factor Authentication</h2>
+                  <p>Enter the 6-digit verification code from your authenticator application.</p>
+                </div>
+
+                <div className="login-form-group">
+                  <label>Authenticator Code</label>
                   <input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    className="login-input"
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={6}
+                    value={tfaOtp}
+                    onChange={e => setTfaOtp(e.target.value.replace(/[^0-9]/g, ''))}
+                    placeholder="000000"
+                    className="login-input-field login-otp-input"
+                    autoFocus
                     required
-                    autoComplete="email"
                   />
                 </div>
-              </div>
 
-              <div className="login-field">
-                <div className="login-label-row">
-                  <label htmlFor="password">Password</label>
-                  <Link to="/forgot-password" className="login-forgot-link">Forgot password?</Link>
+                <button 
+                  type="submit" 
+                  className="login-submit-button"
+                  disabled={isLoading || tfaOtp.length < 6}
+                >
+                  {isLoading ? <span className="login-spinner" /> : 'Verify Code & Sign In'}
+                </button>
+
+                <button 
+                  type="button" 
+                  className="login-back-button"
+                  onClick={() => { setTfaRequired(false); setTfaOtp(''); setError(''); }}
+                >
+                  <ArrowLeft size={15} /> Back to standard login
+                </button>
+              </form>
+            ) : (
+              /* Standard Login Form */
+              <form onSubmit={handleSubmit} className="login-form-inner">
+
+                {/* Social Login Options */}
+                <div className="login-social-grid">
+                  <a href="http://localhost:5000/api/auth/google" className="login-social-pill">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="18" height="18" />
+                    <span>Google</span>
+                  </a>
+                  <a href="http://localhost:5000/api/auth/facebook" className="login-social-pill">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                    <span>Facebook</span>
+                  </a>
                 </div>
-                <div className="login-input-wrap">
-                  <svg className="login-input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                  </svg>
-                  <input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    className="login-input"
-                    required
-                    autoComplete="current-password"
-                  />
-                  <button type="button" className="login-eye-btn" onClick={() => setShowPassword(v => !v)} tabIndex={-1} aria-label="Toggle password">
-                    {showPassword ? (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>
-                      </svg>
-                    ) : (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-                      </svg>
-                    )}
-                  </button>
+
+                <div className="login-sep-line">
+                  <span>or sign in with email</span>
                 </div>
-              </div>
 
-              <div className="login-remember">
-                <label className="login-check-label">
-                  <input type="checkbox" className="login-checkbox" />
-                  <span>Remember me for 30 days</span>
-                </label>
-              </div>
+                {/* Email Address */}
+                <div className="login-form-group">
+                  <label htmlFor="login-email">Email Address</label>
+                  <div className="login-input-container">
+                    <Mail size={17} className="login-input-svg" />
+                    <input
+                      id="login-email"
+                      type="email"
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      placeholder="you@example.com"
+                      className="login-input-field"
+                      required
+                      autoComplete="email"
+                    />
+                  </div>
+                </div>
 
-              <button type="submit" className="login-submit-btn" disabled={isLoading}>
-                {isLoading ? (
-                  <><span className="login-spinner"></span> Signing in…</>
-                ) : 'Sign In'}
-              </button>
+                {/* Password */}
+                <div className="login-form-group">
+                  <div className="login-field-header">
+                    <label htmlFor="login-pass">Password</label>
+                    <Link to="/forgot-password" className="login-forgot-btn">Forgot Password?</Link>
+                  </div>
+                  <div className="login-input-container">
+                    <Lock size={17} className="login-input-svg" />
+                    <input
+                      id="login-pass"
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={e => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      className="login-input-field"
+                      required
+                      autoComplete="current-password"
+                    />
+                    <button 
+                      type="button" 
+                      className="login-eye-toggle"
+                      onClick={() => setShowPassword(!showPassword)}
+                      tabIndex={-1}
+                    >
+                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                </div>
 
-              <div className="login-divider">
-                <span>or continue with</span>
-              </div>
+                {/* Remember Me */}
+                <div className="login-checkbox-row">
+                  <label className="login-check-item">
+                    <input 
+                      type="checkbox" 
+                      checked={rememberMe} 
+                      onChange={e => setRememberMe(e.target.checked)} 
+                    />
+                    <span>Keep me logged in on this device</span>
+                  </label>
+                </div>
 
-              <div className="login-social-row">
-                <a href="http://localhost:5000/api/auth/google" className="login-social-btn">
-                  <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" width="20" height="20" />
-                  <span>Google</span>
-                </a>
-                <a href="http://localhost:5000/api/auth/facebook" className="login-social-btn">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                  <span>Facebook</span>
-                </a>
-              </div>
-            </form>
-          )}
+                {/* Submit Button */}
+                <button 
+                  type="submit" 
+                  className="login-submit-button"
+                  disabled={isLoading}
+                >
+                  {isLoading ? <span className="login-spinner" /> : (
+                    <>Sign In as {selectedRole === 'family' ? 'Family Member' : 'Caregiver'} <ArrowRight size={17} /></>
+                  )}
+                </button>
 
-          <p className="login-signup-text">
-            Don't have an account? <Link to="/register">Create account</Link>
-          </p>
+                <div className="login-footer-text">
+                  <span>Don't have an account yet?</span>
+                  <Link to="/register" className="login-footer-link">
+                    Create account
+                  </Link>
+                </div>
+
+              </form>
+            )}
+
+          </div>
+
         </div>
-      </div>
-
-      {/* ─── RIGHT: Hero Panel ─── */}
-      <div className="login-hero-panel">
-        <div className="login-hero-content">
-
-          <div className="login-hero-badge">
-            <span className="badge-dot"></span>
-            Trusted by many families
-          </div>
-
-          <h2 className="login-hero-title">
-            Caring for your loved ones,<br/>
-            <span>made effortless.</span>
-          </h2>
-
-          <p className="login-hero-desc">
-            Connect with professional caregivers, monitor health in real time, and stay close to the people who matter most — all in one place.
-          </p>
-
-          <div className="login-stats">
-            <div className="login-stat">
-              <strong>100+</strong>
-              <span>Families</span>
-            </div>
-            <div className="login-stat-divider"></div>
-            <div className="login-stat">
-              <strong>100+</strong>
-              <span>Caregivers</span>
-            </div>
-            <div className="login-stat-divider"></div>
-            <div className="login-stat">
-              <strong>98%</strong>
-              <span>Satisfaction</span>
-            </div>
-          </div>
-
-          <div className="login-testimonial">
-            <div className="testimonial-avatar">S</div>
-            <div className="testimonial-body">
-              <p>"FamilyCare completely transformed how we manage care for my mother. It gives us peace of mind every day."</p>
-              <strong>Sarah Mitchell</strong>
-              <span>Family Member, Chicago</span>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Decorative circles */}
-        <div className="hero-circle hero-circle-1"></div>
-        <div className="hero-circle hero-circle-2"></div>
-        <div className="hero-circle hero-circle-3"></div>
-      </div>
+      </main>
 
     </div>
   );

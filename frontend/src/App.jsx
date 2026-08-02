@@ -1,7 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { AuthModalProvider } from './context/AuthModalContext';
 import Navbar from './components/Navbar';
+import AuthModal from './components/auth/AuthModal';
 
 // Public pages
 import Home       from './pages/public/Landing/Landing';
@@ -82,6 +84,7 @@ const AppContent = () => {
   return (
     <div className="App">
       {!hideNav && <Navbar />}
+      <AuthModal />
       <Routes>
         {/* Public */}
         <Route path="/"          element={<Home />} />
@@ -142,7 +145,9 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <AppContent />
+        <AuthModalProvider>
+          <AppContent />
+        </AuthModalProvider>
       </AuthProvider>
     </Router>
   );
