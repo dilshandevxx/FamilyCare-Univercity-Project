@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, HeartPulse, Clock, TrendingUp, UserCheck, Loader2 } from 'lucide-react';
+import { Users, HeartPulse, Clock, TrendingUp, UserCheck, Loader2, BarChart3, PieChart } from 'lucide-react';
 import AdminLayoutV2 from '../../../layouts/AdminLayoutV2/AdminLayoutV2';
 import api from '../../../services/api';
 import './AdminAnalyticsV2.css';
@@ -26,8 +26,24 @@ const AdminAnalyticsV2 = () => {
   if (loading || !data) {
     return (
       <AdminLayoutV2 title="System Performance Analytics">
-        <div className="analytics-v2-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-          <Loader2 className="animate-spin" size={40} color="#00A896" />
+        <div className="analytics-v2-container">
+          <div className="analytics-v2-metrics-grid">
+            <div className="skeleton skeleton-metric"></div>
+            <div className="skeleton skeleton-metric"></div>
+            <div className="skeleton skeleton-metric"></div>
+          </div>
+          <div className="analytics-v2-row">
+            <div className="analytics-v2-card">
+              <div className="skeleton skeleton-title"></div>
+              <div className="skeleton skeleton-text" style={{ width: '80%' }}></div>
+              <div className="skeleton skeleton-card" style={{ marginTop: '1.5rem' }}></div>
+            </div>
+            <div className="analytics-v2-card">
+              <div className="skeleton skeleton-title"></div>
+              <div className="skeleton skeleton-text" style={{ width: '80%' }}></div>
+              <div className="skeleton skeleton-card" style={{ marginTop: '1.5rem' }}></div>
+            </div>
+          </div>
         </div>
       </AdminLayoutV2>
     );
@@ -148,8 +164,9 @@ const AdminAnalyticsV2 = () => {
                   </div>
                 </>
               ) : (
-                <div style={{ height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94A3B8' }}>
-                  No sufficient data for graph.
+                <div className="analytics-empty-state">
+                  <BarChart3 size={40} strokeWidth={1.5} />
+                  <p>No registration data available</p>
                 </div>
               )}
             </div>
@@ -202,8 +219,9 @@ const AdminAnalyticsV2 = () => {
                   </div>
                 </>
               ) : (
-                <div style={{ width: '100%', height: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94A3B8' }}>
-                  No log records found.
+                <div className="analytics-empty-state">
+                  <PieChart size={40} strokeWidth={1.5} />
+                  <p>No log records found</p>
                 </div>
               )}
             </div>
