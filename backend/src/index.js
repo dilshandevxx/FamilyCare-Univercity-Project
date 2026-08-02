@@ -105,6 +105,24 @@ async function runMigrations() {
       console.log('✅ Migration: added caregivers.status (existing rows set to approved)');
     }
   } catch (err) { console.warn('⚠️  Migration (caregivers.status):', err.message); }
+  // ── settings table ──────────────────────────────────────────────
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS settings (
+        k VARCHAR(50) PRIMARY KEY,
+        v VARCHAR(255) NOT NULL
+      )
+    `);
+    // Insert defaults if empty
+    await pool.query(`
+      INSERT IGNORE INTO settings (k, v) VALUES 
+      ('twoFactor', 'false'),
+      ('sessionTimeout', '30'),
+      ('hrThreshold', '100'),
+      ('tempThreshold', '100.4')
+    `);
+    console.log('✅ Migration: ensured settings table and defaults');
+  } catch (err) { console.warn('⚠️  Migration (settings):', err.message); }
 }
 
 runMigrations().then(() => {

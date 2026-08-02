@@ -575,7 +575,11 @@ const getAdminActivity = async (req, res) => {
 
 const getAdminSettings = async (req, res) => {
   try {
-    const [settings] = await pool.query('SELECT * FROM settings');
+    const [rows] = await pool.query('SELECT * FROM settings');
+    const settings = {};
+    rows.forEach(row => {
+      settings[row.k] = row.v;
+    });
     res.json(settings);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -584,8 +588,12 @@ const getAdminSettings = async (req, res) => {
 
 const updateAdminSettings = async (req, res) => {
   try {
-    const { key, value } = req.body;
-    await pool.query('INSERT INTO settings (k, v) VALUES (?, ?) ON DUPLICATE KEY UPDATE v = ?', [key, value, value]);
+    const settingsObj = req.body;
+    for (const [key, value] of Object.entries(settingsObj)) {
+      if (value !== undefined) {
+        await pool.query('INSERT INTO settings (k, v) VALUES (?, ?) ON DUPLICATE KEY UPDATE v = ?', [key, String(value), String(value)]);
+      }
+    }
     res.json({ message: 'Settings updated' });
   } catch (err) {
     res.status(500).json({ error: err.message });
