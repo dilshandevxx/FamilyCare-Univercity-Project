@@ -120,16 +120,28 @@ const AdminAnalyticsV2 = () => {
               <span>Total System Users</span>
             </div>
             <div className="metric-body">
-              <h3>{kpis.total_users.toLocaleString()}</h3>
-              <div className="metric-trend-row">
-                <span className={`trend-pill ${kpis.monthly_growth_pct >= 0 ? 'positive' : 'negative'}`}>
-                  <TrendingUp size={12} /> {kpis.monthly_growth_pct >= 0 ? '+' : ''}{kpis.monthly_growth_pct}%
-                </span>
-                <span className="trend-label">vs last month</span>
+              <div className="metric-main-info">
+                <h3>{kpis.total_users.toLocaleString()}</h3>
+                <div className="metric-trend-row">
+                  <span className={`trend-pill ${kpis.monthly_growth_pct >= 0 ? 'positive' : 'negative'}`}>
+                    <TrendingUp size={12} /> {kpis.monthly_growth_pct >= 0 ? '+' : ''}{kpis.monthly_growth_pct}%
+                  </span>
+                  <span className="trend-label">vs last month</span>
+                </div>
               </div>
-              <svg className="metric-sparkline" viewBox="0 0 80 40">
-                <path d="M0,30 Q20,10 40,25 T80,5" fill="none" stroke="#00A896" strokeWidth="2" strokeLinecap="round" />
-              </svg>
+              <div className="metric-sparkline-container">
+                <svg className="metric-sparkline" viewBox="0 0 100 40" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="sparkline-teal-grad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#00A896" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#00A896" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M 0,32 C 20,24 35,36 50,18 C 65,8 80,16 100,6 L 100,40 L 0,40 Z" fill="url(#sparkline-teal-grad)" />
+                  <path d="M 0,32 C 20,24 35,36 50,18 C 65,8 80,16 100,6" fill="none" stroke="#00A896" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="100" cy="6" r="3" fill="#00A896" />
+                </svg>
+              </div>
             </div>
           </div>
           <div className="analytics-v2-metric-box">
@@ -140,16 +152,28 @@ const AdminAnalyticsV2 = () => {
               <span>Vitals Upload Count</span>
             </div>
             <div className="metric-body">
-              <h3>{kpis.logs_today.toLocaleString()}</h3>
-              <div className="metric-trend-row">
-                <span className="trend-pill positive">
-                  <TrendingUp size={12} /> +12%
-                </span>
-                <span className="trend-label">Today's submissions</span>
+              <div className="metric-main-info">
+                <h3>{kpis.logs_today.toLocaleString()}</h3>
+                <div className="metric-trend-row">
+                  <span className="trend-pill positive">
+                    <TrendingUp size={12} /> +12%
+                  </span>
+                  <span className="trend-label">Today's submissions</span>
+                </div>
               </div>
-              <svg className="metric-sparkline" viewBox="0 0 80 40">
-                <path d="M0,20 Q20,30 40,15 T80,10" fill="none" stroke="#4F46E5" strokeWidth="2" strokeLinecap="round" />
-              </svg>
+              <div className="metric-sparkline-container">
+                <svg className="metric-sparkline" viewBox="0 0 100 40" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="sparkline-indigo-grad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#4F46E5" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#4F46E5" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M 0,28 C 25,38 45,15 65,22 C 80,28 90,12 100,8 L 100,40 L 0,40 Z" fill="url(#sparkline-indigo-grad)" />
+                  <path d="M 0,28 C 25,38 45,15 65,22 C 80,28 90,12 100,8" fill="none" stroke="#4F46E5" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="100" cy="8" r="3" fill="#4F46E5" />
+                </svg>
+              </div>
             </div>
           </div>
           <div className="analytics-v2-metric-box">
@@ -160,16 +184,28 @@ const AdminAnalyticsV2 = () => {
               <span>Active Caregivers</span>
             </div>
             <div className="metric-body">
-              <h3>{kpis.active_caregivers.toLocaleString()}</h3>
-              <div className="metric-trend-row">
-                <span className="trend-pill positive">
-                  <TrendingUp size={12} /> +5%
-                </span>
-                <span className="trend-label">Currently assigned</span>
+              <div className="metric-main-info">
+                <h3>{kpis.active_caregivers.toLocaleString()}</h3>
+                <div className="metric-trend-row">
+                  <span className="trend-pill positive">
+                    <TrendingUp size={12} /> +5%
+                  </span>
+                  <span className="trend-label">Currently assigned</span>
+                </div>
               </div>
-              <svg className="metric-sparkline" viewBox="0 0 80 40">
-                <path d="M0,25 Q15,15 30,20 T80,15" fill="none" stroke="#EA580C" strokeWidth="2" strokeLinecap="round" />
-              </svg>
+              <div className="metric-sparkline-container">
+                <svg className="metric-sparkline" viewBox="0 0 100 40" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="sparkline-orange-grad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="#EA580C" stopOpacity="0.25" />
+                      <stop offset="100%" stopColor="#EA580C" stopOpacity="0" />
+                    </linearGradient>
+                  </defs>
+                  <path d="M 0,30 C 20,20 40,26 60,14 C 75,22 88,10 100,12 L 100,40 L 0,40 Z" fill="url(#sparkline-orange-grad)" />
+                  <path d="M 0,30 C 20,20 40,26 60,14 C 75,22 88,10 100,12" fill="none" stroke="#EA580C" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="100" cy="12" r="3" fill="#EA580C" />
+                </svg>
+              </div>
             </div>
           </div>
         </div>

@@ -100,10 +100,19 @@
 .badge-orange { background-color: #FFF7ED; color: #EA580C; }
 
 .metric-body {
-  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
-.metric-body h3 {
+.metric-main-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.metric-main-info h3 {
   font-size: 1.8rem;
   font-weight: 800;
   color: #0F172A;
@@ -114,8 +123,9 @@
 .metric-trend-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  margin-top: 8px;
+  gap: 6px;
+  margin-top: 4px;
+  flex-wrap: wrap;
 }
 
 .trend-pill {
@@ -124,7 +134,7 @@
   gap: 4px;
   font-size: 0.75rem;
   font-weight: 700;
-  padding: 4px 8px;
+  padding: 3px 8px;
   border-radius: 20px;
 }
 
@@ -142,15 +152,30 @@
   font-size: 0.75rem;
   color: #94A3B8;
   font-weight: 500;
+  white-space: nowrap;
+}
+
+.metric-sparkline-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  width: 96px;
+  height: 44px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 4px;
 }
 
 .metric-sparkline {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 80px;
-  height: 40px;
-  opacity: 0.6;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.04));
+  transition: transform 0.3s ease;
+}
+
+.analytics-v2-metric-box:hover .metric-sparkline {
+  transform: scale(1.04);
 }
 
 /* Row Chart Panels */
