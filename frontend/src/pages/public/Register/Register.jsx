@@ -4,6 +4,7 @@ import { useAuth } from '../../../context/AuthContext';
 import GoogleSignInButton from '../../../components/auth/GoogleSignInButton';
 import familyHeroImg from '../../../assets/auth_family_hero.png';
 import caregiverHeroImg from '../../../assets/auth_caregiver_hero.png';
+import BrandLogo from '../../../components/common/BrandLogo';
 import './Register.css';
 
 /* ── Legal Modal ──────────────────────────────────────────────────────────── */
@@ -249,14 +250,9 @@ const Register = () => {
           </div>
 
           <div className="reg-hero-content">
-            <Link to="/" className="reg-brand">
-              <div className="reg-brand-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
-              </div>
-              <span className="reg-brand-name">FamilyCare</span>
-            </Link>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <BrandLogo to="/" size="md" variant="white" />
+            </div>
 
             <h2 className="reg-hero-title">
               {selectedRole === 'family' ? (

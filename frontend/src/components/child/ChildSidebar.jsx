@@ -10,10 +10,10 @@ import {
   Bell,
   Settings,
   LogOut,
-  ShieldCheck,
   Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import BrandLogo from '../common/BrandLogo';
 import './ChildSidebar.css';
 
 const navItems = [
@@ -22,7 +22,7 @@ const navItems = [
   { icon: UserPlus,        label: 'Add Parent',  path: '/add-parent' },
   { icon: HeartPulse,      label: 'Caregivers',  path: '/caregivers-list' },
   { icon: Activity,        label: 'Health Feed', path: '/health-feed' },
-  { icon: BarChart2,       label: 'Analytics',   path: '/analytics', badge: 'New' },
+  { icon: BarChart2,       label: 'Analytics',   path: '/analytics' },
   { icon: Bell,            label: 'Alerts',      path: '/alerts' },
   { icon: Settings,        label: 'Settings',    path: '/settings' },
 ];
@@ -40,15 +40,7 @@ const ChildSidebar = () => {
     <aside className="child-sidebar">
       {/* Brand Header */}
       <div className="cs-header">
-        <div className="cs-brand-wrap">
-          <div className="cs-brand-icon">
-            <ShieldCheck size={20} color="#ffffff" />
-          </div>
-          <div>
-            <span className="cs-logo">FamilyCare</span>
-            <span className="cs-tagline">Family Portal</span>
-          </div>
-        </div>
+        <BrandLogo to="/dashboard" size="md" tagline="Family Portal" />
       </div>
 
       {/* User Profile Block */}

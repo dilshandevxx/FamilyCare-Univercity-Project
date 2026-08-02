@@ -1,0 +1,118 @@
+/* ═══════════════════════════════════════════════════════════════════
+   FamilyCare — Brand Logo Styles
+   Modern Typography • Flat Color Palette • Precision Alignment
+═══════════════════════════════════════════════════════════════════ */
+
+.fc-brand-logo-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  outline: none;
+}
+
+.fc-brand-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.fc-brand-logo-link:hover .fc-brand-logo {
+  transform: translateY(-1px);
+}
+
+.fc-logo-mark-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 12px;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fc-brand-logo-link:hover .fc-logo-mark-wrap {
+  transform: scale(1.04);
+}
+
+.brand-logo-svg {
+  display: block;
+}
+
+.fc-logo-text-wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.1;
+}
+
+.fc-logo-title {
+  display: flex;
+  align-items: baseline;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+.fc-name-family {
+  font-weight: 800;
+  transition: color 0.18s;
+}
+
+.fc-name-family.text-slate {
+  color: #0f172a;
+}
+
+.fc-name-family.text-white {
+  color: #ffffff;
+}
+
+.fc-name-care {
+  color: #00A896;
+  font-weight: 800;
+  margin-left: 1px;
+}
+
+.fc-logo-tagline {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-top: 2px;
+}
+
+.fc-variant-white .fc-logo-tagline {
+  color: #94a3b8;
+}
+
+/* ── Size Variants ── */
+.fc-size-sm .fc-logo-title {
+  font-size: 1.05rem;
+}
+.fc-size-sm .fc-logo-tagline {
+  font-size: 0.6rem;
+}
+
+.fc-size-md .fc-logo-title {
+  font-size: 1.25rem;
+}
+.fc-size-md .fc-logo-tagline {
+  font-size: 0.68rem;
+}
+
+.fc-size-lg .fc-logo-title {
+  font-size: 1.6rem;
+  letter-spacing: -0.6px;
+}
+.fc-size-lg .fc-logo-tagline {
+  font-size: 0.78rem;
+}
+
+.fc-size-xl .fc-logo-title {
+  font-size: 2.1rem;
+  letter-spacing: -0.8px;
+}
+.fc-size-xl .fc-logo-tagline {
+  font-size: 0.88rem;
+}

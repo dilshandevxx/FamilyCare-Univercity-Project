@@ -9,6 +9,7 @@ import GoogleSignInButton from '../../../components/auth/GoogleSignInButton';
 import familyHeroImg from '../../../assets/auth_family_hero.png';
 import caregiverHeroImg from '../../../assets/auth_caregiver_hero.png';
 import api from '../../../services/api';
+import BrandLogo from '../../../components/common/BrandLogo';
 import './Login.css';
 
 const Login = () => {
@@ -104,14 +105,7 @@ const Login = () => {
 
       {/* Top Navbar Brand */}
       <header className="login-topbar">
-        <Link to="/" className="login-topbar-brand">
-          <div className="login-brand-logo">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M12 21C12 21 3 14 3 8.5C3 5.46 5.46 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.54 3 23 5.46 23 8.5C23 14 14 21 12 21Z" fill="#00C9B5"/>
-            </svg>
-          </div>
-          <span className="login-brand-title">FamilyCare</span>
-        </Link>
+        <BrandLogo to="/" size="md" />
 
         <Link to="/" className="login-home-btn">
           <Home size={15} />

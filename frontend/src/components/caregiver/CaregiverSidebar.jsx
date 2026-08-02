@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Home, Users, FilePlus, Clock, Mail, Settings, Phone, LogOut, X, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import BrandLogo from '../common/BrandLogo';
 import './CaregiverSidebar.css';
 
 const API_BASE = 'http://localhost:5000';
@@ -24,9 +25,7 @@ const CaregiverSidebar = () => {
   return (
     <div className="sidebar-container">
       <div className="sidebar-header">
-        <h1 className="sidebar-logo">FamilyCare</h1>
-        <p className="sidebar-subtitle">Caregiver Portal</p>
-
+        <BrandLogo to="/caregiver/dashboard" size="md" tagline="Caregiver Portal" />
       </div>
 
       <nav className="sidebar-nav">

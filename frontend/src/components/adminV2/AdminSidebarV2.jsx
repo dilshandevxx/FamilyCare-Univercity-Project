@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useAdminStats } from '../../context/AdminStatsContext';
+import BrandLogo from '../common/BrandLogo';
 import './AdminSidebarV2.css';
 
 import adminService from '../../services/adminService';
@@ -61,13 +62,7 @@ const AdminSidebarV2 = () => {
   return (
     <div className="admin-v2-sidebar">
       <div className="admin-v2-sidebar-header">
-        <div className="admin-v2-logo-container">
-          <div className="admin-v2-logo-icon">FC</div>
-          <div>
-            <h1 className="admin-v2-logo">FamilyCare</h1>
-            <p className="admin-v2-logo-sub">Console V2</p>
-          </div>
-        </div>
+        <BrandLogo to="/admin/dashboard" size="md" tagline="Admin Console" />
       </div>
 
       <nav className="admin-v2-nav">

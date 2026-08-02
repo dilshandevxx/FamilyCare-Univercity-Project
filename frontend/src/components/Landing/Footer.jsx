@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import BrandLogo from '../common/BrandLogo';
 
 const Toast = ({ message, onDone }) => {
   React.useEffect(() => {
@@ -83,12 +84,9 @@ const Footer = () => {
         <div className="footer-grid" style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: '4rem' }}>
 
           <div>
-            <h4
-              onClick={() => navigate('/')}
-              style={{ color: 'var(--color-primary)', fontSize: '1.5rem', marginBottom: '1.5rem', cursor: 'pointer', display: 'inline-block' }}
-            >
-              FamilyCare
-            </h4>
+            <div style={{ marginBottom: '1.2rem' }}>
+              <BrandLogo to="/" size="md" tagline="Eldercare Platform" />
+            </div>
             <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', lineHeight: '1.6' }}>
               Building the future of eldercare management for families abroad. Because distance shouldn't mean disconnected.
             </p>

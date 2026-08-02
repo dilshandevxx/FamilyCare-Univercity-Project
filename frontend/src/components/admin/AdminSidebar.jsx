@@ -5,6 +5,7 @@ import {
   Bell, BarChart2, Monitor, Settings, LogOut, Radio, X, AlertTriangle,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import BrandLogo from '../common/BrandLogo';
 import api from '../../services/api';
 import './AdminSidebar.css';
 
@@ -44,8 +45,7 @@ const AdminSidebar = () => {
   return (
     <div className="admin-sidebar">
       <div className="admin-sidebar-header">
-        <h1 className="admin-logo">FamilyCare</h1>
-        <p className="admin-logo-sub">Admin Console</p>
+        <BrandLogo to="/admin/dashboard" size="md" tagline="Admin Console" />
       </div>
 
       <nav className="admin-nav">

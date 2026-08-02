@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAuthModal } from '../context/AuthModalContext';
 import { Menu, X, ChevronRight } from 'lucide-react';
+import BrandLogo from './common/BrandLogo';
 
 const NAV_LINKS = [
   { label: 'Home',       to: '/' },
@@ -41,20 +42,7 @@ const Navbar = () => {
       <nav className={`navbar${scrolled ? ' navbar--scrolled' : ''}`}>
         <div className="navbar__inner container">
           {/* Logo */}
-          <Link to="/" className="navbar__logo" onClick={() => setMenuOpen(false)}>
-            <div className="logo-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M12 21C12 21 3 14 3 8.5C3 5.46 5.46 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.54 3 23 5.46 23 8.5C23 14 14 21 12 21Z" fill="url(#grad)"/>
-                <defs>
-                  <linearGradient id="grad" x1="3" y1="3" x2="23" y2="21" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#0D9488" />
-                    <stop offset="1" stopColor="#0F766E" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-            <span className="logo-text">FamilyCare</span>
-          </Link>
+          <BrandLogo to="/" size="md" onClick={() => setMenuOpen(false)} />
 
           {/* Desktop Links */}
           <div className="navbar__links">
@@ -120,20 +108,7 @@ const Navbar = () => {
       {/* Mobile full-screen overlay */}
       <div className={`mobile-overlay${menuOpen ? ' mobile-overlay--open' : ''}`}>
         <div className="mobile-overlay__header">
-          <Link to="/" className="navbar__logo" onClick={() => setMenuOpen(false)}>
-            <div className="logo-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M12 21C12 21 3 14 3 8.5C3 5.46 5.46 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.54 3 23 5.46 23 8.5C23 14 14 21 12 21Z" fill="url(#grad2)"/>
-                <defs>
-                  <linearGradient id="grad2" x1="3" y1="3" x2="23" y2="21" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#0D9488" />
-                    <stop offset="1" stopColor="#0F766E" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </div>
-            <span className="logo-text">FamilyCare</span>
-          </Link>
+          <BrandLogo to="/" size="md" onClick={() => setMenuOpen(false)} />
           <button className="mobile-overlay__close" onClick={() => setMenuOpen(false)} aria-label="Close menu">
             <X size={24} />
           </button>
