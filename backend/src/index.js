@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const { passport } = require('./config/passport');
 const pool = require('./config/db');
+const { logMiddleware } = require('./middleware/logStreamer');
 
 // Route imports
 const authRoutes = require('./routes/authRoutes');
@@ -21,6 +22,7 @@ const app = express();
 // ── Middleware ────────────────────────────────────────────────
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
+app.use(logMiddleware);
 app.use(passport.initialize());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/uploads/health-attachments', express.static(path.join(__dirname, '../uploads/health-attachments')));

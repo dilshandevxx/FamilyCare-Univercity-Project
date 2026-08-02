@@ -1,6 +1,25 @@
 const bcrypt = require('bcryptjs');
+const { performance } = require('perf_hooks');
 const pool = require('../config/db');
 const os = require('os');
+const { logEmitter } = require('../middleware/logStreamer');
+
+let lastCpuInfo = os.cpus();
+function getCpuUtilization() {
+  const currentCpuInfo = os.cpus();
+  let idleDiff = 0;
+  let totalDiff = 0;
+  currentCpuInfo.forEach((cpu, i) => {
+    const lastCpu = lastCpuInfo[i];
+    for (const type in cpu.times) {
+      const diff = cpu.times[type] - lastCpu.times[type];
+      totalDiff += diff;
+      if (type === 'idle') idleDiff += diff;
+    }
+  });
+  lastCpuInfo = currentCpuInfo;
+  return totalDiff === 0 ? 0 : Math.round(100 - ((idleDiff / totalDiff) * 100));
+}
 
 // ── GET /api/admin/residents ─────────────────────────────────────
 // All residents (parents) with their assigned caregiver name + user info
@@ -622,10 +641,46 @@ const updateAdminSettings = async (req, res) => {
 
 const getSystemStatus = async (req, res) => {
   try {
-    const [db] = await pool.query('SELECT 1');
-    res.json({ db: 'online', uptime: process.uptime() });
+    const dbStart = performance.now();
+    await pool.query('SELECT 1');
+    const dbEnd = performance.now();
+    const latencyMs = Math.round(dbEnd - dbStart);
+
+    // MySQL connection pool stats
+    let activeConnections = 0;
+    let poolLimit = 10;
+    if (pool.pool) {
+      activeConnections = pool.pool._allConnections.length - pool.pool._freeConnections.length;
+      poolLimit = pool.pool.config.connectionLimit || 10;
+    }
+    
+    const cpu = getCpuUtilization();
+    const totalMem = os.totalmem();
+    const freeMem = os.freemem();
+    const usedMem = totalMem - freeMem;
+    const ram = Math.round((usedMem / totalMem) * 100);
+    const ramDetails = `${(usedMem / 1024 ** 3).toFixed(1)} GB of ${(totalMem / 1024 ** 3).toFixed(1)} GB assigned`;
+
+    res.json({ 
+      dbStatus: 'Healthy', 
+      uptime: process.uptime(),
+      cpu,
+      ram,
+      ramDetails,
+      activeConnections,
+      poolLimit,
+      latencyMs
+    });
   } catch (err) {
-    res.json({ db: 'offline' });
+    res.json({ 
+      dbStatus: 'Unknown',
+      cpu: 0,
+      ram: 0,
+      ramDetails: '— GB of — GB assigned',
+      activeConnections: 0,
+      poolLimit: 10,
+      latencyMs: 0
+    });
   }
 };
 
@@ -637,6 +692,26 @@ const sendBroadcast = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+};
+
+const streamSystemLogs = (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  // Send an initial connected message
+  res.write(`data: ${JSON.stringify({ time: new Date().toISOString().split('T')[1].slice(0, 8), type: 'info', event: 'SSE connection established' })}\n\n`);
+
+  const logListener = (logData) => {
+    res.write(`data: ${JSON.stringify(logData)}\n\n`);
+  };
+
+  logEmitter.on('log', logListener);
+
+  req.on('close', () => {
+    logEmitter.off('log', logListener);
+  });
 };
 
 module.exports = {
@@ -665,4 +740,5 @@ module.exports = {
   updateAdminSettings,
   getSystemStatus,
   sendBroadcast,
+  streamSystemLogs,
 };
