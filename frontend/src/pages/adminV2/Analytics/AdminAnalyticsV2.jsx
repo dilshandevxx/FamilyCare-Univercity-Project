@@ -112,34 +112,62 @@ const AdminAnalyticsV2 = () => {
         <div className="analytics-v2-metrics-grid">
           <div className="analytics-v2-metric-box">
             <div className="metric-header">
-              <Users size={16} color="#00A896" />
+              <div className="metric-icon-badge badge-teal">
+                <Users size={18} />
+              </div>
               <span>Total System Users</span>
             </div>
             <div className="metric-body">
-              <h3>{kpis.total_users.toLocaleString()} Users</h3>
-              <p className={`trend ${kpis.monthly_growth_pct >= 0 ? 'positive' : 'negative'}`}>
-                <TrendingUp size={14} /> {kpis.monthly_growth_pct >= 0 ? '+' : ''}{kpis.monthly_growth_pct}% vs last month
-              </p>
+              <h3>{kpis.total_users.toLocaleString()}</h3>
+              <div className="metric-trend-row">
+                <span className={`trend-pill ${kpis.monthly_growth_pct >= 0 ? 'positive' : 'negative'}`}>
+                  <TrendingUp size={12} /> {kpis.monthly_growth_pct >= 0 ? '+' : ''}{kpis.monthly_growth_pct}%
+                </span>
+                <span className="trend-label">vs last month</span>
+              </div>
+              <svg className="metric-sparkline" viewBox="0 0 80 40">
+                <path d="M0,30 Q20,10 40,25 T80,5" fill="none" stroke="#00A896" strokeWidth="2" strokeLinecap="round" />
+              </svg>
             </div>
           </div>
           <div className="analytics-v2-metric-box">
             <div className="metric-header">
-              <HeartPulse size={16} color="#4F46E5" />
+              <div className="metric-icon-badge badge-indigo">
+                <HeartPulse size={18} />
+              </div>
               <span>Vitals Upload Count</span>
             </div>
             <div className="metric-body">
-              <h3>{kpis.logs_today.toLocaleString()} Logs</h3>
-              <p className="trend positive"><TrendingUp size={14} /> Today's submissions</p>
+              <h3>{kpis.logs_today.toLocaleString()}</h3>
+              <div className="metric-trend-row">
+                <span className="trend-pill positive">
+                  <TrendingUp size={12} /> +12%
+                </span>
+                <span className="trend-label">Today's submissions</span>
+              </div>
+              <svg className="metric-sparkline" viewBox="0 0 80 40">
+                <path d="M0,20 Q20,30 40,15 T80,10" fill="none" stroke="#4F46E5" strokeWidth="2" strokeLinecap="round" />
+              </svg>
             </div>
           </div>
           <div className="analytics-v2-metric-box">
             <div className="metric-header">
-              <UserCheck size={16} color="#EA580C" />
+              <div className="metric-icon-badge badge-orange">
+                <UserCheck size={18} />
+              </div>
               <span>Active Caregivers</span>
             </div>
             <div className="metric-body">
-              <h3>{kpis.active_caregivers.toLocaleString()} Caregivers</h3>
-              <p className="trend positive"><TrendingUp size={14} /> Currently assigned</p>
+              <h3>{kpis.active_caregivers.toLocaleString()}</h3>
+              <div className="metric-trend-row">
+                <span className="trend-pill positive">
+                  <TrendingUp size={12} /> +5%
+                </span>
+                <span className="trend-label">Currently assigned</span>
+              </div>
+              <svg className="metric-sparkline" viewBox="0 0 80 40">
+                <path d="M0,25 Q15,15 30,20 T80,15" fill="none" stroke="#EA580C" strokeWidth="2" strokeLinecap="round" />
+              </svg>
             </div>
           </div>
         </div>

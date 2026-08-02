@@ -77,34 +77,80 @@
 .metric-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.82rem;
+  gap: 12px;
+  font-size: 0.85rem;
   font-weight: 600;
   color: #64748B;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
 
+.metric-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+}
+
+.badge-teal { background-color: #E6F7F5; color: #00A896; }
+.badge-indigo { background-color: #EEF2FF; color: #4F46E5; }
+.badge-orange { background-color: #FFF7ED; color: #EA580C; }
+
+.metric-body {
+  position: relative;
+}
+
 .metric-body h3 {
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   font-weight: 800;
   color: #0F172A;
   margin: 0;
   letter-spacing: -0.5px;
 }
 
-.metric-body p {
-  font-size: 0.78rem;
-  font-weight: 600;
-  margin: 6px 0 0 0;
+.metric-trend-row {
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: space-between;
+  margin-top: 8px;
 }
 
-.metric-body p.positive {
-  color: #00A896;
+.trend-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 20px;
+}
+
+.trend-pill.positive {
+  background-color: #ECFDF5;
+  color: #059669;
+}
+
+.trend-pill.negative {
+  background-color: #FEF2F2;
+  color: #DC2626;
+}
+
+.trend-label {
+  font-size: 0.75rem;
+  color: #94A3B8;
+  font-weight: 500;
+}
+
+.metric-sparkline {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 80px;
+  height: 40px;
+  opacity: 0.6;
 }
 
 /* Row Chart Panels */
