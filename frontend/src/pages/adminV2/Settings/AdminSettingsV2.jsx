@@ -49,7 +49,8 @@ const AdminSettingsV2 = () => {
         setShowToast(false);
       }, 2500);
     } catch (error) {
-      alert('Failed to save settings');
+      console.error('[AdminSettings] Failed to save:', error);
+      alert(error?.response?.data?.error || 'Failed to save settings');
     } finally {
       setSaving(false);
     }
