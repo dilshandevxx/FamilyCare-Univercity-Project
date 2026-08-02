@@ -121,15 +121,19 @@ const Parents = () => {
 
       if (!matchesSearch) return false;
 
-      if (statusFilter === 'assigned') return !!p.assigned_caregiver_id && p.assignment_status === 'approved';
+      if (statusFilter === 'assigned') return !!p.assigned_caregiver_id && (p.assignment_status === 'accepted' || !p.assignment_status);
       if (statusFilter === 'pending') return p.assignment_status === 'pending';
-      if (statusFilter === 'unassigned') return !p.assigned_caregiver_id || p.assignment_status === 'rejected';
+      if (statusFilter === 'rejected') return p.assignment_status === 'rejected';
+      if (statusFilter === 'unassigned') return !p.assigned_caregiver_id;
 
       return true;
     });
   }, [parents, searchTerm, statusFilter]);
 
-  const totalAssigned = parents.filter(p => p.assigned_caregiver_id && p.assignment_status === 'approved').length;
+  const totalAssigned = parents.filter(p => p.assigned_caregiver_id && (p.assignment_status === 'accepted' || !p.assignment_status)).length;
+  const totalPending  = parents.filter(p => p.assignment_status === 'pending').length;
+  const totalRejected = parents.filter(p => p.assignment_status === 'rejected').length;
+  const totalUnassigned = parents.filter(p => !p.assigned_caregiver_id).length;
 
   return (
     <ChildLayout title="My Parents">
@@ -158,6 +162,12 @@ const Parents = () => {
                 <span className="pc-stat-pill-value">{totalAssigned}</span>
                 <span className="pc-stat-pill-label">In Active Care</span>
               </div>
+              {totalPending > 0 && (
+                <div className="pc-stat-pill pending-stat">
+                  <span className="pc-stat-pill-value" style={{ color: '#d97706' }}>{totalPending}</span>
+                  <span className="pc-stat-pill-label">Pending</span>
+                </div>
+              )}
             </div>
             <Link to="/add-parent" className="pc-btn-add-parent">
               <Plus size={18} strokeWidth={2.5} />
@@ -201,13 +211,21 @@ const Parents = () => {
               className={`pc-tab-btn ${statusFilter === 'pending' ? 'active' : ''}`}
               onClick={() => setStatusFilter('pending')}
             >
-              Pending ({parents.filter(p => p.assignment_status === 'pending').length})
+              Pending ({totalPending})
             </button>
+            {totalRejected > 0 && (
+              <button
+                className={`pc-tab-btn ${statusFilter === 'rejected' ? 'active' : ''}`}
+                onClick={() => setStatusFilter('rejected')}
+              >
+                Declined ({totalRejected})
+              </button>
+            )}
             <button
               className={`pc-tab-btn ${statusFilter === 'unassigned' ? 'active' : ''}`}
               onClick={() => setStatusFilter('unassigned')}
             >
-              Unassigned ({parents.filter(p => !p.assigned_caregiver_id).length})
+              Unassigned ({totalUnassigned})
             </button>
           </div>
         </div>
@@ -257,7 +275,7 @@ const Parents = () => {
               const hasCaregiver = !!parent.assigned_caregiver_id;
               const isPending = parent.assignment_status === 'pending';
               const isRejected = parent.assignment_status === 'rejected';
-              const isApproved = hasCaregiver && !isPending && !isRejected;
+              const isApproved = hasCaregiver && (parent.assignment_status === 'accepted' || !parent.assignment_status);
 
               return (
                 <div key={parent.id} className="pc-parent-card">
@@ -270,7 +288,7 @@ const Parents = () => {
                         alt={parent.name}
                         className="pc-avatar-img"
                       />
-                      <span className={`pc-avatar-status-dot ${isApproved ? 'active' : isPending ? 'pending' : 'neutral'}`} />
+                      <span className={`pc-avatar-status-dot ${isApproved ? 'active' : isPending ? 'pending' : isRejected ? 'rejected' : 'neutral'}`} />
                     </div>
 
                     <div className="pc-identity-info">
@@ -339,17 +357,17 @@ const Parents = () => {
                       <span className="pc-sec-title">DEDICATED CAREGIVER</span>
                       {isApproved && (
                         <span className="pc-status-badge approved">
-                          <CheckCircle2 size={11} /> Active
+                          <CheckCircle2 size={11} /> Accepted & Active
                         </span>
                       )}
                       {isPending && (
                         <span className="pc-status-badge pending">
-                          <Clock size={11} /> Pending
+                          <Clock size={11} /> Pending Approval
                         </span>
                       )}
                       {isRejected && (
                         <span className="pc-status-badge rejected">
-                          <AlertTriangle size={11} /> Declined
+                          <AlertTriangle size={11} /> Request Declined
                         </span>
                       )}
                       {!hasCaregiver && (
@@ -359,7 +377,53 @@ const Parents = () => {
                       )}
                     </div>
 
-                    {parent.caregiver_name ? (
+                    {isPending ? (
+                      <div className="pc-pending-caregiver-box">
+                        <div className="pc-caregiver-box pending-state">
+                          <div className="pc-cg-avatar-wrapper">
+                            <img
+                              src={parent.caregiver_avatar_url || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(parent.caregiver_name || 'caregiver')}`}
+                              alt={parent.caregiver_name}
+                              className="pc-cg-avatar"
+                            />
+                          </div>
+                          <div className="pc-cg-details">
+                            <div className="pc-cg-name-row">
+                              <span className="pc-cg-name">{parent.caregiver_name}</span>
+                              <button
+                                onClick={() => startEdit(parent)}
+                                className="pc-cg-change-link"
+                              >
+                                Change
+                              </button>
+                            </div>
+                            <span className="pc-cg-specialty">
+                              {parent.caregiver_specialization || 'Certified Caregiver'}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="pc-pending-notice-banner">
+                          <Clock size={12} className="pc-pending-clock-icon" />
+                          <span>Request sent to {parent.caregiver_name}. Waiting for caregiver acceptance.</span>
+                        </div>
+                      </div>
+                    ) : isRejected ? (
+                      <div className="pc-rejected-caregiver-box">
+                        <div className="pc-rejected-notice-banner">
+                          <div className="pc-rejected-reason-row">
+                            <AlertTriangle size={13} className="pc-rejected-icon" />
+                            <span><strong>Declined by {parent.caregiver_name || 'Caregiver'}:</strong> {parent.rejection_reason || 'Caregiver reached full capacity.'}</span>
+                          </div>
+                          <button
+                            onClick={() => startEdit(parent)}
+                            className="pc-btn-reassign-now"
+                          >
+                            <UserPlus size={12} strokeWidth={2.5} />
+                            <span>Assign Another Caregiver</span>
+                          </button>
+                        </div>
+                      </div>
+                    ) : hasCaregiver ? (
                       <div className="pc-caregiver-box">
                         <div className="pc-cg-avatar-wrapper">
                           <img
@@ -395,12 +459,6 @@ const Parents = () => {
                           <Plus size={12} strokeWidth={2.5} />
                           <span>Assign</span>
                         </button>
-                      </div>
-                    )}
-
-                    {isRejected && (
-                      <div className="pc-rejection-note">
-                        <strong>Reason:</strong> {parent.rejection_reason || 'Caregiver at full capacity.'}
                       </div>
                     )}
                   </div>

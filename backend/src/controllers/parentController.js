@@ -282,14 +282,49 @@ const deleteParent = async (req, res) => {
 const assignCaregiver = async (req, res) => {
   const { id } = req.params;
   const { assigned_caregiver_id } = req.body;
+  const child_id = req.user.id;
   try {
     const parsedCaregiverId = assigned_caregiver_id ? parseInt(assigned_caregiver_id, 10) : null;
     const newStatus = parsedCaregiverId ? 'pending' : null;
-    await pool.query(
+    
+    const [result] = await pool.query(
       'UPDATE parents SET assigned_caregiver_id = ?, assignment_status = ?, rejection_reason = NULL WHERE id = ? AND child_id = ?',
-      [parsedCaregiverId, newStatus, id, req.user.id]
+      [parsedCaregiverId, newStatus, id, child_id]
     );
-    res.json({ message: 'Caregiver assignment updated successfully' });
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Parent not found or access denied.' });
+    }
+
+    // Fetch parent details to send helpful response and insert alert
+    const [[parent]] = await pool.query('SELECT * FROM parents WHERE id = ?', [id]);
+    
+    if (parsedCaregiverId) {
+      const [[cg]] = await pool.query('SELECT c.*, u.name as user_name FROM caregivers c LEFT JOIN users u ON c.user_id = u.id WHERE c.id = ?', [parsedCaregiverId]);
+      const cgName = cg?.name || cg?.user_name || 'Caregiver';
+      
+      // Add alert
+      try {
+        await pool.query(
+          `INSERT INTO alerts (parent_id, title, description, type)
+           VALUES (?, ?, ?, 'info')`,
+          [
+            id,
+            'Caregiver Request Sent',
+            `Care assignment request sent to ${cgName} for ${parent?.name || 'parent'}. Status: Pending approval.`
+          ]
+        );
+      } catch (alertErr) {
+        console.warn('Could not insert assignment alert:', alertErr);
+      }
+    }
+
+    res.json({
+      message: parsedCaregiverId
+        ? `Care request sent to caregiver. Status is now pending their approval.`
+        : `Caregiver removed successfully.`,
+      assignment_status: newStatus
+    });
   } catch (err) {
     console.error('Error assigning caregiver:', err);
     res.status(500).json({ error: err.message });

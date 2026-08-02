@@ -497,17 +497,50 @@
   min-width: 0;
 }
 
+.cdb-family-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .cdb-family-name {
   font-size: 0.92rem;
   font-weight: 700;
   color: #0f172a;
-  display: block;
+}
+
+.cdb-cg-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.cdb-cg-tag.pending {
+  background: #fffbeb;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.cdb-cg-tag.active {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.cdb-cg-tag.rejected {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecdd3;
 }
 
 .cdb-family-meta {
   font-size: 0.74rem;
   color: #64748b;
-  margin-top: 1px;
+  margin-top: 2px;
   display: block;
 }
 

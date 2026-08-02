@@ -261,26 +261,41 @@ const Dashboard = () => {
           </div>
         ) : (
           <div className="cdb-family-list">
-            {dbParents.map(p => (
-              <div key={p.id} className="cdb-family-item">
-                <img
-                  src={p.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(p.name)}`}
-                  alt={p.name}
-                  className="cdb-family-avatar"
-                />
-                <div className="cdb-family-info">
-                  <span className="cdb-family-name">{p.name}</span>
-                  <span className="cdb-family-meta">
-                    {p.relationship || 'Family'} {p.age ? `• ${p.age} yrs` : ''}
-                    {p.caregiver_name ? ` • Carer: ${p.caregiver_name}` : ''}
-                  </span>
+            {dbParents.map(p => {
+              const isPending = p.assignment_status === 'pending';
+              const isRejected = p.assignment_status === 'rejected';
+              const isApproved = !!p.assigned_caregiver_id && (p.assignment_status === 'accepted' || !p.assignment_status);
+
+              return (
+                <div key={p.id} className="cdb-family-item">
+                  <img
+                    src={p.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(p.name)}`}
+                    alt={p.name}
+                    className="cdb-family-avatar"
+                  />
+                  <div className="cdb-family-info">
+                    <div className="cdb-family-name-row">
+                      <span className="cdb-family-name">{p.name}</span>
+                      {isPending ? (
+                        <span className="cdb-cg-tag pending">⏳ Pending Caregiver</span>
+                      ) : isRejected ? (
+                        <span className="cdb-cg-tag rejected">✕ Declined</span>
+                      ) : isApproved ? (
+                        <span className="cdb-cg-tag active">✓ Active Care</span>
+                      ) : null}
+                    </div>
+                    <span className="cdb-family-meta">
+                      {p.relationship || 'Family'} {p.age ? `• ${p.age} yrs` : ''}
+                      {p.caregiver_name ? ` • Carer: ${p.caregiver_name}` : ' • No caregiver assigned'}
+                    </span>
+                  </div>
+                  <div className={`cdb-health-dot ${p.id % 2 === 0 ? 'amber' : 'green'}`} title={p.id % 2 === 0 ? 'Needs Attention' : 'Good'} />
+                  <Link to={`/health-feed?parent_id=${p.id}`} className="cdb-family-btn">
+                    Vitals <ChevronRight size={13}/>
+                  </Link>
                 </div>
-                <div className={`cdb-health-dot ${p.id % 2 === 0 ? 'amber' : 'green'}`} title={p.id % 2 === 0 ? 'Needs Attention' : 'Good'} />
-                <Link to={`/health-feed?parent_id=${p.id}`} className="cdb-family-btn">
-                  Vitals <ChevronRight size={13}/>
-                </Link>
-              </div>
-            ))}
+              );
+            })}
             <Link to="/add-parent" className="cdb-add-member-row">
               <Plus size={16}/> Add New Member
             </Link>

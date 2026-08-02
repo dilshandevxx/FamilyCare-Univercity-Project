@@ -295,9 +295,10 @@
   border-radius: 50%;
   border: 2.5px solid #ffffff;
 }
-.pc-avatar-status-dot.active  { background: #10B981; }
-.pc-avatar-status-dot.pending { background: #F59E0B; }
-.pc-avatar-status-dot.neutral { background: #94a3b8; }
+.pc-avatar-status-dot.active   { background: #10B981; }
+.pc-avatar-status-dot.pending  { background: #F59E0B; }
+.pc-avatar-status-dot.rejected { background: #EF4444; }
+.pc-avatar-status-dot.neutral  { background: #94a3b8; }
 
 .pc-identity-info {
   flex: 1;
@@ -580,13 +581,87 @@
   color: #ffffff;
 }
 
-.pc-rejection-note {
-  background: #fef2f2;
-  border: 1px solid #fecdd3;
+/* ── Pending Box & Notice ── */
+.pc-pending-caregiver-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pc-caregiver-box.pending-state {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.pc-pending-notice-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
   border-radius: 9px;
   padding: 6px 10px;
-  font-size: 0.75rem;
-  color: #9f1239;
+  font-size: 0.72rem;
+  color: #92400e;
+  line-height: 1.35;
+}
+
+.pc-pending-clock-icon {
+  flex-shrink: 0;
+  color: #d97706;
+}
+
+/* ── Rejected Notice Box ── */
+.pc-rejected-caregiver-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pc-rejected-notice-banner {
+  background: #fef2f2;
+  border: 1px solid #fecdd3;
+  border-radius: 12px;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pc-rejected-reason-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 0.74rem;
+  color: #991b1b;
+  line-height: 1.35;
+}
+
+.pc-rejected-icon {
+  flex-shrink: 0;
+  color: #dc2626;
+  margin-top: 1px;
+}
+
+.pc-btn-reassign-now {
+  background: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 0.73rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 0.18s ease;
+  align-self: flex-start;
+}
+
+.pc-btn-reassign-now:hover {
+  background: #b91c1c;
 }
 
 /* ── 4. Clinical & Medical Section (Flex 1 for uniform alignment) ── */
