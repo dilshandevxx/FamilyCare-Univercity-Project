@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { 
   Mail, Lock, Eye, EyeOff, ShieldCheck, Heart, Stethoscope, 
   ArrowRight, ArrowLeft, CheckCircle2, Sparkles, AlertCircle, Home
@@ -12,6 +12,7 @@ import api from '../../../services/api';
 import './Login.css';
 
 const Login = () => {
+  const [searchParams] = useSearchParams();
   const [selectedRole, setSelectedRole] = useState('family');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -27,6 +28,13 @@ const Login = () => {
 
   const navigate = useNavigate();
   const { login, googleLogin } = useAuth();
+
+  useEffect(() => {
+    const oauthErr = searchParams.get('error');
+    if (oauthErr === 'oauth_failed') {
+      setError('Google Sign-in was cancelled or encountered an authorization issue. Please try again or use email sign-in.');
+    }
+  }, [searchParams]);
 
   const redirectByRole = (role) => {
     if (role === 'admin') navigate('/admin/dashboard');
