@@ -192,12 +192,12 @@
   border: 1.5px solid #CBD5E1;
 }
 
-/* Sidebar emergency modal style overrides for glassmorphism */
+/* ---- Emergency Broadcast Modal — Light Theme ---- */
 .admin-v2-modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(15, 23, 42, 0.7);
-  backdrop-filter: blur(8px);
+  background-color: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(6px);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -206,16 +206,21 @@
 }
 
 .admin-v2-modal {
-  background-color: #1E293B;
+  background-color: #FFFFFF;
   border-radius: 16px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.15), 0 4px 16px rgba(0, 0, 0, 0.06);
   width: 100%;
   max-width: 480px;
   padding: 2rem;
   position: relative;
-  border: 1px solid #334155;
+  border: 1px solid #E2E8F0;
   animation: modal-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  color: #F1F5F9;
+  color: #0F172A;
+}
+
+@keyframes modal-enter {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
 }
 
 .admin-v2-modal-close {
@@ -224,19 +229,19 @@
   right: 1.25rem;
   background: none;
   border: none;
-  color: #64748B;
+  color: #94A3B8;
   cursor: pointer;
   padding: 6px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: all 0.18s;
 }
 
 .admin-v2-modal-close:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  color: #F1F5F9;
+  background-color: #F1F5F9;
+  color: #475569;
 }
 
 .admin-v2-modal-header {
@@ -247,26 +252,27 @@
 }
 
 .admin-v2-modal-icon {
-  background-color: rgba(239, 68, 68, 0.15);
+  background-color: #FEF2F2;
   padding: 10px;
   border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  border: 1px solid #FECACA;
+  flex-shrink: 0;
 }
 
 .admin-v2-modal-title {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #F8FAFC;
+  color: #0F172A;
   margin: 0;
   letter-spacing: -0.3px;
 }
 
 .admin-v2-modal-desc {
   font-size: 0.8rem;
-  color: #94A3B8;
+  color: #64748B;
   margin: 4px 0 0 0;
   line-height: 1.5;
 }
@@ -279,19 +285,25 @@
   width: 100%;
   padding: 0.9rem;
   border-radius: 10px;
-  background-color: #0F172A;
-  border: 1.5px solid #334155;
-  color: #F8FAFC;
+  background-color: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
+  color: #0F172A;
   font-family: inherit;
   font-size: 0.88rem;
   outline: none;
   resize: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
+}
+
+.admin-v2-modal-textarea::placeholder {
+  color: #94A3B8;
 }
 
 .admin-v2-modal-textarea:focus {
   border-color: #EF4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  background-color: #FFFFFF;
 }
 
 .admin-v2-modal-actions {
@@ -302,20 +314,20 @@
 
 .admin-v2-modal-cancel {
   padding: 0.65rem 1.4rem;
-  background-color: transparent;
-  border: 1.5px solid #334155;
+  background-color: #F8FAFC;
+  border: 1.5px solid #E2E8F0;
   border-radius: 10px;
-  color: #94A3B8;
+  color: #64748B;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.18s;
 }
 
 .admin-v2-modal-cancel:hover {
-  background-color: rgba(255, 255, 255, 0.03);
-  color: #F1F5F9;
-  border-color: #475569;
+  background-color: #F1F5F9;
+  color: #475569;
+  border-color: #CBD5E1;
 }
 
 .admin-v2-modal-send {
@@ -330,16 +342,21 @@
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.18s;
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
 }
 
 .admin-v2-modal-send:hover {
   background-color: #DC2626;
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.35);
 }
 
-/* Success State in Broadcast Modal */
+.admin-v2-modal-send:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* ---- Success State in Broadcast Modal ---- */
 .admin-v2-broadcast-success {
   display: flex;
   flex-direction: column;
@@ -349,7 +366,7 @@
 }
 
 .admin-v2-success-icon-wrapper {
-  background-color: rgba(0, 168, 150, 0.15);
+  background-color: #F0FDF9;
   width: 64px;
   height: 64px;
   border-radius: 50%;
@@ -357,21 +374,22 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 1.25rem;
-  border: 1.5px solid rgba(0, 168, 150, 0.3);
-  box-shadow: 0 0 15px rgba(0, 168, 150, 0.2);
+  border: 1.5px solid #CCFBF1;
+  box-shadow: 0 4px 12px rgba(0, 168, 150, 0.12);
 }
 
 .admin-v2-broadcast-success h3 {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #F8FAFC;
+  color: #0F172A;
   margin: 0 0 8px 0;
 }
 
 .admin-v2-broadcast-success p {
   font-size: 0.85rem;
-  color: #94A3B8;
+  color: #64748B;
   margin: 0;
   max-width: 300px;
   line-height: 1.5;
 }
+
