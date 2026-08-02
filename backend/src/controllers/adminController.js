@@ -291,7 +291,7 @@ const getPendingCaregivers = async (req, res) => {
          c.id, c.name, c.specialization, c.experience_years,
          c.certification, c.license_id, c.bio, c.hourly_rate,
          c.is_available, c.created_at,
-         u.email, u.name AS user_name, u.created_at AS registered_at
+         u.email, u.phone, u.name AS user_name, u.created_at AS registered_at
        FROM caregivers c
        LEFT JOIN users u ON u.id = c.user_id
        WHERE c.status = 'pending'
