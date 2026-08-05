@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import CaregiverLayout from '../../../layouts/CaregiverLayout';
 import {
   User, Calendar, Bell, Shield, LogOut, CheckCircle2,
-  ChevronRight, Edit3, Zap, Lock, Loader2, ShieldCheck, ShieldOff, X, ScanLine
+  ChevronRight, Edit3, Zap, Lock, Loader2, ShieldCheck, ShieldOff, X, ScanLine,
+  CreditCard, Sparkles, Check, HelpCircle
 } from 'lucide-react';
 import api from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
@@ -158,6 +159,9 @@ const CaregiverSettings = () => {
   const [profile, setProfile] = useState({
     name: '', email: '', phone: '',
     experience_years: '', bio: '', certification: '', license_id: '', hourly_rate: '',
+    monthly_rate: '350', plan_title: 'Comprehensive Monthly Care Plan',
+    plan_description: 'Full-spectrum daily elder care and continuous health vitals monitoring.',
+    plan_features: 'Daily Vital Signs Logging\nMedication Reminders & Tracking\n24/7 Priority Emergency Support\nWeekly Family Health Progress Reports',
   });
 
   const [availability, setAvailability] = useState({
@@ -205,6 +209,10 @@ const CaregiverSettings = () => {
           certification:    data.certification    || '',
           license_id:       data.license_id       || '',
           hourly_rate:      data.hourly_rate != null ? String(data.hourly_rate) : '',
+          monthly_rate:     data.monthly_rate != null ? String(data.monthly_rate) : '350',
+          plan_title:       data.plan_title       || 'Comprehensive Monthly Care Plan',
+          plan_description: data.plan_description || 'Full-spectrum daily elder care and continuous health vitals monitoring.',
+          plan_features:    data.plan_features    || 'Daily Vital Signs Logging\nMedication Reminders & Tracking\n24/7 Priority Emergency Support\nWeekly Family Health Progress Reports',
         });
         setAvailability({
           is_available:            !!data.is_available,
@@ -398,6 +406,7 @@ const CaregiverSettings = () => {
 
   const tabs = [
     { id: 'profile',       label: 'Profile' },
+    { id: 'plan',          label: 'Monthly Plan' },
     { id: 'availability',  label: 'Availability' },
     { id: 'notifications', label: 'Notifications' },
     { id: 'security',      label: 'Security' },
@@ -427,11 +436,11 @@ const CaregiverSettings = () => {
             <span className="separator">›</span>
             <span className="current">Settings</span>
           </div>
-          <h1>Account Settings</h1>
+          <h1>Account Settings & Care Plans</h1>
           <p className="desktop-only subtitle">
-            Manage your professional profile, availability windows, and notification preferences.
+            Manage your professional profile, monthly care subscription package, availability windows, and security.
           </p>
-          <p className="mobile-only subtitle">Customize your schedule and preferences.</p>
+          <p className="mobile-only subtitle">Customize your schedule, monthly plan, and preferences.</p>
         </div>
 
         <div className="settings-layout">
@@ -448,10 +457,11 @@ const CaregiverSettings = () => {
 
           {/* Desktop Sidebar */}
           <div className="settings-sidebar sticky">
-            <NavButton active={activeTab === 'profile'}       onClick={() => scrollToSection('profile')}       icon={<User size={18} />}     label="Profile" />
-            <NavButton active={activeTab === 'availability'}  onClick={() => scrollToSection('availability')}  icon={<Calendar size={18} />} label="Availability" />
-            <NavButton active={activeTab === 'notifications'} onClick={() => scrollToSection('notifications')} icon={<Bell size={18} />}     label="Notifications" />
-            <NavButton active={activeTab === 'security'}      onClick={() => scrollToSection('security')}      icon={<Shield size={18} />}   label="Security" />
+            <NavButton active={activeTab === 'profile'}       onClick={() => scrollToSection('profile')}       icon={<User size={18} />}       label="Profile" />
+            <NavButton active={activeTab === 'plan'}          onClick={() => scrollToSection('plan')}          icon={<CreditCard size={18} />} label="Monthly Plan" />
+            <NavButton active={activeTab === 'availability'}  onClick={() => scrollToSection('availability')}  icon={<Calendar size={18} />}   label="Availability" />
+            <NavButton active={activeTab === 'notifications'} onClick={() => scrollToSection('notifications')} icon={<Bell size={18} />}       label="Notifications" />
+            <NavButton active={activeTab === 'security'}      onClick={() => scrollToSection('security')}      icon={<Shield size={18} />}     label="Security" />
           </div>
 
           {/* Content Area */}
@@ -568,6 +578,147 @@ const CaregiverSettings = () => {
                   onClick={saveProfile}
                   loading={saving === 'profile'}
                   label="Save Changes"
+                  className="btn-primary-teal"
+                />
+              </div>
+            </div>
+
+            {/* ── Monthly Plan ── */}
+            <div id="plan" className="settings-card" style={{ marginTop: '24px' }}>
+              <div className="card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: '700', color: '#0f172a', margin: 0 }}>Monthly Care Subscription Plan</h2>
+                    <span style={{ fontSize: '0.75rem', background: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: '12px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <Sparkles size={12} /> PayHere Integrated
+                    </span>
+                  </div>
+                  <p style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '4px', margin: 0 }}>
+                    Families subscribe to this monthly package when assigning you to care for their parent.
+                  </p>
+                </div>
+                <div className="desktop-only">
+                  <CreditCard className="icon-teal" size={24} />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginTop: '20px' }}>
+                {/* Form fields */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <InputField
+                    label="PLAN TITLE"
+                    value={profile.plan_title}
+                    onChange={pf('plan_title')}
+                    placeholder="e.g. Comprehensive Monthly Care Plan"
+                  />
+
+                  <div className="settings-input-group">
+                    <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>MONTHLY SUBSCRIPTION RATE (LKR / mo)</span>
+                      <span style={{ fontSize: '0.75rem', color: '#0d9488', fontWeight: '600' }}>Charged Monthly via PayHere</span>
+                    </label>
+                    <div style={{ position: 'relative' }}>
+                      <span style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#0d9488', fontWeight: '700', fontSize: '0.9rem' }}>LKR</span>
+                      <input
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={profile.monthly_rate}
+                        onChange={pf('monthly_rate')}
+                        placeholder="350.00"
+                        style={{ paddingLeft: '3.2rem', fontWeight: '600', fontSize: '1.05rem', color: '#0f172a' }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="settings-input-group">
+                    <label>PLAN SUMMARY / DESCRIPTION</label>
+                    <textarea
+                      value={profile.plan_description}
+                      onChange={pf('plan_description')}
+                      placeholder="Describe what is covered in your full monthly care..."
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="settings-input-group">
+                    <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span>PLAN FEATURES & INCLUSIONS</span>
+                      <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>(One feature per line)</span>
+                    </label>
+                    <textarea
+                      value={profile.plan_features}
+                      onChange={pf('plan_features')}
+                      placeholder="Daily Vital Signs Logging&#10;Medication Reminders & Tracking&#10;24/7 Emergency Notification Access&#10;Weekly Family Progress Updates"
+                      rows={4}
+                      style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}
+                    />
+                  </div>
+                </div>
+
+                {/* Live Card Preview */}
+                <div>
+                  <label style={{ fontSize: '0.75rem', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '8px', display: 'block' }}>
+                    Live Family Checkout Preview
+                  </label>
+                  <div style={{
+                    background: 'linear-gradient(135deg, #0f766e 0%, #115e59 100%)',
+                    borderRadius: '16px',
+                    padding: '24px',
+                    color: '#ffffff',
+                    boxShadow: '0 10px 25px -5px rgba(13, 148, 136, 0.3)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    minHeight: '280px'
+                  }}>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                        <span style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)', padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600' }}>
+                          Monthly Care Plan
+                        </span>
+                        <span style={{ fontSize: '0.8rem', opacity: 0.85 }}>30 Days Validity</span>
+                      </div>
+                      <h3 style={{ fontSize: '1.25rem', fontWeight: '700', margin: '0 0 6px 0', color: '#ffffff' }}>
+                        {profile.plan_title || 'Monthly Care Plan'}
+                      </h3>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', margin: '14px 0' }}>
+                        <span style={{ fontSize: '1.8rem', fontWeight: '800' }}>
+                          LKR {Number(profile.monthly_rate || 350).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </span>
+                        <span style={{ fontSize: '0.85rem', opacity: 0.8 }}>/ month</span>
+                      </div>
+                      <p style={{ fontSize: '0.82rem', opacity: 0.9, lineHeight: 1.4, marginBottom: '16px' }}>
+                        {profile.plan_description || 'Full-spectrum daily elder care and continuous health vitals monitoring.'}
+                      </p>
+                    </div>
+
+                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.15)', paddingTop: '14px' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase', letterSpacing: '0.04em', opacity: 0.8, marginBottom: '8px' }}>
+                        Package Includes:
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        {(profile.plan_features || 'Daily Vitals Tracking\nMedication Reminders\nEmergency Alerts')
+                          .split('\n')
+                          .filter(f => f.trim())
+                          .slice(0, 4)
+                          .map((feature, idx) => (
+                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.78rem' }}>
+                              <Check size={13} style={{ color: '#5eead4', flexShrink: 0 }} />
+                              <span>{feature.trim()}</span>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="card-actions" style={{ marginTop: '20px', display: 'flex', justifyContent: 'flex-end' }}>
+                <SpinBtn
+                  onClick={saveProfile}
+                  loading={saving === 'profile'}
+                  label="Save Monthly Plan Settings"
                   className="btn-primary-teal"
                 />
               </div>

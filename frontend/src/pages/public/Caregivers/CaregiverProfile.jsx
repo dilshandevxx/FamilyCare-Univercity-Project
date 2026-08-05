@@ -176,6 +176,49 @@ const CaregiverProfile = () => {
           {/* Left column */}
           <div style={{ display:'flex', flexDirection:'column', gap:'1.25rem' }}>
 
+            {/* Monthly Subscription Plan Card */}
+            <div style={{
+              background: 'linear-gradient(135deg, #0d9488 0%, #115e59 100%)',
+              borderRadius: '16px',
+              padding: '1.75rem',
+              color: '#ffffff',
+              boxShadow: '0 4px 20px rgba(13, 148, 136, 0.25)'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <span style={{ fontSize: '0.72rem', background: 'rgba(255,255,255,0.2)', padding: '3px 10px', borderRadius: '12px', fontWeight: '700', letterSpacing: '0.5px' }}>
+                  MONTHLY CARE PACKAGE
+                </span>
+                <span style={{ fontSize: '0.8rem', opacity: 0.9 }}>30 Days Window</span>
+              </div>
+              <h2 style={{ fontSize: '1.3rem', fontWeight: '800', margin: '0 0 6px 0', color: '#ffffff' }}>
+                {cg.plan_title || 'Comprehensive Monthly Care Plan'}
+              </h2>
+              <div style={{ fontSize: '1.8rem', fontWeight: '800', margin: '10px 0', color: '#5eead4' }}>
+                LKR {Number(cg.monthly_rate || 350).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                <span style={{ fontSize: '0.85rem', color: '#ccfbf1', fontWeight: 'normal' }}> / month</span>
+              </div>
+              <p style={{ color: '#e6fffa', fontSize: '0.88rem', lineHeight: 1.5, margin: '0 0 14px 0' }}>
+                {cg.plan_description || 'Full-spectrum daily elder care and continuous health vitals monitoring.'}
+              </p>
+
+              <div style={{ borderTop: '1px solid rgba(255,255,255,0.2)', paddingTop: '12px' }}>
+                <div style={{ fontSize: '0.74rem', textTransform: 'uppercase', letterSpacing: '0.5px', opacity: 0.85, marginBottom: '8px' }}>
+                  Plan Features & Inclusions:
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '8px' }}>
+                  {(cg.plan_features || 'Daily Vital Signs Logging\nMedication Reminders & Tracking\n24/7 Priority Emergency Support\nWeekly Family Health Progress Reports')
+                    .split('\n')
+                    .filter(f => f.trim())
+                    .map((feat, idx) => (
+                      <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem' }}>
+                        <span style={{ color: '#5eead4', fontWeight: 'bold' }}>✓</span>
+                        <span>{feat.trim()}</span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+
             {/* About */}
             {cg.bio && (
               <div style={{ background:'white', borderRadius:'16px', padding:'1.75rem', boxShadow:'0 2px 12px rgba(0,0,0,0.05)' }}>

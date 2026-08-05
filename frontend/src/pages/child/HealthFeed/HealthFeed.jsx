@@ -1,36 +1,54 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import {
-  Activity, Heart, HeartPulse, ShieldAlert, Phone, MapPin, 
-  UserRoundCheck, ShieldCheck, Sparkles, Filter, Calendar, 
-  MessageSquare, Video, Info, Plus, ChevronRight, CheckCircle2, Clock
+  Activity, Heart, Thermometer, Phone, MapPin, 
+  UserCheck, Sparkles, Filter, Calendar, 
+  MessageSquare, Plus, CheckCircle2, Clock, 
+  AlertTriangle, FileText, Download, Smile, 
+  Meh, Frown, Coffee, Utensils, Moon, Check, 
+  ShieldCheck, RefreshCw, User, Eye
 } from 'lucide-react';
 import ChildLayout from '../../../layouts/ChildLayout';
 import api from '../../../services/api';
 import './HealthFeed.css';
 
+const residentAvatar = (name) =>
+  `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name || 'elder')}`;
+
+const getConditionClass = (cond) => {
+  const c = (cond || '').toUpperCase();
+  if (c === 'CRITICAL') return 'hf-badge-critical';
+  if (c === 'NEEDS ATTENTION' || c === 'WARNING') return 'hf-badge-warning';
+  return 'hf-badge-stable';
+};
+
 const HealthFeed = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const initialParentId = searchParams.get('parent_id') || '';
 
   const [parents, setParents] = useState([]);
   const [selectedParentId, setSelectedParentId] = useState(initialParentId);
-  const [feedLogs, setFeedLogs] = useState([]);
-  const [filterType, setFilterType] = useState('All'); // All, Vitals, Medication, Meals
-  const [selectedDate, setSelectedDate] = useState('2023-10-24'); // Mock default date
+  const [feedData, setFeedData] = useState({ parent: null, logs: [] });
+  const [filterType, setFilterType] = useState('All'); // All, Vitals, Medication, Meals, Attachments
   const [loading, setLoading] = useState(true);
   const [parentsLoading, setParentsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // 1. Fetch parents to populate dropdown
+  // 1. Fetch all parents for the logged-in child
   useEffect(() => {
     const fetchParents = async () => {
       try {
         setParentsLoading(true);
         const { data } = await api.get('/parents');
-        setParents(data || []);
-        if (data && data.length > 0 && !selectedParentId) {
-          setSelectedParentId(data[0].id);
+        const list = Array.isArray(data) ? data : [];
+        setParents(list);
+        if (list.length > 0) {
+          // If no initial parent or initial parent not in list, select first
+          const exists = list.some(p => String(p.id) === String(initialParentId));
+          const targetId = exists ? initialParentId : String(list[0].id);
+          setSelectedParentId(targetId);
+          setSearchParams({ parent_id: targetId });
         }
       } catch (err) {
         console.error('Error fetching parents:', err);
@@ -40,232 +58,338 @@ const HealthFeed = () => {
       }
     };
     fetchParents();
-  }, [selectedParentId]);
+  }, []);
 
   // 2. Fetch unified health feed logs when selected parent changes
-  useEffect(() => {
-    const fetchFeed = async () => {
-      if (!selectedParentId) return;
-      try {
-        setLoading(true);
-        const { data } = await api.get(`/health/feed?parent_id=${selectedParentId}`);
-        setFeedLogs(data || []);
-      } catch (err) {
-        console.error('Error fetching health feed:', err);
-        setError('Failed to load health feed logs.');
-      } finally {
-        setLoading(false);
+  const fetchFeed = async (parentId) => {
+    if (!parentId) return;
+    try {
+      setLoading(true);
+      setError('');
+      const { data } = await api.get(`/health/feed?parent_id=${parentId}`);
+      if (data && data.logs) {
+        setFeedData(data);
+      } else if (Array.isArray(data)) {
+        setFeedData({ parent: null, logs: data });
+      } else {
+        setFeedData({ parent: null, logs: [] });
       }
-    };
-    fetchFeed();
-  }, [selectedParentId]);
-
-  // Handle parent change
-  const handleParentChange = (e) => {
-    setSelectedParentId(e.target.value);
+    } catch (err) {
+      console.error('Error fetching health feed:', err);
+      setError('Failed to load health feed logs.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Filter logs based on filter tags
-  const filteredLogs = feedLogs.filter(log => {
+  useEffect(() => {
+    if (selectedParentId) {
+      fetchFeed(selectedParentId);
+    }
+  }, [selectedParentId]);
+
+  // Handle parent card click
+  const handleSelectParent = (id) => {
+    setSelectedParentId(String(id));
+    setSearchParams({ parent_id: String(id) });
+  };
+
+  // Active parent object from parents list or backend metadata
+  const activeParent = parents.find(p => String(p.id) === String(selectedParentId)) || feedData.parent || {};
+
+  // Filter logs based on filter chips
+  const logsList = feedData.logs || [];
+  const filteredLogs = logsList.filter(log => {
     if (filterType === 'All') return true;
-    if (filterType === 'Vitals') return log.type === 'vitals';
-    if (filterType === 'Medication') {
-      // Activity matches Medication Administered or Medication keyword
-      return log.type === 'activity' && (log.category === 'Medication' || log.title?.toLowerCase().includes('medication'));
-    }
-    if (filterType === 'Meals') {
-      // Activity matches Dinner/Lunch/Breakfast/Meals
-      return log.type === 'activity' && (log.category === 'Meals' || log.title?.toLowerCase().includes('log') || log.title?.toLowerCase().includes('dinner') || log.title?.toLowerCase().includes('lunch') || log.title?.toLowerCase().includes('breakfast'));
-    }
+    if (filterType === 'Vitals') return log.type === 'vitals' && (log.blood_pressure || log.heart_rate || log.temperature);
+    if (filterType === 'Medication') return log.meds_taken !== null && log.meds_taken !== undefined;
+    if (filterType === 'Meals') return log.breakfast_status || log.lunch_status || log.dinner_status || log.category === 'Meals';
+    if (filterType === 'Attachments') return !!log.attachment_url;
     return true;
   });
 
-  // Find currently selected parent object
-  const activeParentObj = parents.find(p => String(p.id) === String(selectedParentId)) || {
-    name: 'Eleanor Vance',
-    address: 'Kindred Hearth Residence',
-    age: 82,
-    gender: 'female',
-    relationship: 'Mother',
-    caregiver_name: 'Sarah Jenkins, RN'
-  };
-
-  // Retrieve latest vital readings from feed logs
-  const latestVitals = feedLogs.find(log => log.type === 'vitals') || {
-    blood_pressure: '124/82',
-    temperature: '98.6'
-  };
+  // Latest vital readings
+  const latestVitals = logsList.find(log => log.type === 'vitals' && (log.blood_pressure || log.heart_rate)) || {};
 
   return (
     <ChildLayout title="Health Logs">
       <div className="hf-container">
 
-        {/* BREADCRUMB */}
-        <div className="hf-breadcrumb">
-          <Link to="/dashboard">Dashboard</Link>
-          <span className="hf-bc-separator">&gt;</span>
-          <span className="hf-bc-active">Health Feed</span>
+        {/* TOP BAR / BREADCRUMB */}
+        <div className="hf-top-header">
+          <div className="hf-breadcrumb">
+            <Link to="/dashboard">Dashboard</Link>
+            <span className="hf-bc-separator">&gt;</span>
+            <span className="hf-bc-active">Health Feed</span>
+          </div>
+          {activeParent?.emergency_contact && (
+            <a href={`tel:${activeParent.emergency_contact}`} className="hf-emergency-btn">
+              <Phone size={15} /> Emergency Call: {activeParent.emergency_contact}
+            </a>
+          )}
         </div>
 
-        {/* TABS HEADER ROW */}
-        <div className="hf-tabs-row">
-          <div className="hf-tabs">
-            <button className="hf-tab active">Overview</button>
-            <button className="hf-tab">History</button>
-            <button className="hf-tab">Analytics</button>
-          </div>
-          <div className="hf-tabs-right">
-            <button className="hf-emergency-btn">
-              🚨 Emergency Call
+        {/* ── 1. CLEAN PARENT SELECTOR TABS ── */}
+        <div className="hf-parent-selector-section">
+          <div className="hf-section-header">
+            <div>
+              <h2 className="hf-main-title">Parent Health Feeds</h2>
+              <p className="hf-sub-title">Select an elderly parent to view their clinical vitals timeline, caregiver logs, and meal records</p>
+            </div>
+            <button 
+              className="hf-refresh-btn"
+              onClick={() => fetchFeed(selectedParentId)}
+              title="Refresh feed"
+            >
+              <RefreshCw size={15} className={loading ? 'hf-spin' : ''} /> Refresh
             </button>
           </div>
+
+          {parentsLoading ? (
+            <div className="hf-parents-skeleton">
+              <div className="hf-skeleton-card"></div>
+              <div className="hf-skeleton-card"></div>
+            </div>
+          ) : parents.length === 0 ? (
+            <div className="hf-no-parents-box">
+              <User size={32} />
+              <p>No parents added to your account yet.</p>
+              <Link to="/add-parent" className="hf-add-parent-btn">+ Add Parent</Link>
+            </div>
+          ) : (
+            <div className="hf-parent-cards-grid">
+              {parents.map(p => {
+                const isSelected = String(p.id) === String(selectedParentId);
+                const condition = p.care_status || 'STABLE';
+                return (
+                  <div
+                    key={p.id}
+                    className={`hf-parent-card ${isSelected ? 'active' : ''}`}
+                    onClick={() => handleSelectParent(p.id)}
+                  >
+                    <div className="hf-pc-left">
+                      <img 
+                        src={residentAvatar(p.name)} 
+                        alt={p.name} 
+                        className="hf-pc-avatar"
+                      />
+                      <div>
+                        <h4 className="hf-pc-name">{p.name}</h4>
+                        <p className="hf-pc-meta">
+                          {p.relationship ? `${p.relationship} • ` : ''}{p.age ? `${p.age} yrs` : 'Senior'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="hf-pc-right">
+                      <span className={`hf-condition-badge ${getConditionClass(condition)}`}>
+                        {condition}
+                      </span>
+                      <span className="hf-pc-caregiver">
+                        {p.assigned_caregiver_id ? '👨‍⚕️ Caregiver Assigned' : '⚠️ No Caregiver'}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        {/* FEED GRID */}
+        {/* ── 2. FEED & SIDEBAR GRID ── */}
         <div className="hf-grid">
           
           {/* LEFT PANEL - TIMELINE FEED */}
           <div className="hf-feed-panel">
             
-            {/* FILTER PANEL */}
-            <div className="hf-filter-card">
-              <div className="hf-filter-inputs">
-                <div className="hf-input-box">
-                  <label>PATIENT</label>
-                  {parentsLoading ? (
-                    <select disabled><option>Loading parents...</option></select>
-                  ) : (
-                    <select value={selectedParentId} onChange={handleParentChange}>
-                      {parents.map(p => (
-                        <option key={p.id} value={p.id}>{p.name}</option>
-                      ))}
-                      {parents.length === 0 && (
-                        <option value="">Eleanor Vance</option>
-                      )}
-                    </select>
-                  )}
-                </div>
-
-                <div className="hf-input-box">
-                  <label>DATE</label>
-                  <div className="hf-date-wrapper">
-                    <Calendar size={14} className="hf-date-icon" />
-                    <input 
-                      type="date" 
-                      value={selectedDate} 
-                      onChange={(e) => setSelectedDate(e.target.value)} 
-                    />
-                  </div>
-                </div>
+            {/* FILTER CHIPS & STATS BAR */}
+            <div className="hf-filter-bar">
+              <div className="hf-filter-chips">
+                <span className="hf-filter-label"><Filter size={14} /> Filter:</span>
+                {['All', 'Vitals', 'Medication', 'Meals', 'Attachments'].map(tag => (
+                  <button 
+                    key={tag} 
+                    className={`hf-chip-btn ${filterType === tag ? 'active' : ''}`}
+                    onClick={() => setFilterType(tag)}
+                  >
+                    {tag}
+                  </button>
+                ))}
               </div>
-
-              {/* Tag filters */}
-              <div className="hf-filter-tags">
-                <span className="hf-filter-label">FILTER LOGS</span>
-                <div className="hf-tags-list">
-                  {['All', 'Vitals', 'Medication', 'Meals'].map(tag => (
-                    <button 
-                      key={tag} 
-                      className={`hf-tag-btn ${filterType === tag ? 'active' : ''}`}
-                      onClick={() => setFilterType(tag)}
-                    >
-                      {tag}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <span className="hf-logs-count">{filteredLogs.length} updates</span>
             </div>
 
-            {/* TIMELINE FEED SECTION */}
-            <div className="hf-timeline">
-              <h3 className="hf-timeline-group-title">Today</h3>
-
+            {/* TIMELINE SECTION */}
+            <div className="hf-timeline-container">
               {loading ? (
                 <div className="hf-feed-loader">
                   <div className="hf-spinner"></div>
-                  <p>Loading timeline updates...</p>
+                  <p>Loading real-time health logs for {activeParent.name || 'parent'}...</p>
+                </div>
+              ) : error ? (
+                <div className="hf-feed-error">
+                  <AlertTriangle size={24} />
+                  <p>{error}</p>
                 </div>
               ) : filteredLogs.length === 0 ? (
-                <div className="hf-feed-empty">
-                  <Info size={32} />
-                  <p>No feed entries match your filter selection.</p>
+                <div className="hf-feed-empty-state">
+                  <div className="hf-empty-icon-wrap">
+                    <Activity size={36} />
+                  </div>
+                  <h3>No Health Logs for {activeParent.name || 'this parent'}</h3>
+                  <p>
+                    {activeParent.assigned_caregiver_id 
+                      ? 'The assigned caregiver has not logged vitals for this parent yet today. When logs are entered, they will appear here instantly.'
+                      : 'Assign a certified caregiver to start receiving daily clinical vital checks, meal tracking, and health updates.'}
+                  </p>
+                  {!activeParent.assigned_caregiver_id && (
+                    <Link to="/caregivers-list" className="hf-assign-cta-btn">
+                      Browse & Assign Caregivers
+                    </Link>
+                  )}
                 </div>
               ) : (
                 filteredLogs.map((log, index) => {
-                  const logTime = new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                  
+                  const logDate = new Date(log.timestamp);
+                  const timeFormatted = isNaN(logDate.getTime()) 
+                    ? 'Recent' 
+                    : logDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                  const dateFormatted = isNaN(logDate.getTime()) 
+                    ? 'Today' 
+                    : logDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+
+                  const isVitals = log.type === 'vitals';
+                  const condition = log.overall_condition || 'STABLE';
+
                   return (
-                    <div key={log.id || index} className="hf-timeline-item">
-                      {/* Timeline side marker */}
-                      <div className="hf-timeline-marker">
-                        <div className={`hf-marker-dot ${log.type === 'vitals' ? 'teal' : 'orange'}`}></div>
-                        {index < filteredLogs.length - 1 && <div className="hf-marker-line"></div>}
+                    <div key={log.id || index} className="hf-timeline-entry">
+                      
+                      {/* Timeline side dot & connector line */}
+                      <div className="hf-timeline-stem">
+                        <div className={`hf-stem-dot ${condition === 'CRITICAL' ? 'critical' : condition === 'NEEDS ATTENTION' ? 'warning' : 'stable'}`}></div>
+                        {index < filteredLogs.length - 1 && <div className="hf-stem-line"></div>}
                       </div>
 
                       {/* Card Content */}
-                      <div className="hf-timeline-card">
+                      <div className="hf-log-card">
                         
-                        {/* Title and meta */}
-                        <div className="hf-timeline-card-header">
+                        {/* Header: Title, Timestamp, Logged By */}
+                        <div className="hf-log-card-header">
                           <div>
-                            <h4 className="hf-log-title">{log.title || 'Morning Vitals Check'}</h4>
-                            <p className="hf-log-meta">
-                              {log.type === 'vitals' ? 'Live Update' : 'Activity'} • {logTime} by {log.logged_by}
+                            <div className="hf-log-title-row">
+                              <h4 className="hf-log-title">
+                                {isVitals ? 'Daily Clinical Health & Vitals Check' : log.title || 'Health Activity Log'}
+                              </h4>
+                              <span className={`hf-condition-badge ${getConditionClass(condition)}`}>
+                                {condition}
+                              </span>
+                            </div>
+                            <p className="hf-log-meta-text">
+                              <Clock size={12} /> {dateFormatted} at {timeFormatted} • Recorded by <strong>{log.logged_by || 'Caregiver'}</strong>
                             </p>
                           </div>
-                          {log.stability && (
-                            <span className="hf-status-pill success">STABILITY: {log.stability}</span>
-                          )}
-                          {log.verified && (
-                            <span className="hf-status-pill success">✓ Verified</span>
+
+                          {log.mood && (
+                            <div className="hf-mood-pill" title={`Mood: ${log.mood}`}>
+                              {log.mood === 'happy' && <><Smile size={15} color="#16a34a"/> <span>Good Spirits</span></>}
+                              {log.mood === 'neutral' && <><Meh size={15} color="#0284c7"/> <span>Calm / Neutral</span></>}
+                              {log.mood === 'sad' && <><Frown size={15} color="#dc2626"/> <span>Distressed / Low</span></>}
+                            </div>
                           )}
                         </div>
 
-                        {/* Description/Notes */}
-                        {log.description && (
-                          <p className="hf-log-desc">"{log.description}"</p>
-                        )}
+                        {/* Vitals Grid (If vitals exist) */}
+                        {(log.blood_pressure || log.heart_rate || log.temperature) && (
+                          <div className="hf-vitals-display-grid">
+                            {log.blood_pressure && (
+                              <div className="hf-vital-box">
+                                <span className="hf-vb-label"><Activity size={13}/> Blood Pressure</span>
+                                <div className="hf-vb-val-row">
+                                  <span className="hf-vb-val">{log.blood_pressure}</span>
+                                  <span className="hf-vb-unit">mmHg</span>
+                                </div>
+                              </div>
+                            )}
 
-                        {/* Vitals Blocks Grid */}
-                        {log.type === 'vitals' && (
-                          <div className="hf-vitals-grid">
-                            <div className="hf-vital-block">
-                              <span className="hf-vital-label">BLOOD PRESSURE</span>
-                              <div className="hf-vital-value-row">
-                                <span className="hf-vital-number">{log.blood_pressure || '120/80'}</span>
-                                <span className="hf-vital-unit">mmHg</span>
+                            {log.heart_rate && (
+                              <div className="hf-vital-box">
+                                <span className="hf-vb-label"><Heart size={13}/> Heart Rate</span>
+                                <div className="hf-vb-val-row">
+                                  <span className="hf-vb-val">{log.heart_rate}</span>
+                                  <span className="hf-vb-unit">bpm</span>
+                                </div>
                               </div>
-                            </div>
-                            <div className="hf-vital-block">
-                              <span className="hf-vital-label">TEMPERATURE</span>
-                              <div className="hf-vital-value-row">
-                                <span className="hf-vital-number">{log.temperature || '98.6'}</span>
-                                <span className="hf-vital-unit">°F</span>
+                            )}
+
+                            {log.temperature && (
+                              <div className="hf-vital-box">
+                                <span className="hf-vb-label"><Thermometer size={13}/> Temperature</span>
+                                <div className="hf-vb-val-row">
+                                  <span className="hf-vb-val">{log.temperature}</span>
+                                  <span className="hf-vb-unit">°F</span>
+                                </div>
                               </div>
-                            </div>
-                            <div className="hf-vital-block">
-                              <span className="hf-vital-label">HEART RATE</span>
-                              <div className="hf-vital-value-row">
-                                <span className="hf-vital-number">{log.heart_rate || '72'}</span>
-                                <span className="hf-vital-unit">bpm</span>
-                              </div>
-                            </div>
+                            )}
                           </div>
                         )}
 
-                        {/* If it's a Food/Meal Log */}
-                        {log.title === 'Dinner Log' && (
-                          <div className="hf-meal-block">
-                            <img 
-                              src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=300&auto=format&fit=crop" 
-                              alt="Salmon dinner" 
-                              className="hf-meal-img"
-                            />
-                            <div className="hf-meal-tags">
-                              {log.tags && log.tags.map(tag => (
-                                <span key={tag} className="hf-meal-tag">{tag}</span>
-                              ))}
-                            </div>
+                        {/* Meals & Medication Row */}
+                        {(log.breakfast_status || log.lunch_status || log.dinner_status || log.meds_taken !== null) && (
+                          <div className="hf-nutrition-meds-row">
+                            {/* Meals */}
+                            {(log.breakfast_status || log.lunch_status || log.dinner_status) && (
+                              <div className="hf-meals-badge-group">
+                                <span className="hf-nm-title"><Utensils size={13}/> Meals:</span>
+                                {log.breakfast_status && (
+                                  <span className={`hf-meal-tag ${log.breakfast_status.toLowerCase()}`}>
+                                    <Coffee size={11} /> B: {log.breakfast_status}
+                                  </span>
+                                )}
+                                {log.lunch_status && (
+                                  <span className={`hf-meal-tag ${log.lunch_status.toLowerCase()}`}>
+                                    <Utensils size={11} /> L: {log.lunch_status}
+                                  </span>
+                                )}
+                                {log.dinner_status && (
+                                  <span className={`hf-meal-tag ${log.dinner_status.toLowerCase()}`}>
+                                    <Moon size={11} /> D: {log.dinner_status}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+
+                            {/* Medication Adherence */}
+                            {log.meds_taken !== null && log.meds_taken !== undefined && (
+                              <div className="hf-meds-status-tag">
+                                {log.meds_taken === 1 || log.meds_taken === true || log.meds_taken === '1' ? (
+                                  <span className="hf-meds-taken"><Check size={12}/> Meds Administered</span>
+                                ) : (
+                                  <span className="hf-meds-pending"><Clock size={12}/> Meds Pending</span>
+                                )}
+                                {log.meds_notes && <span className="hf-meds-note">({log.meds_notes})</span>}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Clinical / Caregiver Notes */}
+                        {log.description && (
+                          <div className="hf-clinical-notes-box">
+                            <p className="hf-cn-text">"{log.description}"</p>
+                          </div>
+                        )}
+
+                        {/* Attachment Link */}
+                        {log.attachment_url && (
+                          <div className="hf-attachment-row">
+                            <a 
+                              href={log.attachment_url.startsWith('http') ? log.attachment_url : `${api.defaults.baseURL || ''}${log.attachment_url}`} 
+                              target="_blank" 
+                              rel="noreferrer" 
+                              className="hf-attachment-link"
+                            >
+                              <FileText size={14} /> View Attached Medical Record / Report <Eye size={13}/>
+                            </a>
                           </div>
                         )}
 
@@ -278,99 +402,117 @@ const HealthFeed = () => {
 
           </div>
 
-          {/* RIGHT PANEL - SIDEBAR WIDGETS */}
+          {/* RIGHT PANEL - ACTIVE PARENT & CAREGIVER SIDEBAR */}
           <div className="hf-sidebar-panel">
             
-            {/* Widget 1: Patient summary */}
-            <div className="hf-patient-widget teal-bg">
-              <div className="hf-pw-header">
-                <div>
-                  <h3 className="hf-pw-name">{activeParentObj.name}</h3>
-                  <p className="hf-pw-location">{activeParentObj.address}</p>
-                </div>
+            {/* Widget 1: Selected Parent Card */}
+            <div className="hf-card hf-parent-profile-widget">
+              <div className="hf-ppw-header">
                 <img 
-                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(activeParentObj.name)}`} 
-                  alt="avatar" 
-                  className="hf-pw-avatar"
+                  src={residentAvatar(activeParent.name)} 
+                  alt={activeParent.name} 
+                  className="hf-ppw-avatar"
                 />
-              </div>
-
-              <div className="hf-pw-vitals">
-                <div className="hf-pw-vital-row">
-                  <span className="hf-pw-vital-label">Latest BP</span>
-                  <span className="hf-pw-vital-value">{latestVitals.blood_pressure || '124/82'}</span>
-                </div>
-                <div className="hf-pw-vital-row">
-                  <span className="hf-pw-vital-label">Avg Temp</span>
-                  <span className="hf-pw-vital-value">{latestVitals.temperature || '98.6'}°F</span>
+                <div>
+                  <h3 className="hf-ppw-name">{activeParent.name || 'Selected Parent'}</h3>
+                  <p className="hf-ppw-meta">
+                    {activeParent.relationship ? `${activeParent.relationship} • ` : ''}
+                    {activeParent.age ? `${activeParent.age} years old` : 'Elder Resident'}
+                  </p>
                 </div>
               </div>
 
-              <div className="hf-pw-footer">
-                <span className="hf-live-indicator">
-                  <span className="hf-pulse-dot"></span> LIVE TRACKING
-                </span>
-                <span className="hf-update-time">LAST UPDATE: 12M AGO</span>
+              {activeParent.address && (
+                <div className="hf-ppw-info-row">
+                  <MapPin size={14} className="text-gray" />
+                  <span>{activeParent.address}</span>
+                </div>
+              )}
+
+              {activeParent.medical_conditions && (
+                <div className="hf-ppw-conditions-box">
+                  <span className="hf-widget-lbl">MEDICAL CONDITIONS</span>
+                  <p>{activeParent.medical_conditions}</p>
+                </div>
+              )}
+
+              {/* Latest Vitals Snapshot */}
+              <div className="hf-pw-vitals-strip">
+                <div className="hf-pw-vital-item">
+                  <span className="hf-pw-lbl">Latest BP</span>
+                  <span className="hf-pw-val">{latestVitals.blood_pressure || '—'}</span>
+                </div>
+                <div className="hf-pw-vital-item">
+                  <span className="hf-pw-lbl">Heart Rate</span>
+                  <span className="hf-pw-val">{latestVitals.heart_rate ? `${latestVitals.heart_rate} bpm` : '—'}</span>
+                </div>
+                <div className="hf-pw-vital-item">
+                  <span className="hf-pw-lbl">Temp</span>
+                  <span className="hf-pw-val">{latestVitals.temperature ? `${latestVitals.temperature}°F` : '—'}</span>
+                </div>
               </div>
             </div>
 
-            {/* Widget 2: Caregiver widget */}
+            {/* Widget 2: Assigned Caregiver Widget */}
             <div className="hf-card">
-              <span className="hf-widget-lbl">CURRENT CAREGIVER</span>
-              {activeParentObj.assigned_caregiver_id ? (
+              <span className="hf-widget-lbl">ASSIGNED CAREGIVER</span>
+              {activeParent.assigned_caregiver_id ? (
                 <div className="hf-caregiver-widget">
                   <img 
-                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(activeParentObj.caregiver_name || 'Caregiver')}`} 
+                    src={residentAvatar(activeParent.caregiver_name || 'Caregiver')} 
                     alt="Caregiver avatar" 
                     className="hf-cg-avatar"
                   />
                   <div className="hf-cg-info">
-                    <h4 className="hf-cg-name">{activeParentObj.caregiver_name}</h4>
-                    <p className="hf-cg-duty">{activeParentObj.caregiver_specialization || 'Assigned Caregiver'}</p>
+                    <h4 className="hf-cg-name">{activeParent.caregiver_name || 'Certified Caregiver'}</h4>
+                    <p className="hf-cg-duty">Assigned Health Attendant</p>
                   </div>
                   <div className="hf-cg-actions">
-                    <Link to={`/messages?recipient=${activeParentObj.assigned_caregiver_id}`} className="hf-cg-icon-btn"><MessageSquare size={16} /></Link>
-                    <button className="hf-cg-icon-btn"><Video size={16} /></button>
+                    <Link 
+                      to={`/messages?recipient=${activeParent.assigned_caregiver_id}`} 
+                      className="hf-cg-icon-btn"
+                      title="Send Message"
+                    >
+                      <MessageSquare size={16} />
+                    </Link>
                   </div>
                 </div>
               ) : (
                 <div className="hf-caregiver-widget unassigned">
                   <div className="hf-cg-info">
                     <h4 className="hf-cg-name text-gray">No Caregiver Assigned</h4>
-                    <p className="hf-cg-duty">Enable tracking & messaging</p>
+                    <p className="hf-cg-duty">Subscribe to a care plan</p>
                   </div>
                   <div className="hf-cg-actions">
-                    <Link to="/caregivers-list" className="hf-cg-assign-btn">Assign Now</Link>
+                    <Link to="/caregivers-list" className="hf-cg-assign-btn">Assign</Link>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Widget 3: Vitality index dial */}
+            {/* Widget 3: Health Status Card */}
             <div className="hf-card hf-vitality-card">
               <div className="hf-vitality-header">
-                <span className="hf-widget-lbl">Vitality Index</span>
-                <Info size={14} className="hf-info-icon" />
+                <span className="hf-widget-lbl">Care Status Summary</span>
+                <ShieldCheck size={16} color="#0d9488" />
               </div>
-              <div className="hf-vitality-gauge">
-                <div className="hf-gauge-circle">
-                  <h2 className="hf-gauge-number">92</h2>
-                  <p className="hf-gauge-lbl">HEALTH SCORE</p>
+              <div className="hf-status-summary-box">
+                <div className={`hf-large-status ${getConditionClass(activeParent.care_status || 'STABLE')}`}>
+                  {activeParent.care_status || 'STABLE'}
                 </div>
+                <p className="hf-status-desc">
+                  {activeParent.care_status === 'CRITICAL' 
+                    ? 'Attention required. Check the latest health log notes immediately.'
+                    : activeParent.care_status === 'NEEDS ATTENTION'
+                    ? 'Moderate observation required by assigned caregiver.'
+                    : 'All recorded vital signs and nutrition indicators are within safe thresholds.'}
+                </p>
               </div>
-              <p className="hf-vitality-description">
-                {activeParentObj.name}'s health score has increased by <span className="text-teal">4%</span> compared to last week.
-              </p>
             </div>
 
           </div>
 
         </div>
-
-        {/* Floating Action Button */}
-        <Link to="/add-parent" className="hf-fab">
-          <Plus size={24} />
-        </Link>
 
       </div>
     </ChildLayout>

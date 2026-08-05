@@ -2,6 +2,15 @@ const pool = require('../config/db');
 const bcrypt = require('bcryptjs');
 const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
+const {
+  PAYHERE_MERCHANT_ID,
+  PAYHERE_MERCHANT_SECRET,
+  PAYHERE_MODE,
+  PAYHERE_CURRENCY,
+  formatAmount,
+  generatePayhereHash,
+  verifyPayhereSignature,
+} = require('../config/payhere');
 
 // GET /api/users/profile
 const getProfile = async (req, res) => {
@@ -83,7 +92,11 @@ const getCaregiverSettings = async (req, res) => {
     if (userRows.length === 0) return res.status(404).json({ error: 'User not found' });
 
     const [cgRows] = await pool.query(
-      `SELECT experience_years, bio, certification, license_id, hourly_rate, is_available,
+      `SELECT experience_years, bio, certification, license_id, hourly_rate,
+              COALESCE(monthly_rate, 350.00) AS monthly_rate,
+              COALESCE(plan_title, 'Comprehensive Monthly Care Plan') AS plan_title,
+              plan_description, plan_features,
+              is_available,
               notif_messages, notif_health, notif_visits,
               schedule_weekday_start, schedule_weekday_end, schedule_weekday_active,
               schedule_sat_start, schedule_sat_end, schedule_sat_active, schedule_sun_active
@@ -93,6 +106,8 @@ const getCaregiverSettings = async (req, res) => {
 
     const cg = cgRows[0] || {
       experience_years: '', bio: '', certification: '', license_id: '', hourly_rate: '',
+      monthly_rate: 350.00, plan_title: 'Comprehensive Monthly Care Plan',
+      plan_description: '', plan_features: '',
       is_available: true,
       notif_messages: true, notif_health: true, notif_visits: false,
       schedule_weekday_start: '08:00', schedule_weekday_end: '17:30', schedule_weekday_active: true,
@@ -108,23 +123,53 @@ const getCaregiverSettings = async (req, res) => {
 
 // PUT /api/users/caregiver-settings/profile
 const updateCaregiverProfile = async (req, res) => {
-  const { name, email, phone, experience_years, bio, certification, license_id, hourly_rate } = req.body;
+  const {
+    name,
+    email,
+    phone,
+    experience_years,
+    bio,
+    certification,
+    license_id,
+    hourly_rate,
+    monthly_rate,
+    plan_title,
+    plan_description,
+    plan_features
+  } = req.body;
+
   try {
     await pool.query(
       'UPDATE users SET name = ?, email = ?, phone = ? WHERE id = ?',
       [name, email, phone || null, req.user.id]
     );
     await pool.query(
-      `INSERT INTO caregivers (user_id, name, experience_years, bio, certification, license_id, hourly_rate)
-       VALUES (?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO caregivers (user_id, name, experience_years, bio, certification, license_id, hourly_rate, monthly_rate, plan_title, plan_description, plan_features)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON DUPLICATE KEY UPDATE
          name             = VALUES(name),
          experience_years = VALUES(experience_years),
          bio              = VALUES(bio),
          certification    = VALUES(certification),
          license_id       = VALUES(license_id),
-         hourly_rate      = VALUES(hourly_rate)`,
-      [req.user.id, name, experience_years || null, bio || null, certification || null, license_id || null, hourly_rate || 0]
+         hourly_rate      = VALUES(hourly_rate),
+         monthly_rate     = VALUES(monthly_rate),
+         plan_title       = VALUES(plan_title),
+         plan_description = VALUES(plan_description),
+         plan_features    = VALUES(plan_features)`,
+      [
+        req.user.id,
+        name,
+        experience_years || null,
+        bio || null,
+        certification || null,
+        license_id || null,
+        hourly_rate || 0,
+        monthly_rate || 350.00,
+        plan_title || 'Comprehensive Monthly Care Plan',
+        plan_description || null,
+        plan_features || null,
+      ]
     );
     res.json({ message: 'Profile updated successfully' });
   } catch (err) {
@@ -786,6 +831,259 @@ const getChildDashboardStats = async (req, res) => {
   }
 };
 
+// ── PayHere Monthly Subscription & Assignment ───────────────────────────
+
+// POST /api/users/subscriptions/payhere-init
+const initiatePayhereSubscription = async (req, res) => {
+  const { parentId, caregiverId } = req.body;
+  const childId = req.user.id;
+
+  if (!parentId || !caregiverId) {
+    return res.status(400).json({ error: 'parentId and caregiverId are required' });
+  }
+
+  try {
+    // 1. Verify parent belongs to the logged in child
+    const [[parent]] = await pool.query(
+      'SELECT id, name, age, condition_summary, child_id FROM parents WHERE id = ? AND child_id = ?',
+      [parentId, childId]
+    );
+    if (!parent) {
+      return res.status(404).json({ error: 'Parent not found or you do not have permission to manage this parent.' });
+    }
+
+    // 2. Fetch caregiver details & plan pricing
+    const [[cg]] = await pool.query(
+      `SELECT c.id, c.user_id, COALESCE(c.name, u.name) AS name, c.specialization,
+              COALESCE(c.monthly_rate, 350.00) AS monthly_rate,
+              COALESCE(c.plan_title, 'Comprehensive Monthly Care Plan') AS plan_title,
+              c.plan_description, c.plan_features, u.email, u.phone, u.avatar_url
+       FROM caregivers c
+       LEFT JOIN users u ON u.id = c.user_id
+       WHERE c.id = ?`,
+      [caregiverId]
+    );
+
+    if (!cg) {
+      return res.status(404).json({ error: 'Caregiver profile not found.' });
+    }
+
+    // 3. Fetch logged in user (child) info
+    const [[childUser]] = await pool.query('SELECT name, email, phone FROM users WHERE id = ?', [childId]);
+
+    const orderId = `FC-SUB-${Date.now()}-${childId}`;
+    const amount = Number(cg.monthly_rate || 350.00);
+    const formattedAmount = formatAmount(amount);
+    const currency = process.env.PAYHERE_CURRENCY || 'LKR';
+    const merchantId = PAYHERE_MERCHANT_ID;
+    const hash = generatePayhereHash(merchantId, orderId, formattedAmount, currency);
+
+    const nameParts = (childUser?.name || 'Family Member').trim().split(' ');
+    const firstName = nameParts[0] || 'Family';
+    const lastName = nameParts.slice(1).join(' ') || 'Member';
+
+    res.json({
+      sandbox: PAYHERE_MODE !== 'live',
+      merchant_id: merchantId,
+      return_url: `${process.env.CLIENT_URL || 'http://localhost:5173'}/parents`,
+      cancel_url: `${process.env.CLIENT_URL || 'http://localhost:5173'}/caregivers-list`,
+      notify_url: `${process.env.SERVER_URL || 'http://localhost:5000'}/api/users/subscriptions/payhere-notify`,
+      order_id: orderId,
+      items: `1-Month Caregiver Subscription: ${cg.plan_title} (${cg.name})`,
+      amount: formattedAmount,
+      currency: currency,
+      hash: hash,
+      first_name: firstName,
+      last_name: lastName,
+      email: childUser?.email || 'user@familycare.com',
+      phone: childUser?.phone || '0771234567',
+      address: 'FamilyCare Platform',
+      city: 'Colombo',
+      country: 'Sri Lanka',
+      parent: {
+        id: parent.id,
+        name: parent.name,
+      },
+      caregiver: {
+        id: cg.id,
+        name: cg.name,
+        avatar_url: cg.avatar_url,
+        specialization: cg.specialization,
+        monthly_rate: amount,
+        plan_title: cg.plan_title,
+        plan_features: cg.plan_features,
+        plan_description: cg.plan_description,
+      }
+    });
+  } catch (err) {
+    console.error('Error initiating PayHere subscription:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// POST /api/users/subscriptions/payhere-verify
+const verifyAndCompletePayhereSubscription = async (req, res) => {
+  const childId = req.user.id;
+  const {
+    order_id,
+    payhere_payment_id,
+    payhere_amount,
+    payhere_currency,
+    parentId,
+    caregiverId,
+    plan_title,
+  } = req.body;
+
+  if (!parentId || !caregiverId || !order_id) {
+    return res.status(400).json({ error: 'Missing required parameters (parentId, caregiverId, order_id).' });
+  }
+
+  try {
+    // 1. Verify parent belongs to child
+    const [[parent]] = await pool.query(
+      'SELECT id, name, child_id FROM parents WHERE id = ? AND child_id = ?',
+      [parentId, childId]
+    );
+    if (!parent) {
+      return res.status(404).json({ error: 'Parent not found or unauthorized.' });
+    }
+
+    // 2. Fetch caregiver info
+    const [[cg]] = await pool.query(
+      `SELECT c.id, c.user_id, COALESCE(c.name, u.name) AS name,
+              COALESCE(c.monthly_rate, 350.00) AS monthly_rate,
+              COALESCE(c.plan_title, 'Comprehensive Monthly Care Plan') AS plan_title
+       FROM caregivers c
+       LEFT JOIN users u ON u.id = c.user_id
+       WHERE c.id = ?`,
+      [caregiverId]
+    );
+    if (!cg) {
+      return res.status(404).json({ error: 'Caregiver not found.' });
+    }
+
+    const paidAmount = Number(payhere_amount || cg.monthly_rate || 350.00);
+    const currency = payhere_currency || process.env.PAYHERE_CURRENCY || 'LKR';
+    const planName = plan_title || cg.plan_title || 'Comprehensive Monthly Care Plan';
+    const txId = payhere_payment_id || `SANDBOX-TX-${Date.now()}`;
+
+    // 3. Compute 1 month validity (+30 days)
+    const startDate = new Date();
+    const endDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+    // 4. Create caregiver_subscriptions record
+    const [subResult] = await pool.query(
+      `INSERT INTO caregiver_subscriptions 
+         (child_id, parent_id, caregiver_id, plan_name, amount, currency, status, payment_method, payhere_payment_id, transaction_id, start_date, end_date, auto_renew)
+       VALUES (?, ?, ?, ?, ?, ?, 'active', 'PayHere Sandbox', ?, ?, ?, ?, 1)`,
+      [
+        childId,
+        parentId,
+        caregiverId,
+        planName,
+        paidAmount,
+        currency,
+        txId,
+        order_id,
+        startDate,
+        endDate,
+      ]
+    );
+    const subscriptionId = subResult.insertId;
+
+    // 5. Create transaction payment audit record
+    await pool.query(
+      `INSERT INTO subscription_payments
+         (subscription_id, child_id, parent_id, caregiver_id, amount, currency, payment_gateway, payhere_order_id, payhere_payment_id, payment_status, raw_response)
+       VALUES (?, ?, ?, ?, ?, ?, 'PayHere Sandbox', ?, ?, 'succeeded', ?)`,
+      [
+        subscriptionId,
+        childId,
+        parentId,
+        caregiverId,
+        paidAmount,
+        currency,
+        order_id,
+        txId,
+        JSON.stringify(req.body),
+      ]
+    );
+
+    // 6. Update parent record (assign caregiver and mark active subscription)
+    await pool.query(
+      `UPDATE parents
+       SET assigned_caregiver_id = ?,
+           assignment_status = 'accepted',
+           subscription_id = ?,
+           subscription_status = 'active',
+           subscription_end_date = ?
+       WHERE id = ?`,
+      [caregiverId, subscriptionId, endDate, parentId]
+    );
+
+    // 7. Insert Notification alerts for Child & Caregiver
+    try {
+      await pool.query(
+        `INSERT INTO alerts (parent_id, title, description, type)
+         VALUES (?, ?, ?, 'info')`,
+        [
+          parentId,
+          '1-Month Care Subscription Activated',
+          `1-month care plan (${planName}) for ${parent.name} with caregiver ${cg.name} is active until ${endDate.toLocaleDateString()}. Paid: ${currency} ${paidAmount.toFixed(2)} via PayHere Sandbox.`,
+        ]
+      );
+    } catch (alertErr) {
+      console.warn('Could not create subscription alert:', alertErr);
+    }
+
+    res.json({
+      message: `Successfully paid 1-month subscription for ${parent.name}!`,
+      subscription: {
+        id: subscriptionId,
+        order_id,
+        transaction_id: txId,
+        amount: paidAmount,
+        currency: currency,
+        plan_name: planName,
+        parent_name: parent.name,
+        caregiver_name: cg.name,
+        start_date: startDate,
+        end_date: endDate,
+        status: 'active',
+      }
+    });
+  } catch (err) {
+    console.error('Error verifying PayHere subscription:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// GET /api/users/subscriptions/my-subscriptions
+const getChildSubscriptions = async (req, res) => {
+  const childId = req.user.id;
+  try {
+    const [rows] = await pool.query(
+      `SELECT cs.*, 
+              p.name AS parent_name, p.age AS parent_age,
+              COALESCE(c.name, u.name) AS caregiver_name,
+              u.avatar_url AS caregiver_avatar_url,
+              u.email AS caregiver_email,
+              u.phone AS caregiver_phone
+       FROM caregiver_subscriptions cs
+       JOIN parents p ON cs.parent_id = p.id
+       JOIN caregivers c ON cs.caregiver_id = c.id
+       LEFT JOIN users u ON c.user_id = u.id
+       WHERE cs.child_id = ?
+       ORDER BY cs.created_at DESC`,
+      [childId]
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error('Error fetching child subscriptions:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   getProfile,
   updateProfile,
@@ -808,4 +1106,7 @@ module.exports = {
   getNotificationPrefs,
   deleteAccount,
   getChildDashboardStats,
+  initiatePayhereSubscription,
+  verifyAndCompletePayhereSubscription,
+  getChildSubscriptions,
 };

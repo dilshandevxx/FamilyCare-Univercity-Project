@@ -201,7 +201,11 @@ const Parents = () => {
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                           <span className="pm-med-lbl">ASSIGNED CAREGIVER</span>
                           {parent.assigned_caregiver_id && (
-                            parent.assignment_status === 'pending' ? (
+                            parent.subscription_status === 'active' ? (
+                              <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#0f766e', background: '#ccfbf1', padding: '2px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <CheckCircle2 size={11} /> 1-Month Plan Active
+                              </span>
+                            ) : parent.assignment_status === 'pending' ? (
                               <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#b45309', background: '#fef3c7', padding: '2px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                                 <Clock size={11} /> Request Pending
                               </span>
@@ -211,7 +215,7 @@ const Parents = () => {
                               </span>
                             ) : (
                               <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#15803d', background: '#dcfce7', padding: '2px 8px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                                <CheckCircle2 size={11} /> Active
+                                <CheckCircle2 size={11} /> Assigned
                               </span>
                             )
                           )}
@@ -228,13 +232,19 @@ const Parents = () => {
                                   <span style={{ fontSize: '0.75rem', color: '#6b7280' }}>{parent.caregiver_specialization}</span>
                                 )}
                               </div>
-                              <button 
-                                onClick={() => startEdit(parent)}
-                                style={{ fontSize: '0.75rem', color: 'var(--color-primary)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                              <Link 
+                                to="/caregivers-list"
+                                style={{ fontSize: '0.75rem', color: 'var(--color-primary)', textDecoration: 'underline', fontWeight: '600' }}
                               >
-                                Change
-                              </button>
+                                Manage Plan
+                              </Link>
                             </div>
+
+                            {parent.subscription_end_date && (
+                              <div style={{ fontSize: '0.74rem', color: '#64748b', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span>Plan expires: {new Date(parent.subscription_end_date).toLocaleDateString()}</span>
+                              </div>
+                            )}
 
                             {parent.assignment_status === 'rejected' && (
                               <div style={{ background: '#fff1f2', border: '1px solid #fecdd3', padding: '8px 10px', borderRadius: '6px', marginTop: '8px', fontSize: '0.78rem', color: '#9f1239' }}>
@@ -245,12 +255,12 @@ const Parents = () => {
                         ) : (
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px' }}>
                             <span className="pm-unassigned">None Assigned</span>
-                            <button 
-                              onClick={() => startEdit(parent)}
-                              style={{ fontSize: '0.8rem', color: 'var(--color-primary)', background: 'rgba(13,148,136,0.1)', border: 'none', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                            <Link 
+                              to="/caregivers-list"
+                              style={{ fontSize: '0.8rem', color: '#ffffff', background: '#0d9488', textDecoration: 'none', padding: '4px 10px', borderRadius: '6px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '4px' }}
                             >
-                              <Plus size={12} /> Assign Caregiver
-                            </button>
+                              <Plus size={12} /> Assign & Subscribe
+                            </Link>
                           </div>
                         )}
                       </div>

@@ -12,6 +12,9 @@ const getPublicCaregivers = async (req, res) => {
     const [rows] = await pool.query(`
       SELECT c.id, c.user_id, COALESCE(c.name, u.name) AS name, c.specialization, c.experience_years,
              c.certification, c.license_id, c.hourly_rate, c.bio,
+             COALESCE(c.monthly_rate, 350.00) AS monthly_rate,
+             COALESCE(c.plan_title, 'Comprehensive Monthly Care Plan') AS plan_title,
+             c.plan_description, c.plan_features,
              c.is_available, c.rating, c.total_reviews,
              c.location, c.languages, c.status,
              COALESCE(c.max_capacity, 4) AS max_capacity,
@@ -35,6 +38,9 @@ const getPublicCaregiverById = async (req, res) => {
     const [rows] = await pool.query(`
       SELECT c.id, c.user_id, COALESCE(c.name, u.name) AS name, c.specialization, c.experience_years,
              c.certification, c.license_id, c.hourly_rate, c.bio,
+             COALESCE(c.monthly_rate, 350.00) AS monthly_rate,
+             COALESCE(c.plan_title, 'Comprehensive Monthly Care Plan') AS plan_title,
+             c.plan_description, c.plan_features,
              c.is_available, c.rating, c.total_reviews,
              c.location, c.languages, c.status,
              COALESCE(c.max_capacity, 4) AS max_capacity,
@@ -64,6 +70,9 @@ const getCaregivers = async (req, res) => {
     const [rows] = await pool.query(`
       SELECT c.id, c.user_id, COALESCE(c.name, u.name) AS name, c.specialization, c.experience_years,
              c.certification, c.license_id, c.hourly_rate, c.bio,
+             COALESCE(c.monthly_rate, 350.00) AS monthly_rate,
+             COALESCE(c.plan_title, 'Comprehensive Monthly Care Plan') AS plan_title,
+             c.plan_description, c.plan_features,
              c.is_available, c.rating, c.total_reviews,
              c.location, c.languages, c.status,
              COALESCE(c.max_capacity, 4) AS max_capacity,
