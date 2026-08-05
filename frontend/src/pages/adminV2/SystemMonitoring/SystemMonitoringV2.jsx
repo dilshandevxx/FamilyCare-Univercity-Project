@@ -8,6 +8,7 @@ const POLL_INTERVAL_MS = 10_000; // 10 seconds
 
 const SystemMonitoringV2 = () => {
   const [status, setStatus] = useState(null);
+  const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastRefreshed, setLastRefreshed] = useState(null);
@@ -33,12 +34,39 @@ const SystemMonitoringV2 = () => {
     return () => clearInterval(intervalId);
   }, [fetchStatus]);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+    const eventSource = new EventSource(`${baseUrl}/admin/system-logs/stream?token=${token}`);
+
+    eventSource.onmessage = (event) => {
+      try {
+        const logData = JSON.parse(event.data);
+        setLogs((prevLogs) => {
+          const newLogs = [...prevLogs, logData];
+          if (newLogs.length > 200) return newLogs.slice(newLogs.length - 200);
+          return newLogs;
+        });
+      } catch (err) {
+        console.error('Error parsing SSE log data:', err);
+      }
+    };
+
+    eventSource.onerror = (err) => {
+      console.error('SSE Error:', err);
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
+
   // Auto-scroll terminal to bottom on new logs
   useEffect(() => {
     if (terminalRef.current) {
       terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
     }
-  }, [status?.logs]);
+  }, [logs]);
 
   if (loading && !status) {
     return (
@@ -57,7 +85,6 @@ const SystemMonitoringV2 = () => {
   const activeConns = status?.activeConnections ?? '—';
   const poolLimit   = status?.poolLimit      ?? '—';
   const latencyMs   = status?.latencyMs      ?? '—';
-  const logs        = status?.logs           ?? [];
 
   return (
     <AdminLayoutV2 title="System Infrastructure Health">

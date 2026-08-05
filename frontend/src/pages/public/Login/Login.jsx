@@ -9,6 +9,7 @@ import GoogleSignInButton from '../../../components/auth/GoogleSignInButton';
 import familyHeroImg from '../../../assets/auth_family_hero.png';
 import caregiverHeroImg from '../../../assets/auth_caregiver_hero.png';
 import api from '../../../services/api';
+import BrandLogo from '../../../components/common/BrandLogo';
 import './Login.css';
 
 const Login = () => {
@@ -104,14 +105,7 @@ const Login = () => {
 
       {/* Top Navbar Brand */}
       <header className="login-topbar">
-        <Link to="/" className="login-topbar-brand">
-          <div className="login-brand-logo">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M12 21C12 21 3 14 3 8.5C3 5.46 5.46 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.54 3 23 5.46 23 8.5C23 14 14 21 12 21Z" fill="#00C9B5"/>
-            </svg>
-          </div>
-          <span className="login-brand-title">FamilyCare</span>
-        </Link>
+        <BrandLogo to="/" size="md" />
 
         <Link to="/" className="login-home-btn">
           <Home size={15} />
@@ -134,90 +128,130 @@ const Login = () => {
               <div className="login-hero-overlay"></div>
             </div>
             
-            <div className="login-hero-tag">
-              <span className="login-tag-dot"></span>
-              {selectedRole === 'family' ? 'Family Member Portal' : 'Caregiver Portal'}
+            <div className="login-hero-top">
+              <div className="login-hero-pill">
+                <span className="login-tag-dot"></span>
+                <span>{selectedRole === 'family' ? 'Family Care Portal' : 'Caregiver Network'}</span>
+              </div>
             </div>
 
             <div className="login-hero-center-content">
-              <h1 className="login-hero-heading">
+              <h2 className="login-hero-heading">
                 {selectedRole === 'family' ? (
-                  <>Welcome back to <br/><span className="text-teal-gradient">peace of mind.</span></>
+                  <>Peace of mind for <br/><span className="text-teal-accent">your loved ones.</span></>
                 ) : (
-                  <>Welcome back to <br/><span className="text-teal-gradient">care coordination.</span></>
+                  <>Empowering <br/><span className="text-teal-accent">compassionate care.</span></>
                 )}
-              </h1>
+              </h2>
 
-              <p className="login-hero-description">
-                {selectedRole === 'family'
-                  ? 'Stay connected to your elderly loved ones with live health updates, verified caregivers, and instant care logs.'
-                  : 'Access your assigned residents, record vital metrics, review schedules, and coordinate with families effortlessly.'}
-              </p>
+              {/* The One Meaningful Modern Thing: Live Health & Care Snapshot Card */}
+              {selectedRole === 'family' ? (
+                <div className="auth-live-card">
+                  <div className="auth-live-card-header">
+                    <div className="auth-live-avatar-wrap">
+                      <img
+                        src="https://api.dicebear.com/7.x/avataaars/svg?seed=Eleanor"
+                        alt="Eleanor Vance"
+                        className="auth-live-avatar"
+                      />
+                      <span className="auth-live-pulse-dot" />
+                    </div>
+                    <div className="auth-live-info">
+                      <h4 className="auth-live-name">Eleanor Vance</h4>
+                      <span className="auth-live-role">Mother • Vitals Logged 5m ago</span>
+                    </div>
+                    <span className="auth-live-status-pill">● Normal</span>
+                  </div>
 
-              <div className="login-hero-trust-badge">
-                <div className="login-trust-icon-box">
-                  <div className="login-trust-online-dot"></div>
-                  <ShieldCheck size={18} />
+                  <div className="auth-live-metrics-grid">
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Blood Pressure</span>
+                      <span className="auth-metric-num">120/80 <small>mmHg</small></span>
+                    </div>
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Heart Rate</span>
+                      <span className="auth-metric-num">72 <small>bpm</small></span>
+                    </div>
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Blood Sugar</span>
+                      <span className="auth-metric-num">98 <small>mg/dL</small></span>
+                    </div>
+                  </div>
                 </div>
-                <div className="login-trust-info">
-                  <strong>HIPAA & 256-Bit Encrypted</strong>
-                  <span>Verified medical-grade care network</span>
+              ) : (
+                <div className="auth-live-card">
+                  <div className="auth-live-card-header">
+                    <div className="auth-live-avatar-wrap">
+                      <img
+                        src="https://api.dicebear.com/7.x/bottts/svg?seed=SarahChen"
+                        alt="Nurse Sarah"
+                        className="auth-live-avatar"
+                      />
+                      <span className="auth-live-pulse-dot" />
+                    </div>
+                    <div className="auth-live-info">
+                      <h4 className="auth-live-name">Nurse Sarah Chen</h4>
+                      <span className="auth-live-role">Registered Geriatric Nurse</span>
+                    </div>
+                    <span className="auth-live-status-pill">● Active Duty</span>
+                  </div>
+
+                  <div className="auth-live-metrics-grid">
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Assigned Elders</span>
+                      <span className="auth-metric-num">4 Residents</span>
+                    </div>
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Today's Visits</span>
+                      <span className="auth-metric-num">3 / 4 Done</span>
+                    </div>
+                    <div className="auth-live-metric">
+                      <span className="auth-metric-lbl">Care Rating</span>
+                      <span className="auth-metric-num">4.98 ★</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
-            <div className="login-hero-stats">
-              <div className="login-stat">
-                <strong>5,000+</strong>
-                <span>Families</span>
-              </div>
-              <div className="login-stat-sep"></div>
-              <div className="login-stat">
-                <strong>4.95★</strong>
-                <span>Rating</span>
-              </div>
-              <div className="login-stat-sep"></div>
-              <div className="login-stat">
-                <strong>100%</strong>
-                <span>Secure</span>
-              </div>
+            <div className="login-hero-footer-trust">
+              <ShieldCheck size={14} className="login-trust-icon" />
+              <span>HIPAA Compliant &amp; 256-Bit Encrypted Healthcare Network</span>
             </div>
           </div>
 
           {/* ── Right Form Side ── */}
           <div className="login-card-form">
 
-            {/* Mode Switcher (Sign In / Register Link) */}
-            <div className="login-mode-tabs">
-              <button type="button" className="login-mode-tab active">
-                Sign In
-              </button>
-              <Link to="/register" className="login-mode-tab">
-                Create Account
-              </Link>
+            {/* Clean Modern Form Header */}
+            <div className="login-form-header">
+              <h1 className="login-form-title">Welcome back</h1>
+              <p className="login-form-subtitle">
+                Please enter your credentials to sign in to your portal.
+              </p>
             </div>
 
-            {/* Role Switcher */}
-            <div className="login-role-switch">
+            {/* Modern Segmented Role Switcher */}
+            <div className="login-segmented-control">
               <button
                 type="button"
-                className={`login-role-btn ${selectedRole === 'family' ? 'active' : ''}`}
+                className={`login-segment-btn ${selectedRole === 'family' ? 'active' : ''}`}
                 onClick={() => { setSelectedRole('family'); setError(''); }}
               >
-                <Heart size={15} />
+                <Heart size={16} className="segment-icon" />
                 <span>Family Member</span>
               </button>
               <button
                 type="button"
-                className={`login-role-btn ${selectedRole === 'caregiver' ? 'active' : ''}`}
+                className={`login-segment-btn ${selectedRole === 'caregiver' ? 'active' : ''}`}
                 onClick={() => { setSelectedRole('caregiver'); setError(''); }}
               >
-                <Stethoscope size={15} />
+                <Stethoscope size={16} className="segment-icon" />
                 <span>Caregiver</span>
               </button>
             </div>
 
-            {/* Error Message */}
+            {/* Error Alert Box */}
             {error && (
               <div className="login-alert-box">
                 <AlertCircle size={16} className="flex-shrink-0" />
@@ -228,9 +262,9 @@ const Login = () => {
             {/* 2FA Mode */}
             {tfaRequired ? (
               <form onSubmit={handleTfaSubmit} className="login-form-inner">
-                <div className="login-form-title">
-                  <h2>Two-Factor Authentication</h2>
-                  <p>Enter the 6-digit verification code from your authenticator application.</p>
+                <div className="login-2fa-header">
+                  <h2>Two-Factor Verification</h2>
+                  <p>Enter the 6-digit code from your authenticator app.</p>
                 </div>
 
                 <div className="login-form-group">
@@ -276,21 +310,21 @@ const Login = () => {
                   onError={(msg) => setError(msg)}
                 />
 
-                <div className="login-sep-line">
-                  <span>or sign in with email</span>
+                <div className="login-divider">
+                  <span>or continue with email</span>
                 </div>
 
                 {/* Email Address */}
                 <div className="login-form-group">
                   <label htmlFor="login-email">Email Address</label>
                   <div className="login-input-container">
-                    <Mail size={17} className="login-input-svg" />
+                    <Mail size={18} className="login-input-svg" />
                     <input
                       id="login-email"
                       type="email"
                       value={email}
                       onChange={e => setEmail(e.target.value)}
-                      placeholder="you@example.com"
+                      placeholder="name@example.com"
                       className="login-input-field"
                       required
                       autoComplete="email"
@@ -302,10 +336,10 @@ const Login = () => {
                 <div className="login-form-group">
                   <div className="login-field-header">
                     <label htmlFor="login-pass">Password</label>
-                    <Link to="/forgot-password" className="login-forgot-btn">Forgot Password?</Link>
+                    <Link to="/forgot-password" className="login-forgot-btn">Forgot password?</Link>
                   </div>
                   <div className="login-input-container">
-                    <Lock size={17} className="login-input-svg" />
+                    <Lock size={18} className="login-input-svg" />
                     <input
                       id="login-pass"
                       type={showPassword ? 'text' : 'password'}
@@ -321,8 +355,9 @@ const Login = () => {
                       className="login-eye-toggle"
                       onClick={() => setShowPassword(!showPassword)}
                       tabIndex={-1}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                      {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                     </button>
                   </div>
                 </div>
@@ -335,7 +370,7 @@ const Login = () => {
                       checked={rememberMe} 
                       onChange={e => setRememberMe(e.target.checked)} 
                     />
-                    <span>Keep me logged in on this device</span>
+                    <span>Remember me on this device</span>
                   </label>
                 </div>
 
@@ -346,12 +381,15 @@ const Login = () => {
                   disabled={isLoading}
                 >
                   {isLoading ? <span className="login-spinner" /> : (
-                    <>Sign In as {selectedRole === 'family' ? 'Family Member' : 'Caregiver'} <ArrowRight size={17} /></>
+                    <>
+                      <span>Sign In as {selectedRole === 'family' ? 'Family Member' : 'Caregiver'}</span>
+                      <ArrowRight size={18} />
+                    </>
                   )}
                 </button>
 
                 <div className="login-footer-text">
-                  <span>Don't have an account yet?</span>
+                  <span>Don't have an account?</span>
                   <Link to="/register" className="login-footer-link">
                     Create account
                   </Link>

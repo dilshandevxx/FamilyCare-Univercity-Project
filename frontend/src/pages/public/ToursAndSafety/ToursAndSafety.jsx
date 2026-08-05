@@ -83,7 +83,7 @@ const ToursAndSafety = () => (
     `}</style>
 
     {/* Hero */}
-    <header style={{ padding:'140px 5% 80px', background:'linear-gradient(135deg,#f0fdf9 0%,#fff 60%)', textAlign:'center' }}>
+    <header style={{ padding:'140px 5% 80px', background:'#f0fdfa', textAlign:'center' }}>
       <div className="ts-hero">
         <span style={{ display:'inline-block', background:'#e0f2f1', color:'#00796b', fontSize:'0.75rem', fontWeight:'700', letterSpacing:'1.2px', padding:'5px 14px', borderRadius:'20px', marginBottom:'1.2rem' }}>
           TOURS &amp; SAFETY
@@ -138,7 +138,7 @@ const ToursAndSafety = () => (
     </section>
 
     {/* Trust Banner */}
-    <section style={{ padding:'60px 5%', background:'linear-gradient(135deg,#00A896,#00796b)', textAlign:'center', color:'white' }}>
+    <section style={{ padding:'60px 5%', background:'#00A896', textAlign:'center', color:'white' }}>
       <Shield size={40} style={{ marginBottom:'1rem', opacity:0.9 }} />
       <h2 style={{ fontWeight:'800', fontSize:'clamp(1.4rem,3vw,2rem)', marginBottom:'0.75rem' }}>Your Trust is Our Product</h2>
       <p style={{ opacity:0.85, fontSize:'1rem', maxWidth:'480px', margin:'0 auto', lineHeight:'1.7' }}>

@@ -61,7 +61,7 @@ const Careers = () => {
       `}</style>
 
       {/* Hero */}
-      <header style={{ padding: '140px 5% 80px', background: 'linear-gradient(135deg,#f0fdf9 0%,#fff 60%)' }}>
+      <header style={{ padding: '140px 5% 80px', background: '#f0fdfa' }}>
         <div className="car-hero" style={{ maxWidth: '640px', margin: '0 auto', textAlign: 'center' }}>
           <span style={{ display:'inline-block', background:'#e0f2f1', color:'#00796b', fontSize:'0.75rem', fontWeight:'700', letterSpacing:'1.2px', padding:'5px 14px', borderRadius:'20px', marginBottom:'1.2rem' }}>
             JOIN OUR TEAM

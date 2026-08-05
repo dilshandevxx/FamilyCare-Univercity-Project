@@ -122,12 +122,31 @@ const addLog = async (req, res) => {
     }
 
     // ── Step 4: Auto-create alert for critical/warning conditions ──
-    const condUpper = (overall_condition || '').toUpperCase();
-    if (condUpper === 'CRITICAL' || condUpper === 'NEEDS ATTENTION') {
+    const [settingsRows] = await pool.query("SELECT * FROM settings WHERE k IN ('hrThreshold', 'tempThreshold')");
+    let hrThreshold = 100;
+    let tempThreshold = 100.4;
+    settingsRows.forEach(r => {
+      if (r.k === 'hrThreshold') hrThreshold = Number(r.v);
+      if (r.k === 'tempThreshold') tempThreshold = Number(r.v);
+    });
+
+    let condUpper = (overall_condition || '').toUpperCase();
+    let isCritical = condUpper === 'CRITICAL';
+    let isWarning = condUpper === 'NEEDS ATTENTION';
+
+    // Dynamic checks
+    if (heart_rate && Number(heart_rate) > hrThreshold) {
+      isCritical = true;
+    }
+    if (temperature && Number(temperature) > tempThreshold) {
+      isCritical = true;
+    }
+
+    if (isCritical || isWarning) {
       try {
         const [[elder]] = await pool.query('SELECT name FROM parents WHERE id = ?', [parent_id]);
         const elderName = elder ? elder.name : 'Resident';
-        const alertType = condUpper === 'CRITICAL' ? 'critical' : 'warning';
+        const alertType = isCritical ? 'critical' : 'warning';
         const vitals = [
           blood_pressure ? `BP: ${blood_pressure}` : null,
           heart_rate     ? `HR: ${heart_rate} bpm`  : null,
@@ -138,7 +157,7 @@ const addLog = async (req, res) => {
           'INSERT INTO alerts (parent_id, title, description, type) VALUES (?, ?, ?, ?)',
           [
             parent_id,
-            `${condUpper === 'CRITICAL' ? 'Critical' : 'Warning'} condition logged for ${elderName}`,
+            `${isCritical ? 'Critical' : 'Warning'} condition logged for ${elderName}`,
             vitals || (clinical_notes || notes || 'Health log flagged this condition'),
             alertType,
           ]

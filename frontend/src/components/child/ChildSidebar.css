@@ -1,107 +1,225 @@
-/* ─── Child Sidebar ─── */
+/* ═══════════════════════════════════════════════════════════════════
+   FamilyCare — Child Sidebar (Modern Flat Aesthetic, No Gradients)
+   Clean icon tabs, crisp active states, and high visual contrast
+═══════════════════════════════════════════════════════════════════ */
+
 .child-sidebar {
-  width: 240px;
+  width: 250px;
   min-height: 100vh;
   background: #ffffff;
-  border: none;
-  box-shadow: 4px 0 24px rgba(0,0,0,0.02);
+  border-right: 1px solid #edf2f7;
   display: flex;
   flex-direction: column;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 100;
+  font-family: 'Inter', system-ui, sans-serif;
+  user-select: none;
 }
 
+/* ── Brand Header ── */
 .cs-header {
-  padding: 24px 28px 12px;
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid #f8fafc;
+}
+
+.cs-brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cs-brand-icon {
+  width: 38px;
+  height: 38px;
+  background: #00A896;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 168, 150, 0.25);
+  flex-shrink: 0;
 }
 
 .cs-logo {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
-  color: #00a896;
-  letter-spacing: -0.5px;
+  color: #0f172a;
+  letter-spacing: -0.4px;
+  display: block;
+  line-height: 1.1;
 }
 
+.cs-tagline {
+  font-size: 11px;
+  font-weight: 600;
+  color: #00A896;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  display: block;
+}
+
+/* ── User Block ── */
 .cs-user-block {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 20px 8px;
+  margin: 14px 16px;
+  padding: 10px 12px;
+  background: #f8fafc;
+  border: 1px solid #edf2f7;
+  border-radius: 14px;
 }
 
-.cs-avatar {
+.cs-avatar-wrap {
+  position: relative;
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 2px solid #e8edf2;
+  flex-shrink: 0;
 }
 
-.cs-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.cs-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  object-fit: cover;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+.cs-online-dot {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  background: #22c55e;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+}
+
+.cs-user-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
 
 .cs-user-name {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  color: #1e293b;
+  color: #0f172a;
   margin: 0;
-  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.cs-user-role {
-  font-size: 11px;
-  color: #94a3b8;
-  margin: 2px 0 0;
-}
-
-.cs-premium {
-  margin: 4px 20px 16px;
-  padding: 4px 12px;
-  background: #e6f7f5;
-  color: #00a896;
-  font-size: 11px;
+.cs-user-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
   font-weight: 700;
-  border-radius: 20px;
-  display: inline-block;
-  width: fit-content;
+  color: #00A896;
+  margin-top: 2px;
 }
 
+/* ── Navigation ── */
 .cs-nav {
   display: flex;
   flex-direction: column;
-  padding: 0 12px;
+  gap: 4px;
+  padding: 8px 14px;
   flex: 1;
+  overflow-y: auto;
 }
 
+.cs-nav-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #94a3b8;
+  padding: 8px 10px 4px;
+}
+
+/* Icon Tab Links */
 .cs-link {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 18px;
-  color: #64748b;
+  padding: 10px 12px;
+  color: #475569;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 600;
   border-radius: 12px;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  margin-bottom: 6px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 }
 
-.cs-link:hover { 
-  background: #f8fafc; 
-  color: #0f172a; 
-  transform: translateX(6px);
+.cs-link-icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
+.cs-link-text {
+  flex: 1;
+}
+
+.cs-nav-pill {
+  font-size: 10px;
+  font-weight: 700;
+  background: #f0fdfa;
+  color: #00A896;
+  border: 1px solid #99f6e4;
+  padding: 2px 7px;
+  border-radius: 12px;
+}
+
+.cs-link:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  transform: translateX(3px);
+}
+
+.cs-link:hover .cs-link-icon-wrap {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* Active State */
 .cs-link.active {
-  background: linear-gradient(135deg, #00a896 0%, #028090 100%);
+  background: #00A896;
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 168, 150, 0.25);
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 168, 150, 0.22);
 }
 
+.cs-link.active .cs-link-icon-wrap {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.cs-link.active .cs-nav-pill {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+/* ── Footer / Logout ── */
 .cs-footer {
-  padding: 16px 12px 24px;
+  padding: 14px 14px 20px;
+  border-top: 1px solid #f1f5f9;
   margin-top: auto;
 }
 
@@ -111,20 +229,20 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 14px 16px;
+  padding: 11px 14px;
   background: #fef2f2;
   color: #ef4444;
-  border: none;
+  border: 1px solid #fee2e2;
   border-radius: 12px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: all 0.2s ease;
 }
 
 .cs-btn-logout:hover {
   background: #fee2e2;
   color: #dc2626;
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.15);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.12);
 }

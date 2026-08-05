@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../../../services/api';
+import BrandLogo from '../../../components/common/BrandLogo';
 import './ResetPassword.css';
 
 const ResetPassword = () => {
@@ -33,14 +34,9 @@ const ResetPassword = () => {
   };
 
   const BrandBar = () => (
-    <Link to="/" className="rp-brand">
-      <div className="rp-brand-icon">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-        </svg>
-      </div>
-      <span className="rp-brand-name">FamilyCare</span>
-    </Link>
+    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
+      <BrandLogo to="/" size="lg" />
+    </div>
   );
 
   if (!token) {

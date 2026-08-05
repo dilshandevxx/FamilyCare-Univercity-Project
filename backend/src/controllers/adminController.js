@@ -1,6 +1,25 @@
 const bcrypt = require('bcryptjs');
+const { performance } = require('perf_hooks');
 const pool = require('../config/db');
 const os = require('os');
+const { logEmitter } = require('../middleware/logStreamer');
+
+let lastCpuInfo = os.cpus();
+function getCpuUtilization() {
+  const currentCpuInfo = os.cpus();
+  let idleDiff = 0;
+  let totalDiff = 0;
+  currentCpuInfo.forEach((cpu, i) => {
+    const lastCpu = lastCpuInfo[i];
+    for (const type in cpu.times) {
+      const diff = cpu.times[type] - lastCpu.times[type];
+      totalDiff += diff;
+      if (type === 'idle') idleDiff += diff;
+    }
+  });
+  lastCpuInfo = currentCpuInfo;
+  return totalDiff === 0 ? 0 : Math.round(100 - ((idleDiff / totalDiff) * 100));
+}
 
 // ── GET /api/admin/residents ─────────────────────────────────────
 // All residents (parents) with their assigned caregiver name + user info
@@ -279,7 +298,7 @@ const getPendingCaregivers = async (req, res) => {
          c.id, COALESCE(c.name, u.name) AS name, c.specialization, c.experience_years,
          c.certification, c.license_id, c.bio, c.hourly_rate,
          c.is_available, c.created_at,
-         u.email, u.name AS user_name, u.created_at AS registered_at
+         u.email, u.phone, u.name AS user_name, u.created_at AS registered_at
        FROM caregivers c
        LEFT JOIN users u ON u.id = c.user_id
        WHERE c.status = 'pending'
@@ -291,31 +310,74 @@ const getPendingCaregivers = async (req, res) => {
   }
 };
 
-// ── PUT /api/admin/caregivers/:id/approve ───────────────────────
-const approveCaregiver = async (req, res) => {
+// ── GET /api/admin/caregivers/pending/count ───────────────────────
+// Lightweight badge count — how many caregivers are awaiting approval
+const getPendingCaregiversCount = async (req, res) => {
   try {
-    const [result] = await pool.query(
-      "UPDATE caregivers SET status = 'approved' WHERE id = ?",
-      [req.params.id]
+    const [[{ count }]] = await pool.query(
+      "SELECT COUNT(*) AS count FROM caregivers WHERE status = 'pending'"
     );
-    if (result.affectedRows === 0)
-      return res.status(404).json({ error: 'Caregiver not found' });
-    res.json({ message: 'Caregiver approved' });
+    res.json({ count: Number(count) });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-// ── PUT /api/admin/caregivers/:id/reject ────────────────────────
-const rejectCaregiver = async (req, res) => {
+// ── PUT /api/admin/caregivers/:id/approve ───────────────────────────────────
+const approveCaregiver = async (req, res) => {
   try {
     const [result] = await pool.query(
-      "UPDATE caregivers SET status = 'rejected' WHERE id = ?",
+      `UPDATE caregivers
+       SET status = 'approved',
+           approved_at = NOW()
+       WHERE id = ? AND status = 'pending'`,
       [req.params.id]
+    );
+    if (result.affectedRows === 0) {
+      // May already be approved, or not found
+      const [[existing]] = await pool.query('SELECT id, status FROM caregivers WHERE id = ?', [req.params.id]);
+      if (!existing) return res.status(404).json({ error: 'Caregiver not found' });
+      if (existing.status === 'approved') return res.json({ message: 'Caregiver already approved' });
+    }
+
+    // Return the updated caregiver for optimistic UI
+    const [[updated]] = await pool.query(
+      `SELECT c.id, COALESCE(c.name, u.name) AS name, c.status, c.specialization,
+              c.hourly_rate, u.email
+       FROM caregivers c LEFT JOIN users u ON u.id = c.user_id
+       WHERE c.id = ?`,
+      [req.params.id]
+    );
+    res.json({ message: 'Caregiver approved', caregiver: updated });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// ── PUT /api/admin/caregivers/:id/reject ────────────────────────────────────
+const rejectCaregiver = async (req, res) => {
+  const { reason } = req.body; // optional rejection reason
+  try {
+    const [result] = await pool.query(
+      `UPDATE caregivers
+       SET status = 'rejected',
+           rejection_reason = ?,
+           rejected_at = NOW()
+       WHERE id = ?`,
+      [reason || null, req.params.id]
     );
     if (result.affectedRows === 0)
       return res.status(404).json({ error: 'Caregiver not found' });
-    res.json({ message: 'Caregiver rejected' });
+
+    // Return the updated caregiver for optimistic UI
+    const [[updated]] = await pool.query(
+      `SELECT c.id, COALESCE(c.name, u.name) AS name, c.status, c.specialization,
+              c.hourly_rate, u.email
+       FROM caregivers c LEFT JOIN users u ON u.id = c.user_id
+       WHERE c.id = ?`,
+      [req.params.id]
+    );
+    res.json({ message: 'Caregiver rejected', caregiver: updated });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -332,12 +394,16 @@ const getAdminHealthLogs = async (req, res) => {
   try {
     let query = `
       SELECT
-        hl.id, hl.logged_at,
+        hl.id, hl.parent_id, hl.logged_at,
         hl.blood_pressure, hl.heart_rate, hl.temperature,
         hl.meds_taken, hl.meds_notes, hl.clinical_notes,
         hl.mood, hl.overall_condition, hl.notes,
         hl.breakfast_status, hl.lunch_status, hl.dinner_status,
+        hl.attachment_url,
         p.name AS elder_name,
+        p.age AS elder_age,
+        p.gender AS elder_gender,
+        p.room_number AS elder_room,
         u.name AS caregiver_name
       FROM health_logs hl
       LEFT JOIN parents p ON p.id = hl.parent_id
@@ -361,6 +427,42 @@ const getAdminHealthLogs = async (req, res) => {
 
     const [rows] = await pool.query(query, params);
     res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// ── GET /api/admin/health-logs/:id ───────────────────────────────
+// Fetch detailed single health log record for admin view modal
+const getAdminHealthLogById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [[log]] = await pool.query(
+      `SELECT
+        hl.id, hl.parent_id, hl.logged_at,
+        hl.blood_pressure, hl.heart_rate, hl.temperature,
+        hl.meds_taken, hl.meds_notes, hl.clinical_notes,
+        hl.mood, hl.overall_condition, hl.notes,
+        hl.breakfast_status, hl.lunch_status, hl.dinner_status,
+        hl.attachment_url,
+        p.name AS elder_name,
+        p.age AS elder_age,
+        p.gender AS elder_gender,
+        p.room_number AS elder_room,
+        p.care_status AS elder_care_status,
+        p.medical_conditions,
+        p.allergies,
+        u.name AS caregiver_name,
+        u.email AS caregiver_email
+      FROM health_logs hl
+      LEFT JOIN parents p ON p.id = hl.parent_id
+      LEFT JOIN users   u ON u.id = hl.logged_by
+      WHERE hl.id = ?`,
+      [id]
+    );
+
+    if (!log) return res.status(404).json({ error: 'Health record not found' });
+    res.json(log);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -563,7 +665,11 @@ const getAdminActivity = async (req, res) => {
 
 const getAdminSettings = async (req, res) => {
   try {
-    const [settings] = await pool.query('SELECT * FROM settings');
+    const [rows] = await pool.query('SELECT * FROM settings');
+    const settings = {};
+    rows.forEach(row => {
+      settings[row.k] = row.v;
+    });
     res.json(settings);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -572,8 +678,12 @@ const getAdminSettings = async (req, res) => {
 
 const updateAdminSettings = async (req, res) => {
   try {
-    const { key, value } = req.body;
-    await pool.query('INSERT INTO settings (k, v) VALUES (?, ?) ON DUPLICATE KEY UPDATE v = ?', [key, value, value]);
+    const settingsObj = req.body;
+    for (const [key, value] of Object.entries(settingsObj)) {
+      if (value !== undefined) {
+        await pool.query('INSERT INTO settings (k, v) VALUES (?, ?) ON DUPLICATE KEY UPDATE v = ?', [key, String(value), String(value)]);
+      }
+    }
     res.json({ message: 'Settings updated' });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -582,10 +692,46 @@ const updateAdminSettings = async (req, res) => {
 
 const getSystemStatus = async (req, res) => {
   try {
-    const [db] = await pool.query('SELECT 1');
-    res.json({ db: 'online', uptime: process.uptime() });
+    const dbStart = performance.now();
+    await pool.query('SELECT 1');
+    const dbEnd = performance.now();
+    const latencyMs = Math.round(dbEnd - dbStart);
+
+    // MySQL connection pool stats
+    let activeConnections = 0;
+    let poolLimit = 10;
+    if (pool.pool) {
+      activeConnections = pool.pool._allConnections.length - pool.pool._freeConnections.length;
+      poolLimit = pool.pool.config.connectionLimit || 10;
+    }
+    
+    const cpu = getCpuUtilization();
+    const totalMem = os.totalmem();
+    const freeMem = os.freemem();
+    const usedMem = totalMem - freeMem;
+    const ram = Math.round((usedMem / totalMem) * 100);
+    const ramDetails = `${(usedMem / 1024 ** 3).toFixed(1)} GB of ${(totalMem / 1024 ** 3).toFixed(1)} GB assigned`;
+
+    res.json({ 
+      dbStatus: 'Healthy', 
+      uptime: process.uptime(),
+      cpu,
+      ram,
+      ramDetails,
+      activeConnections,
+      poolLimit,
+      latencyMs
+    });
   } catch (err) {
-    res.json({ db: 'offline' });
+    res.json({ 
+      dbStatus: 'Unknown',
+      cpu: 0,
+      ram: 0,
+      ramDetails: '— GB of — GB assigned',
+      activeConnections: 0,
+      poolLimit: 10,
+      latencyMs: 0
+    });
   }
 };
 
@@ -597,6 +743,26 @@ const sendBroadcast = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+};
+
+const streamSystemLogs = (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  // Send an initial connected message
+  res.write(`data: ${JSON.stringify({ time: new Date().toISOString().split('T')[1].slice(0, 8), type: 'info', event: 'SSE connection established' })}\n\n`);
+
+  const logListener = (logData) => {
+    res.write(`data: ${JSON.stringify(logData)}\n\n`);
+  };
+
+  logEmitter.on('log', logListener);
+
+  req.on('close', () => {
+    logEmitter.off('log', logListener);
+  });
 };
 
 module.exports = {
@@ -612,9 +778,11 @@ module.exports = {
   updateUserRole,
   deleteUser,
   getPendingCaregivers,
+  getPendingCaregiversCount,
   approveCaregiver,
   rejectCaregiver,
   getAdminHealthLogs,
+  getAdminHealthLogById,
   getAdminAlerts,
   resolveAdminAlert,
   deleteAdminAlert,
@@ -624,4 +792,5 @@ module.exports = {
   updateAdminSettings,
   getSystemStatus,
   sendBroadcast,
+  streamSystemLogs,
 };

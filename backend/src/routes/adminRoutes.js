@@ -14,9 +14,11 @@ const {
   updateUserRole,
   deleteUser,
   getPendingCaregivers,
+  getPendingCaregiversCount,
   approveCaregiver,
   rejectCaregiver,
   getAdminHealthLogs,
+  getAdminHealthLogById,
   getAdminAlerts,
   resolveAdminAlert,
   deleteAdminAlert,
@@ -26,6 +28,7 @@ const {
   updateAdminSettings,
   getSystemStatus,
   sendBroadcast,
+  streamSystemLogs,
 } = require('../controllers/adminController');
 
 // All admin routes require a valid JWT + admin role
@@ -33,6 +36,7 @@ router.use(protect, adminOnly);
 
 // System Monitoring & Broadcast
 router.get('/system-status',                  getSystemStatus);
+router.get('/system-logs/stream',             streamSystemLogs);
 router.post('/broadcast',                     sendBroadcast);
 
 // Dashboard stats
@@ -45,7 +49,8 @@ router.put('/residents/:id',                  updateResident);
 router.put('/residents/:id/assign',           assignCaregiver);
 router.delete('/residents/:id',               deleteResident);
 
-// Caregivers — pending approval must come before /:id routes
+// Caregivers — specific named routes must come before /:id wildcard routes
+router.get('/caregivers/pending/count',       getPendingCaregiversCount);
 router.get('/caregivers/pending',             getPendingCaregivers);
 router.put('/caregivers/:id/approve',         approveCaregiver);
 router.put('/caregivers/:id/reject',          rejectCaregiver);
@@ -59,6 +64,7 @@ router.delete('/users/:id',                   deleteUser);
 
 // Health logs (admin view — all residents)
 router.get('/health-logs',                    getAdminHealthLogs);
+router.get('/health-logs/:id',                getAdminHealthLogById);
 
 // Alerts (admin view — all residents, no child scoping)
 router.get('/alerts',                         getAdminAlerts);

@@ -398,8 +398,8 @@
 }
 
 .health-v2-modal-header {
-  background: linear-gradient(135deg, var(--primary-teal), #4F46E5);
-  padding: 2.5rem 2rem 2rem 2rem;
+  background: var(--primary-teal);
+  padding: 2.25rem 2rem 1.75rem 2rem;
   color: white;
   display: flex;
   align-items: center;
@@ -408,34 +408,47 @@
 
 .health-v2-modal-icon {
   background: rgba(255, 255, 255, 0.2);
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .health-v2-modal-title {
   margin: 0 0 0.25rem 0;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 800;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.4px;
 }
 
 .health-v2-modal-desc {
   margin: 0;
-  font-size: 0.9rem;
-  opacity: 0.9;
+  font-size: 0.88rem;
+  opacity: 0.95;
   font-weight: 500;
 }
 
 .health-v2-modal-body {
-  padding: 2rem;
+  padding: 1.75rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+/* Modal Loading Banner */
+.modal-loading-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background-color: var(--primary-teal-light);
+  border: 1px solid rgba(0, 168, 150, 0.2);
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--primary-teal-dark);
 }
 
 .v2-vitals-grid {
@@ -449,32 +462,36 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 12px 10px;
-  background-color: #FCFBF9;
+  padding: 14px 10px;
+  background-color: #F8FAFC;
   border: 1px solid #E2E8F0;
   border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.vital-box:hover {
+  border-color: #CBD5E1;
+  background-color: #FFFFFF;
 }
 
 .vital-box .label {
   font-size: 0.72rem;
   color: #64748B;
-  font-weight: 600;
-  margin-bottom: 4px;
+  font-weight: 700;
+  margin-bottom: 6px;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
+  text-align: center;
 }
 
 .vital-box .value {
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 800;
   color: #00A896;
 }
 
 .vital-box:nth-child(2) .value { color: #EF4444; }
 .vital-box:nth-child(3) .value { color: #EA580C; }
-.vital-box:nth-child(4) .value { color: #3B82F6; } /* SpO2 */
-.vital-box:nth-child(5) .value { color: #8B5CF6; } /* Blood Sugar */
-.vital-box:nth-child(6) .value { color: #475569; } /* Weight */
 
 .health-v2-tracking-grid {
   display: grid;
@@ -504,22 +521,8 @@
 .chart-stat .value {
   color: var(--text-dark);
   font-weight: 600;
-  font-size: 0.95rem;
-}
-
-.chart-stat .text-coral {
-  color: var(--danger);
-  font-weight: 700;
-}
-
-.chart-stat .text-teal {
-  color: var(--primary-teal);
-  font-weight: 700;
-}
-
-.chart-stat .text-warning {
-  color: var(--warning);
-  font-weight: 700;
+  font-size: 0.92rem;
+  line-height: 1.4;
 }
 
 .value-pill {
@@ -534,27 +537,27 @@
 .value-pill.status-stable {
   background: #ECFDF5;
   color: #059669;
-  border: 1px dashed #A7F3D0;
+  border: 1px solid #A7F3D0;
 }
 
 .value-pill.status-needs-attention {
   background: #FFFBEB;
   color: #D97706;
-  border: 1px dashed #FDE68A;
+  border: 1px solid #FDE68A;
 }
 
 .value-pill.status-critical {
   background: #FEF2F2;
   color: #DC2626;
-  border: 1px dashed #FECACA;
+  border: 1px solid #FECACA;
 }
 
 .clinical-notes-box {
-  background-color: #FFF9F1;
+  background-color: #FFFDF9;
   border: 1px solid rgba(245, 158, 11, 0.25);
   border-radius: 12px;
-  padding: 1rem;
-  margin-top: 0.5rem;
+  padding: 1.1rem;
+  margin-top: 0.25rem;
 }
 
 .clinical-notes-box h5 {
@@ -571,6 +574,32 @@
   font-size: 0.9rem;
   line-height: 1.5;
   margin: 0;
+}
+
+/* Attachment Box */
+.health-attachment-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background-color: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.attachment-link {
+  color: var(--primary-teal);
+  font-weight: 700;
+  text-decoration: underline;
+  margin-left: auto;
+  transition: color 0.2s ease;
+}
+
+.attachment-link:hover {
+  color: var(--primary-teal-dark);
 }
 
 .health-v2-modal-actions {
@@ -604,5 +633,11 @@
   }
   .health-v2-search input {
     width: 100%;
+  }
+  .v2-vitals-grid {
+    grid-template-columns: 1fr;
+  }
+  .health-v2-tracking-grid {
+    grid-template-columns: 1fr;
   }
 }

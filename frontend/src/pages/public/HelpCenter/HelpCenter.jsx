@@ -117,7 +117,7 @@ const HelpCenter = () => {
       `}</style>
 
       {/* Hero */}
-      <header style={{ padding: '140px 5% 60px', background: 'linear-gradient(135deg,#f0fdf9 0%,#fff 60%)', textAlign: 'center' }}>
+      <header style={{ padding: '140px 5% 60px', background: '#f0fdfa', textAlign: 'center' }}>
         <span style={{ display:'inline-block', background:'#e0f2f1', color:'#00796b', fontSize:'0.75rem', fontWeight:'700', letterSpacing:'1.2px', padding:'5px 14px', borderRadius:'20px', marginBottom:'1.2rem' }}>
           HELP CENTER
         </span>
@@ -155,7 +155,7 @@ const HelpCenter = () => {
         })}
 
         {/* Contact CTA */}
-        <div style={{ marginTop:'3rem', background:'linear-gradient(135deg,#00A896,#00796b)', borderRadius:'16px', padding:'2.5rem', textAlign:'center', color:'white' }}>
+        <div style={{ marginTop:'3rem', background:'#00A896', borderRadius:'16px', padding:'2.5rem', textAlign:'center', color:'white' }}>
           <MessageCircle size={32} style={{ marginBottom:'1rem', opacity:0.9 }} />
           <h3 style={{ fontWeight:'800', fontSize:'1.3rem', marginBottom:'0.5rem' }}>Still need help?</h3>
           <p style={{ opacity:0.85, marginBottom:'1.5rem', fontSize:'0.95rem' }}>Our support team replies within 24 hours on business days.</p>

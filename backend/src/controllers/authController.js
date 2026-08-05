@@ -93,8 +93,17 @@ const login = async (req, res) => {
       }
     }
 
-    // ── 2FA gate ─────────────────────────────────────────────────
-    if (user.tfa_enabled) {
+    // ── 2FA & Timeout Settings ───────────────────────────────────
+    const [settingsRows] = await pool.query("SELECT * FROM settings WHERE k IN ('twoFactor', 'sessionTimeout')");
+    let globalTwoFactor = false;
+    let globalSessionTimeout = '30';
+    settingsRows.forEach(r => {
+      if (r.k === 'twoFactor') globalTwoFactor = (r.v === 'true');
+      if (r.k === 'sessionTimeout') globalSessionTimeout = r.v;
+    });
+
+    const isCaregiverOrAdmin = user.role === 'admin' || user.role === 'caregiver';
+    if (user.tfa_enabled || (globalTwoFactor && isCaregiverOrAdmin)) {
       // Issue a short-lived partial token — no access to protected routes
       const partialToken = jwt.sign(
         { id: user.id, role: user.role, partial: true },
@@ -113,7 +122,7 @@ const login = async (req, res) => {
     }
 
     const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+      expiresIn: `${globalSessionTimeout}m`,
     });
     res.json({ message: 'Login successful', token, role: user.role });
   } catch (err) {
@@ -144,8 +153,23 @@ const validate2FA = async (req, res) => {
     );
     if (rows.length === 0) return res.status(404).json({ error: 'User not found' });
     const user = rows[0];
-    if (!user.tfa_enabled || !user.tfa_secret)
+    const [settingsRows] = await pool.query("SELECT * FROM settings WHERE k IN ('twoFactor', 'sessionTimeout')");
+    let globalTwoFactor = false;
+    let globalSessionTimeout = '30';
+    settingsRows.forEach(r => {
+      if (r.k === 'twoFactor') globalTwoFactor = (r.v === 'true');
+      if (r.k === 'sessionTimeout') globalSessionTimeout = r.v;
+    });
+
+    const isCaregiverOrAdmin = user.role === 'admin' || user.role === 'caregiver';
+    if (!user.tfa_secret && (!globalTwoFactor || !isCaregiverOrAdmin)) {
       return res.status(400).json({ error: '2FA is not set up for this account' });
+    }
+    
+    // If globally enforced but they don't have a secret, they can't log in. They need to set it up.
+    if (!user.tfa_secret) {
+      return res.status(400).json({ error: '2FA is required by admin. Please contact support to set up your 2FA secret.' });
+    }
 
     const valid = speakeasy.totp.verify({
       secret: user.tfa_secret,
@@ -158,7 +182,7 @@ const validate2FA = async (req, res) => {
     const fullToken = jwt.sign(
       { id: decoded.id, role: decoded.role },
       process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
+      { expiresIn: `${globalSessionTimeout}m` }
     );
     res.json({ message: 'Login successful', token: fullToken, role: decoded.role });
   } catch (err) {
@@ -362,17 +386,18 @@ const googleAuth = async (req, res) => {
         user = updatedRows[0];
       }
 
-      // If user is caregiver, ensure row exists in caregivers table
+      // If user is caregiver, ensure a caregivers row exists — preserve whatever
+      // status is already set; do NOT force 'approved' on login.
       if (user.role === 'caregiver') {
         await pool.query(
-          'INSERT IGNORE INTO caregivers (user_id, name, is_available, status) VALUES (?, ?, TRUE, "approved")',
+          "INSERT IGNORE INTO caregivers (user_id, name, is_available, status) VALUES (?, ?, TRUE, 'pending')",
           [user.id, user.name]
         );
       }
     } else {
       // Create new user with Google details
       const [insertResult] = await pool.query(
-        'INSERT INTO users (name, email, password, google_id, role, auth_provider, avatar_url) VALUES (?, ?, NULL, ?, ?, "google", ?)',
+        "INSERT INTO users (name, email, password, google_id, role, auth_provider, avatar_url) VALUES (?, ?, NULL, ?, ?, 'google', ?)",
         [name || email.split('@')[0], email, googleId, dbRole, picture || null]
       );
 
@@ -384,17 +409,18 @@ const googleAuth = async (req, res) => {
           [userId, relationship || 'Family Member']
         );
       } else if (dbRole === 'caregiver') {
+        // New caregiver via Google — starts PENDING, awaiting admin approval
         await pool.query(
           `INSERT INTO caregivers 
             (user_id, name, specialization, experience_years, certification, license_id, hourly_rate, bio, is_available, status)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, TRUE, 'approved')`,
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, TRUE, 'pending')`,
           [
             userId,
             name || email.split('@')[0],
             specialization || 'General Elder Care',
             experience_years || '1-3 years',
-            certification || 'Certified Caregiver',
-            license_id || 'LIC-G-' + userId,
+            certification || null,
+            license_id || null,
             hourly_rate ? parseFloat(hourly_rate) : 25.00,
             bio || 'Dedicated professional caregiver committed to high quality care and wellness.',
           ]

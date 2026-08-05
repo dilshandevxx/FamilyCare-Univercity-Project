@@ -429,13 +429,13 @@
 .ap-success-icon-wrap {
   width: 100px;
   height: 100px;
-  background: linear-gradient(135deg, #e6f7f5 0%, #ccf0eb 100%);
+  background: #f0fdfa;
+  color: #00A896;
   border-radius: 50%;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   margin: 0 auto 1.5rem;
-  color: #00A896;
 }
 
 .ap-success-title {

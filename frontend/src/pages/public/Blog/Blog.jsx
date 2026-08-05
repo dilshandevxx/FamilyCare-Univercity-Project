@@ -100,7 +100,7 @@ const Blog = () => {
       `}</style>
 
       {/* Hero */}
-      <header style={{ padding: '140px 5% 60px', background: 'linear-gradient(135deg,#f0fdf9 0%,#fff 60%)', textAlign: 'center' }}>
+      <header style={{ padding: '140px 5% 60px', background: '#f0fdfa', textAlign: 'center' }}>
         <span style={{ display:'inline-block', background:'#e0f2f1', color:'#00796b', fontSize:'0.75rem', fontWeight:'700', letterSpacing:'1.2px', padding:'5px 14px', borderRadius:'20px', marginBottom:'1.2rem' }}>
           FAMILYCARE BLOG
         </span>
@@ -134,7 +134,7 @@ const Blog = () => {
             <div className="blog-grid">
               {filtered.map((post, i) => (
                 <div key={i} className="blog-card" style={{ animationDelay:`${i*0.07}s` }}>
-                  <div style={{ height:'8px', background:`linear-gradient(90deg,${post.accent},${post.accent}88)` }} />
+                  <div style={{ height:'8px', background: post.accent }} />
                   <div style={{ padding:'1.6rem' }}>
                     <span style={{ fontSize:'0.72rem', fontWeight:'700', background:post.color, color:post.accent, padding:'3px 10px', borderRadius:'20px' }}>{post.category}</span>
                     <h3 style={{ fontWeight:'700', fontSize:'1rem', lineHeight:'1.5', margin:'0.85rem 0 0.6rem', color:'#1A202C' }}>{post.title}</h3>

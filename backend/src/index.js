@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 const { passport } = require('./config/passport');
 const pool = require('./config/db');
+const { logMiddleware } = require('./middleware/logStreamer');
 
 // Route imports
 const authRoutes = require('./routes/authRoutes');
@@ -21,6 +22,7 @@ const app = express();
 // ── Middleware ────────────────────────────────────────────────
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
+app.use(logMiddleware);
 app.use(passport.initialize());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/uploads/health-attachments', express.static(path.join(__dirname, '../uploads/health-attachments')));
@@ -103,6 +105,39 @@ async function runMigrations() {
       console.log('✅ Migration: added caregivers.status (existing rows set to approved)');
     }
   } catch (err) { console.warn('⚠️  Migration (caregivers.status):', err.message); }
+
+  // ── caregivers audit-trail columns ────────────────────────────
+  const cgAuditCols = [
+    ['approved_at',       'ADD COLUMN approved_at DATETIME NULL'],
+    ['rejected_at',       'ADD COLUMN rejected_at DATETIME NULL'],
+    ['rejection_reason',  'ADD COLUMN rejection_reason TEXT NULL'],
+  ];
+  for (const [col, ddl] of cgAuditCols) {
+    try {
+      if (!(await columnExists('caregivers', col))) {
+        await pool.query(`ALTER TABLE caregivers ${ddl}`);
+        console.log(`✅ Migration: added caregivers.${col}`);
+      }
+    } catch (err) { console.warn(`⚠️  Migration (caregivers.${col}):`, err.message); }
+  }
+  // ── settings table ──────────────────────────────────────────────
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS settings (
+        k VARCHAR(50) PRIMARY KEY,
+        v VARCHAR(255) NOT NULL
+      )
+    `);
+    // Insert defaults if empty
+    await pool.query(`
+      INSERT IGNORE INTO settings (k, v) VALUES 
+      ('twoFactor', 'false'),
+      ('sessionTimeout', '30'),
+      ('hrThreshold', '100'),
+      ('tempThreshold', '100.4')
+    `);
+    console.log('✅ Migration: ensured settings table and defaults');
+  } catch (err) { console.warn('⚠️  Migration (settings):', err.message); }
 }
 
 runMigrations().then(() => {

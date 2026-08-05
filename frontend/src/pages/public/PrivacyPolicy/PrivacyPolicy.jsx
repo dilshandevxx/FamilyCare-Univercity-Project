@@ -161,7 +161,7 @@ const PrivacyPolicy = () => {
       `}</style>
 
       {/* Hero */}
-      <header style={{ padding:'120px 5% 50px', background:'linear-gradient(135deg,#f0fdf9 0%,#fff 60%)', borderBottom:'1px solid #EDF2F7' }}>
+      <header style={{ padding:'120px 5% 50px', background:'#f0fdfa', borderBottom:'1px solid #EDF2F7' }}>
         <div style={{ maxWidth:'700px' }}>
           <span style={{ display:'inline-block', background:'#e0f2f1', color:'#00796b', fontSize:'0.75rem', fontWeight:'700', letterSpacing:'1.2px', padding:'5px 14px', borderRadius:'20px', marginBottom:'1.2rem' }}>
             LEGAL
