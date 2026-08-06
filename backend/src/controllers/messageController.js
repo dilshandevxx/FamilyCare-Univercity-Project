@@ -205,10 +205,12 @@ const getMessages = async (req, res) => {
     } catch (_) {}
 
     const [rows] = await pool.query(
-      `SELECT * FROM messages
-       WHERE (sender_id = ? AND receiver_id = ?)
-          OR (sender_id = ? AND receiver_id = ?)
-       ORDER BY created_at ASC`,
+      `SELECT m.*, u.name AS sender_name, u.role AS sender_role
+       FROM messages m
+       LEFT JOIN users u ON u.id = m.sender_id
+       WHERE (m.sender_id = ? AND m.receiver_id = ?)
+          OR (m.sender_id = ? AND m.receiver_id = ?)
+       ORDER BY m.created_at ASC`,
       [myId, otherId, otherId, myId]
     );
 

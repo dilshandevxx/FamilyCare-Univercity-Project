@@ -693,21 +693,38 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-/* SENDER BUBBLE (ME - RIGHT) */
+/* SENDER BUBBLE (ME - RIGHT - WHATSAPP LIGHT GREEN) */
 .mc-bubble.me-bg {
-  background: linear-gradient(135deg, #00A896 0%, #028074 100%);
-  color: #ffffff;
-  border-radius: 18px 18px 4px 18px;
-  box-shadow: 0 3px 10px rgba(0, 168, 150, 0.22);
+  background: #d9fdd3;
+  color: #111b21;
+  border-radius: 8px 0px 8px 8px;
+  box-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
 }
 
-/* RECEIVER BUBBLE (THEM - LEFT) */
+/* RECEIVER BUBBLE (THEM - LEFT - WHATSAPP PURE WHITE) */
 .mc-bubble.them-bg {
   background: #ffffff;
-  color: var(--mc-slate-900);
-  border: 1px solid var(--mc-slate-200);
-  border-radius: 18px 18px 18px 4px;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  color: #111b21;
+  border: 1px solid rgba(11, 20, 26, 0.06);
+  border-radius: 0px 8px 8px 8px;
+  box-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
+}
+
+.mc-sender-label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 3px;
+}
+
+.mc-sender-label.me {
+  color: #0b8043;
+  text-align: right;
+}
+
+.mc-sender-label.them {
+  color: #008069;
+  text-align: left;
 }
 
 .mc-bubble.pending {
@@ -722,6 +739,8 @@
 
 .mc-bubble-content {
   margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.38;
   white-space: pre-wrap;
 }
 
@@ -729,28 +748,27 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 4px;
-  margin-top: 4px;
+  gap: 3px;
+  margin-top: 3px;
 }
 
 .mc-msg-time {
   font-size: 0.65rem;
-  font-weight: 500;
-  opacity: 0.8;
+  color: #667781;
 }
 
 .mc-bubble.me-bg .mc-msg-time {
-  color: rgba(255, 255, 255, 0.85);
+  color: #667781;
 }
 
 .mc-bubble.them-bg .mc-msg-time {
-  color: var(--mc-slate-400);
+  color: #667781;
 }
 
 .mc-read-check {
   display: flex;
   align-items: center;
-  color: rgba(255, 255, 255, 0.9);
+  color: #53bdeb;
 }
 
 .mc-fail-badge {
