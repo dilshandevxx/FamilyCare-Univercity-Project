@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FamilyCare - Final Project Viva Master Guide</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    :root {
+      --primary: #0d9488;
+      --primary-dark: #0f766e;
+      --primary-light: #ccfbf1;
+      --accent: #3b82f6;
+      --accent-light: #dbeafe;
+      --dark: #0f172a;
+      --gray: #475569;
+      --light-gray: #f8fafc;
+      --border: #e2e8f0;
+      --card-bg: #ffffff;
+      --success: #16a34a;
+      --success-light: #dcfce7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--dark);
+      background: #f1f5f9;
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 50px 60px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    }
+
+    /* Header & Branding */
+    .doc-header {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 24px;
+      margin-bottom: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .doc-badge {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .doc-title {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--dark);
+      line-height: 1.2;
+    }
+
+    .doc-subtitle {
+      font-size: 1.05rem;
+      color: var(--gray);
+      margin-top: 6px;
+    }
+
+    .print-btn-bar {
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .print-btn {
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s;
+    }
+
+    .print-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    /* Section styling */
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--dark);
+      margin: 40px 0 20px 0;
+      padding-left: 12px;
+      border-left: 5px solid var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Question Card */
+    .q-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      page-break-inside: avoid;
+    }
+
+    .q-header {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .q-num {
+      background: var(--primary);
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+
+    /* Blocks */
+    .block-simple {
+      background: #f0f9ff;
+      border-left: 4px solid var(--accent);
+      padding: 14px 18px;
+      border-radius: 0 10px 10px 0;
+      margin-bottom: 14px;
+    }
+
+    .block-title-simple {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #0369a1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .block-content-simple {
+      font-size: 0.93rem;
+      color: #334155;
+      line-height: 1.5;
+    }
+
+    .block-viva {
+      background: #f0fdf4;
+      border-left: 4px solid var(--success);
+      padding: 16px 20px;
+      border-radius: 0 10px 10px 0;
+      margin-bottom: 14px;
+    }
+
+    .block-title-viva {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #15803d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .block-content-viva {
+      font-size: 0.95rem;
+      color: #1e293b;
+      line-height: 1.6;
+      font-style: italic;
+    }
+
+    .code-ref {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: #475569;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    /* Formula Box */
+    .formula-box {
+      background: #fdf2f8;
+      border: 1px solid #fbcfe8;
+      color: #9d174d;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      margin: 8px 0;
+    }
+
+    /* Print styles */
+    @media print {
+      body {
+        background: #ffffff;
+        padding: 0;
+      }
+      .container {
+        padding: 0;
+        box-shadow: none;
+        max-width: 100%;
+      }
+      .print-btn-bar {
+        display: none !important;
+      }
+      .q-card {
+        border: 1px solid #cbd5e1;
+        break-inside: avoid;
+        margin-bottom: 20px;
+      }
+      @page {
+        margin: 15mm;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <div class="print-btn-bar">
+      <button class="print-btn" onclick="window.print()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+        Save as PDF / Print Document
+      </button>
+    </div>
+
+    <div class="doc-header">
+      <div>
+        <span class="doc-badge">ACADEMIC VIVA PREPARATION</span>
+        <h1 class="doc-title">FamilyCare System</h1>
+        <p class="doc-subtitle">Final Year University Project Defense & Comprehensive Viva Master Guide</p>
+      </div>
+      <div style="text-align: right; font-size: 0.85rem; color: #64748b;">
+        <strong>Project Scope:</strong> Full Stack Health & Elderly Care<br>
+        <strong>Tech Stack:</strong> React 18, Node.js, Express, MySQL
+      </div>
+    </div>
+
+    <!-- SECTION 1 -->
+    <h2 class="section-title">1. Project Overview & Motivation</h2>
+
+    <!-- Q1 -->
+    <div class="q-card">
+      <div class="q-header">
+        <span class="q-num">Q1</span>
+        <span>What is this project about and what core problem does it solve?</span>
+      </div>
+      <div class="block-simple">
+        <div class="block-title-simple">💡 Simple Explanation (Understand the concept)</div>
+        <div class="block-content-simple">
+          Working children cannot be at home 24/7 with their aging parents. There is no easy way to track their daily blood pressure/sugar, manage doctor visits, or hire certified caregivers with structured monthly subscriptions. FamilyCare connects Children, Parents, Caregivers, and an Admin into one unified, secure platform.
+        </div>
+      </div>
+      <div class="block-viva">
+        <div class="block-title-viva">🎙️ Viva-Ready Answer (What to say to the Professor)</div>
+        <div class="block-content-viva">
+          "Respected panel, FamilyCare is a full-stack, role-based elderly care management and health monitoring platform. It bridges the care-coordination and visibility gap between working adult children, elderly parents, and certified professional caregivers. The system provides daily health vitals logging with automated clinical threshold alerts, caregiver patient capacity management, and secure 30-day care package subscriptions via the PayHere payment gateway."
+        </div>
+      </div>
+      <div class="code-ref">📂 Code: frontend/src/App.jsx & backend/src/index.js</div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="q-card">
+      <div class="q-header">
+        <span class="q-num">Q2</span>
+        <span>What are the 4 user roles in your system and what can each role do?</span>
+      </div>
+      <div class="block-simple">
+        <div class="block-title-simple">💡 Simple Explanation</div>
+        <div class="block-content-simple">
+          <strong>Admin:</strong> Approves caregivers, views platform stats, manages users.<br>
+          <strong>Child:</strong> Registers parents, chooses verified caregivers, pays monthly subscriptions via PayHere, and monitors health vitals.<br>
+          <strong>Caregiver:</strong> Sets their monthly care package price/features, logs daily health vitals for assigned residents, and manages appointments.<br>
+          <strong>Parent:</strong> Simplified view of their assigned caregiver, daily medication schedule, and doctor appointments.
+        </div>
+      </div>
+      <div class="block-viva">
+        <div class="block-title-viva">🎙️ Viva-Ready Answer</div>
+        <div class="block-content-viva">
+          "FamilyCare enforces strict Role-Based Access Control (RBAC) across 4 user tiers:
+          1. <strong>Admin:</strong> Reviews caregiver credentials, approves accounts, and monitors platform metrics.
+          2. <strong>Child (Family Member):</strong> Registers elderly parents, browses caregivers, pays monthly care subscriptions, and tracks daily health charts.
+          3. <strong>Caregiver:</strong> Configures monthly service packages, logs vital signs, and manages appointments within strict capacity limits.
+          4. <strong>Parent:</strong> Provides a high-accessibility dashboard showing daily schedules, medications, and caregiver contact."
+        </div>
+      </div>
+      <div class="code-ref">📂 Code: backend/src/middleware/auth.js & userRoutes.js</div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <h2 class="section-title">2. Architecture & Tech Stack Defense</h2>
+
+    <!-- Q3 -->
+    <div class="q-card">
+      <div class="q-header">
+        <span class="q-num">Q3</span>
+        <span>Explain your system architecture. Why decoupled client-server?</span>
+      </div>
+      <div class="block-simple">
+        <div class="block-title-simple">💡 Simple Explanation</div>
+        <div class="block-content-simple">
+          The frontend (React) and backend (Node.js/Express) are completely separate. The frontend runs in the user's browser as a Single Page App. When it needs data, it sends an HTTP request to the backend REST API. The backend fetches data from MySQL and returns JSON. This separation means we can easily build a mobile app in the future without changing the backend.
+        </div>
+      </div>
+      <div class="block-viva">
+        <div class="block-title-viva">🎙️ Viva-Ready Answer</div>
+        <div class="block-content-viva">
+          "Our system follows a Decoupled 3-Tier Client-Server Architecture:
+          1. <strong>Presentation Layer:</strong> React 18 SPA with Vite for high-performance reactive UI rendering.
+          2. <strong>Application Layer:</strong> Stateless Node.js and Express RESTful API handling authentication, business logic, and PayHere checksum hashing.
+          3. <strong>Data Layer:</strong> MySQL relational database ensuring ACID transactional integrity.
+          This decoupled pattern guarantees separation of concerns, faster client-side routing, and future API reusability for native mobile applications."
+        </div>
+      </div>
+      <div class="code-ref">📂 Code: backend/src/index.js & frontend/src/main.jsx</div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="q-card">
+      <div class="q-header">
+        <span class="q-num">Q4</span>
+        <span>Why did you choose MySQL over MongoDB (NoSQL)?</span>
+      </div>
+      <div class="block-simple">
+        <div class="block-title-simple">💡 Simple Explanation</div>
+        <div class="block-content-simple">
+          Healthcare logs and financial transactions need strict rules. A subscription must strictly link to a parent and a caregiver. MySQL provides ACID guarantees (safe transactions) and Foreign Keys with CASCADE/SET NULL rules to prevent corrupted or orphaned records.
+        </div>
+      </div>
+      <div class="block-viva">
+        <div class="block-title-viva">🎙️ Viva-Ready Answer</div>
+        <div class="block-content-viva">
+          "Elderly health data and subscription billing require strict ACID compliance (Atomicity, Consistency, Isolation, Durability) and relational integrity. In FamilyCare, entities have strict dependencies (Users &rarr; Parents &rarr; Subscriptions &rarr; Payments). MySQL's foreign key constraints prevent orphaned records and ensure transactional consistency, which is vital for clinical logs and financial audit trails."
+        </div>
+      </div>
+      <div class="code-ref">📂 Code: backend/src/config/db.js</div>
+    </div>
+
+    <!-- SECTION 3 -->
+    <h2 class="section-title">3. Authentication, Security & Database</h2>
+
+    <!-- Q5 -->
+    <div class="q-card">
+      <div class="q-header">
+        <span class="q-num">Q5</span>
+        <span>How does Authentication and JWT Authorization work in your system?</span>
+      </div>
+      <div class="block-simple">
+        <div class="block-title-simple">💡 Simple Explanation</div>
+        <div class="block-content-simple">
+          When the user logs in, the backend checks the password using bcrypt. If valid, the backend signs a JSON Web Token (JWT) containing { userId, role }. The frontend stores this token and includes it in the HTTP header ('Authorization: Bearer ...') for every request. Backend middleware checks this signature before letting the user view private data.
+        </div>
+      </div>
+      <div class="block-viva">
+        <div class="block-title-viva">🎙️ Viva-Ready Answer</div>
+        <div class="block-content-viva">
+          "Authentication uses Stateless JSON Web Tokens (JWT) combined with bcryptjs cryptographic password hashing. Upon successful login, the server signs a JWT payload with the user's ID and role. The client includes this token in the 'Authorization: Bearer' header. Backend middleware (verifyToken, requireRole) intercepts each request, verifies the cryptographic signature, and prevents unauthorized cross-role access (e.g. returning 403 Forbidden if a Child tries accessing Admin endpoints)."
+        </div>
+      </div>
+      <div class="code-ref">📂 Code: backend/src/controllers/authController.js</div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="q-card">
+      <div class="q-header">
+        <span class="q-num">Q6</span>
+        <span>How do you prevent SQL Injection attacks?</span>
+      </div>
+      <div class="block-simple">
+        <div class="block-title-simple">💡 Simple Explanation</div>
+        <div class="block-content-simple">
+          We never glue user text directly into SQL strings. We always use question mark placeholders '?' (Parameterized Queries). The database engine pre-compiles the query and treats user text strictly as raw data, never as executable SQL code.
+        </div>
+      </div>
+      <div class="block-viva">
+        <div class="block-title-viva">🎙️ Viva-Ready Answer</div>
+        <div class="block-content-viva">
+          "We prevent SQL Injection by strictly using Parameterized Prepared Statements via mysql2 (e.g., pool.query('SELECT * FROM users WHERE email = ?', [email])). The SQL statement structure is pre-compiled by the database engine, ensuring user input is treated strictly as literal data rather than executable SQL commands."
+        </div>
+      </div>
+      <div class="code-ref">📂 Code: backend/src/controllers/userController.js</div>
+    </div>
+
+    <!-- SECTION 4 -->
+    <h2 class="section-title">4. Payment Gateway & Core Business Logic</h2>
+
+    <!-- Q7 -->
+    <div class="q-card">
+      <div class="q-header">
+        <span class="q-num">Q7</span>
+        <span>Explain the PayHere Sandbox Payment & Subscription workflow in detail.</span>
+      </div>
+      <div class="block-simple">
+        <div class="block-title-simple">💡 Simple Explanation</div>
+        <div class="block-content-simple">
+          1. Child chooses a caregiver for a parent and clicks "Pay with PayHere".<br>
+          2. Backend generates a unique Order ID and a secure MD5 Checksum Hash using the merchant secret.<br>
+          3. PayHere Sandbox popup opens with the test card modal.<br>
+          4. Upon payment completion, backend verifies the payment, marks the subscription as Active for 30 days, assigns the caregiver to the parent, and saves a receipt.
+        </div>
+      </div>
+      <div class="block-viva">
+        <div class="block-title-viva">🎙️ Viva-Ready Answer</div>
+        <div class="block-content-viva">
+          "The payment lifecycle follows a secure 4-step workflow:
+          1. <strong>Initiation (/api/users/subscriptions/initiate):</strong> Backend creates a pending subscription record and generates an MD5 checksum hash:
+          <div class='formula-box'>Hash = MD5(merchant_id + order_id + amount + currency + MD5(merchant_secret))</div>
+          2. <strong>Client Execution:</strong> PayHere JavaScript SDK launches the secure checkout popup with signed parameters.
+          3. <strong>Verification (/api/users/subscriptions/verify):</strong> Backend verifies the payment signature, activates the subscription for +30 days, assigns the caregiver to the parent, and writes a transaction record into subscription_payments.
+          4. <strong>IPN Webhook Listener (/payhere-notify):</strong> Listens for asynchronous server-to-server payment notifications directly from PayHere."
+        </div>
+      </div>
+      <div class="code-ref">📂 Code: backend/src/config/payhere.js & userController.js</div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="q-card">
+      <div class="q-header">
+        <span class="q-num">Q8</span>
+        <span>What is Caregiver Capacity Management and how is it enforced?</span>
+      </div>
+      <div class="block-simple">
+        <div class="block-title-simple">💡 Simple Explanation</div>
+        <div class="block-content-simple">
+          One caregiver cannot safely care for too many elderly residents at once. We set a maximum capacity limit (e.g. 4 residents). If a caregiver already has 4 patients assigned, the backend rejects new assignments with an error.
+        </div>
+      </div>
+      <div class="block-viva">
+        <div class="block-title-viva">🎙️ Viva-Ready Answer</div>
+        <div class="block-content-viva">
+          "To safeguard elder care quality, the backend enforces a Caregiver Capacity Constraint. Each caregiver profile has an active_residents count and a max_capacity limit (default 4). When an assignment is attempted, the backend checks: active_residents &lt; max_capacity. If the caregiver is at capacity, the API rejects the request with HTTP 400 Bad Request, preventing caregiver burnout and ensuring personalized elder attention."
+        </div>
+      </div>
+      <div class="code-ref">📂 Code: backend/src/controllers/caregiverController.js</div>
+    </div>
+
+    <!-- SECTION 5 -->
+    <h2 class="section-title">5. Quick Reference Master Table</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Topic</th>
+          <th>Key Academic Vocabulary to Speak</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Architecture</strong></td>
+          <td>Decoupled 3-Tier Client-Server Architecture with Stateless RESTful APIs</td>
+        </tr>
+        <tr>
+          <td><strong>Frontend</strong></td>
+          <td>React 18 Single Page Application (SPA) with Vite Bundler & Virtual DOM</td>
+        </tr>
+        <tr>
+          <td><strong>Database</strong></td>
+          <td>Relational MySQL in 3rd Normal Form (3NF) with Connection Pooling & ACID compliance</td>
+        </tr>
+        <tr>
+          <td><strong>Security</strong></td>
+          <td>Stateless JWT Tokens, bcryptjs Salting/Hashing, Parameterized Prepared Queries</td>
+        </tr>
+        <tr>
+          <td><strong>Payment Gateway</strong></td>
+          <td>PayHere Sandbox Gateway with MD5 Checksum signature verification and IPN Webhooks</td>
+        </tr>
+        <tr>
+          <td><strong>Business Logic</strong></td>
+          <td>Caregiver Capacity Constraints, Daily Vital Clinical Threshold Alerts, 30-Day Subscription Lifecycle</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top: 40px; padding: 20px; background: #f0fdfa; border-radius: 12px; border: 1px solid #99f6e4; text-align: center;">
+      <h3 style="color: #0f766e; margin-bottom: 6px;">💡 Golden Rule for Tomorrow</h3>
+      <p style="color: #115e59; font-size: 0.95rem;">
+        Speak with confidence, maintain good eye contact with the professors, explain the <em>why</em> behind your design choices, and reference your code files. Best of luck! 🎓
+      </p>
+    </div>
+
+  </div>
+
+</body>
+</html>

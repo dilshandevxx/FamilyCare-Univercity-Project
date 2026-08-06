@@ -276,45 +276,93 @@ const getHealthFeed = async (req, res) => {
   }
 
   try {
-    // 0. Verify Ownership/Access
-    if (role === 'child') {
-      const [[parent]] = await pool.query('SELECT id FROM parents WHERE id = ? AND child_id = ?', [parent_id, user_id]);
-      if (!parent) return res.status(403).json({ error: 'Access denied to this parent feed' });
-    } else if (role === 'caregiver') {
-      const [[parent]] = await pool.query('SELECT id FROM parents WHERE id = ? AND assigned_caregiver_id = ?', [parent_id, user_id]);
-      if (!parent) return res.status(403).json({ error: 'Access denied to this parent feed' });
-    }
-    // 1. Fetch vitals logs
-    const [vitals] = await pool.query(
-      `SELECT 
-        'vitals' AS type,
-        h.id,
-        h.blood_pressure,
-        h.heart_rate,
-        h.temperature,
-        h.notes AS description,
-        COALESCE(u.name, 'Caregiver') AS logged_by,
-        h.logged_at AS timestamp
-       FROM health_logs h
-       LEFT JOIN users u ON h.logged_by = u.id
-       WHERE h.parent_id = ?`,
-      [parent_id]
-    );
+    // 0. Verify Ownership/Access and fetch parent basic info
+    let parentQuery = 'SELECT p.*, u.name AS caregiver_name, u.email AS caregiver_email FROM parents p LEFT JOIN users u ON p.assigned_caregiver_id = u.id WHERE p.id = ?';
+    let queryParams = [parent_id];
 
-    // 2. Fetch activity logs
-    const [activities] = await pool.query(
-      `SELECT 
-        'activity' AS type,
-        a.id,
-        a.activity AS title,
-        a.description,
-        COALESCE(u.name, 'Caregiver') AS logged_by,
-        a.logged_at AS timestamp
-       FROM activity_logs a
-       LEFT JOIN users u ON a.logged_by = u.id
-       WHERE a.parent_id = ?`,
-      [parent_id]
-    );
+    if (role === 'child') {
+      parentQuery += ' AND p.child_id = ?';
+      queryParams.push(user_id);
+    } else if (role === 'caregiver') {
+      parentQuery += ' AND p.assigned_caregiver_id = ?';
+      queryParams.push(user_id);
+    }
+
+    const [[parent]] = await pool.query(parentQuery, queryParams);
+    if (!parent) return res.status(403).json({ error: 'Access denied to this parent feed' });
+
+    // 1. Fetch rich vitals logs
+    let vitals = [];
+    try {
+      const [rows] = await pool.query(
+        `SELECT 
+          'vitals' AS type,
+          h.id,
+          h.blood_pressure,
+          h.heart_rate,
+          h.temperature,
+          COALESCE(h.clinical_notes, h.notes) AS description,
+          h.notes,
+          h.clinical_notes,
+          h.overall_condition,
+          h.mood,
+          h.meds_taken,
+          h.meds_notes,
+          h.breakfast_status,
+          h.lunch_status,
+          h.dinner_status,
+          h.attachment_url,
+          COALESCE(u.name, 'Assigned Caregiver') AS logged_by,
+          h.logged_at AS timestamp
+         FROM health_logs h
+         LEFT JOIN users u ON h.logged_by = u.id
+         WHERE h.parent_id = ?
+         ORDER BY h.logged_at DESC`,
+        [parent_id]
+      );
+      vitals = rows;
+    } catch (vitalErr) {
+      // Fallback if some columns haven't migrated yet
+      const [rows] = await pool.query(
+        `SELECT 
+          'vitals' AS type,
+          h.id,
+          h.blood_pressure,
+          h.heart_rate,
+          h.temperature,
+          h.notes AS description,
+          COALESCE(u.name, 'Assigned Caregiver') AS logged_by,
+          h.logged_at AS timestamp
+         FROM health_logs h
+         LEFT JOIN users u ON h.logged_by = u.id
+         WHERE h.parent_id = ?
+         ORDER BY h.logged_at DESC`,
+        [parent_id]
+      );
+      vitals = rows;
+    }
+
+    // 2. Fetch activity logs (if table exists)
+    let activities = [];
+    try {
+      const [actRows] = await pool.query(
+        `SELECT 
+          'activity' AS type,
+          a.id,
+          a.activity AS title,
+          a.description,
+          COALESCE(u.name, 'Caregiver') AS logged_by,
+          a.logged_at AS timestamp
+         FROM activity_logs a
+         LEFT JOIN users u ON a.logged_by = u.id
+         WHERE a.parent_id = ?
+         ORDER BY a.logged_at DESC`,
+        [parent_id]
+      );
+      activities = actRows;
+    } catch (_) {
+      activities = [];
+    }
 
     // Combine logs
     let combined = [...vitals, ...activities];
@@ -322,50 +370,23 @@ const getHealthFeed = async (req, res) => {
     // Sort by timestamp desc
     combined.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-    // If database has no logs, seed mock logs matching the UI screenshot design for visual beauty
-    if (combined.length === 0) {
-      const today = new Date();
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-
-      combined = [
-        {
-          id: 'mock-1',
-          type: 'vitals',
-          title: 'Morning Vitals Check',
-          blood_pressure: '124/82',
-          temperature: '98.6',
-          heart_rate: '72',
-          description: 'Eleanor is feeling energetic this morning. She enjoyed a light stretch before breakfast.',
-          logged_by: 'Sarah Jenkins, RN',
-          timestamp: new Date(today.setHours(8, 30, 0, 0)).toISOString(),
-          stability: 'HIGH'
-        },
-        {
-          id: 'mock-2',
-          type: 'activity',
-          title: 'Medication Administered',
-          description: 'Lisinopril (10mg) • Dosage: 1 Tablet • Route: Oral',
-          logged_by: 'System (Auto)',
-          timestamp: new Date(today.setHours(10, 15, 0, 0)).toISOString(),
-          category: 'Medication',
-          verified: true
-        },
-        {
-          id: 'mock-3',
-          type: 'activity',
-          title: 'Dinner Log',
-          description: 'Menu: Herb-Crusted Salmon & Wilted Spinach. Completed 90% of the portion. Drank 12oz of water. Mood was relaxed and conversational.',
-          logged_by: 'Sarah Jenkins, RN',
-          timestamp: new Date(yesterday.setHours(18, 45, 0, 0)).toISOString(),
-          category: 'Meals',
-          tags: ['Low Sodium', 'High Protein']
-        }
-      ];
-    }
-
-    // Return combined feed logs
-    res.json(combined);
+    // Return combined feed logs with parent profile metadata
+    res.json({
+      parent: {
+        id: parent.id,
+        name: parent.name,
+        age: parent.age,
+        gender: parent.gender,
+        relationship: parent.relationship,
+        address: parent.address,
+        medical_conditions: parent.medical_conditions,
+        care_status: parent.care_status || 'STABLE',
+        assigned_caregiver_id: parent.assigned_caregiver_id,
+        caregiver_name: parent.caregiver_name,
+        emergency_contact: parent.emergency_contact
+      },
+      logs: combined
+    });
   } catch (err) {
     console.error('Error fetching health feed:', err);
     res.status(500).json({ error: err.message });

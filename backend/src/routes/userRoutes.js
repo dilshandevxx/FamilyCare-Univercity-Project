@@ -25,6 +25,9 @@ const {
   getNotificationPrefs,
   deleteAccount,
   getChildDashboardStats,
+  initiatePayhereSubscription,
+  verifyAndCompletePayhereSubscription,
+  getChildSubscriptions,
 } = require('../controllers/userController');
 
 const storage = multer.diskStorage({
@@ -65,6 +68,11 @@ router.get('/dashboard-stats', protect, getDashboardStats);
 router.get('/caregiver-requests',                     protect, getCaregiverRequests);
 router.put('/caregiver-requests/:parentId/accept',    protect, acceptCaregiverRequest);
 router.put('/caregiver-requests/:parentId/reject',    protect, rejectCaregiverRequest);
+
+// PayHere Monthly Subscriptions & Caregiver Assignment
+router.post('/subscriptions/payhere-init',            protect, initiatePayhereSubscription);
+router.post('/subscriptions/payhere-verify',          protect, verifyAndCompletePayhereSubscription);
+router.get('/subscriptions/my-subscriptions',         protect, getChildSubscriptions);
 
 // Child dashboard stats
 router.get('/child-stats',     protect, getChildDashboardStats);
