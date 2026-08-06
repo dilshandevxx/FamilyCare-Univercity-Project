@@ -4,7 +4,14 @@ import api from '../services/api';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('fc_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -14,10 +21,15 @@ export const AuthProvider = ({ children }) => {
         try {
           const { data } = await api.get('/users/profile');
           setUser(data);
+          localStorage.setItem('fc_user', JSON.stringify(data));
         } catch (err) {
           localStorage.removeItem('token');
+          localStorage.removeItem('fc_user');
           setUser(null);
         }
+      } else {
+        localStorage.removeItem('fc_user');
+        setUser(null);
       }
       setLoading(false);
     };
@@ -30,6 +42,7 @@ export const AuthProvider = ({ children }) => {
     // Fetch full profile so user object has id, name, email, role
     const { data: profile } = await api.get('/users/profile');
     setUser(profile);
+    localStorage.setItem('fc_user', JSON.stringify(profile));
     return data;
   };
 
@@ -37,6 +50,9 @@ export const AuthProvider = ({ children }) => {
     const { data } = await api.post('/auth/register', userData);
     setUser(data.user);
     localStorage.setItem('token', data.token);
+    if (data.user) {
+      localStorage.setItem('fc_user', JSON.stringify(data.user));
+    }
     return data;
   };
 
@@ -44,6 +60,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const { data } = await api.get('/users/profile');
       setUser(data);
+      localStorage.setItem('fc_user', JSON.stringify(data));
     } catch {}
   };
 
@@ -52,11 +69,13 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('token', data.token);
     const { data: profile } = await api.get('/users/profile');
     setUser(profile);
+    localStorage.setItem('fc_user', JSON.stringify(profile));
     return data;
   };
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('fc_user');
     setUser(null);
   };
 

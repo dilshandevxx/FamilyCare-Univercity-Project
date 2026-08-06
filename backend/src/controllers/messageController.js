@@ -163,6 +163,10 @@ const sendMessage = async (req, res) => {
     return res.status(400).json({ error: 'Receiver ID and message content are required' });
   }
 
+  if (Number(sender_id) === Number(receiver_id)) {
+    return res.status(400).json({ error: 'Cannot send message to yourself' });
+  }
+
   try {
     const [result] = await pool.query(
       'INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)',
