@@ -28,11 +28,12 @@ const Parents = () => {
   const fetchParents = async () => {
     try {
       setLoading(true);
+      setError('');
       const { data } = await api.get('/parents');
       setParents(data || []);
     } catch (err) {
       console.error('Error fetching parents:', err);
-      setError('Could not retrieve parent profiles. Please try again.');
+      setError(err.response?.data?.error || 'Could not retrieve parent profiles. Please check that the server is running and try again.');
     } finally {
       setLoading(false);
     }
