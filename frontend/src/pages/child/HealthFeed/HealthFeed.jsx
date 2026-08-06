@@ -31,6 +31,47 @@ const getAttachmentUrl = (url) => {
   return `${cleanBase}${cleanPath}`;
 };
 
+const formatSubmittedTime = (rawIso) => {
+  if (!rawIso) return { display: 'Recent', relative: 'Just now', exactDisplay: 'Recent log', full: 'Recently logged' };
+  const d = new Date(rawIso);
+  if (isNaN(d.getTime())) return { display: 'Recent', relative: 'Just now', exactDisplay: 'Recent log', full: 'Recently logged' };
+
+  const now = new Date();
+  const diffSec = Math.max(0, Math.floor((now - d) / 1000));
+  const diffMin = Math.floor(diffSec / 60);
+  const diffHour = Math.floor(diffMin / 60);
+  const diffDay = Math.floor(diffHour / 24);
+
+  const timeString = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const dateString = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+
+  let relative = 'Just now';
+  if (diffSec < 45) {
+    relative = 'Just now';
+  } else if (diffMin < 60) {
+    relative = `${diffMin}m ago`;
+  } else if (diffHour < 24 && d.getDate() === now.getDate()) {
+    relative = `${diffHour}h ago`;
+  } else if (diffDay === 1 || (diffHour >= 24 && diffHour < 48)) {
+    relative = 'Yesterday';
+  } else if (diffDay > 1 && diffDay < 7) {
+    relative = `${diffDay}d ago`;
+  } else {
+    relative = dateString;
+  }
+
+  const isToday = d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  const exactDisplay = isToday ? `Today, ${timeString}` : diffDay === 1 ? `Yesterday, ${timeString}` : `${dateString}, ${timeString}`;
+
+  return {
+    relative,
+    exactDisplay,
+    timeString,
+    dateString,
+    full: `${dateString} at ${timeString} (${relative})`
+  };
+};
+
 const HealthFeed = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -42,6 +83,7 @@ const HealthFeed = () => {
   const [filterType, setFilterType] = useState('All'); // All, Vitals, Medication, Meals, Attachments
   const [previewDoc, setPreviewDoc] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [parentsLoading, setParentsLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -54,7 +96,6 @@ const HealthFeed = () => {
         const list = Array.isArray(data) ? data : [];
         setParents(list);
         if (list.length > 0) {
-          // If no initial parent or initial parent not in list, select first
           const exists = list.some(p => String(p.id) === String(initialParentId));
           const targetId = exists ? initialParentId : String(list[0].id);
           setSelectedParentId(targetId);
@@ -71,10 +112,10 @@ const HealthFeed = () => {
   }, []);
 
   // 2. Fetch unified health feed logs when selected parent changes
-  const fetchFeed = async (parentId) => {
+  const fetchFeed = async (parentId, isSilent = false) => {
     if (!parentId) return;
     try {
-      setLoading(true);
+      if (!isSilent) setLoading(true);
       setError('');
       const { data } = await api.get(`/health/feed?parent_id=${parentId}`);
       if (data && data.logs) {
@@ -86,9 +127,10 @@ const HealthFeed = () => {
       }
     } catch (err) {
       console.error('Error fetching health feed:', err);
-      setError('Failed to load health feed logs.');
+      if (!isSilent) setError('Failed to load health feed logs.');
     } finally {
-      setLoading(false);
+      if (!isSilent) setLoading(false);
+      setIsRefreshing(false);
     }
   };
 
@@ -97,6 +139,21 @@ const HealthFeed = () => {
       fetchFeed(selectedParentId);
     }
   }, [selectedParentId]);
+
+  // Real-time silent background auto-polling every 25 seconds
+  useEffect(() => {
+    if (!selectedParentId) return;
+    const interval = setInterval(() => {
+      fetchFeed(selectedParentId, true);
+    }, 25000);
+    return () => clearInterval(interval);
+  }, [selectedParentId]);
+
+  const handleManualRefresh = () => {
+    if (!selectedParentId || isRefreshing) return;
+    setIsRefreshing(true);
+    fetchFeed(selectedParentId, true);
+  };
 
   // Handle parent card click
   const handleSelectParent = (id) => {
@@ -226,7 +283,21 @@ const HealthFeed = () => {
                   </button>
                 ))}
               </div>
-              <span className="hf-logs-count">{filteredLogs.length} updates</span>
+              <div className="hf-filter-right">
+                <div className="hf-live-indicator" title="Auto-polling real-time caregiver updates every 25 seconds">
+                  <span className="hf-live-dot"></span>
+                  <span className="hf-live-text">Live Sync</span>
+                </div>
+                <button 
+                  className={`hf-refresh-btn ${isRefreshing ? 'spinning' : ''}`}
+                  onClick={handleManualRefresh}
+                  title="Check for new caregiver updates now"
+                  aria-label="Refresh feed"
+                >
+                  <RefreshCw size={13} />
+                </button>
+                <span className="hf-logs-count">{filteredLogs.length} updates</span>
+              </div>
             </div>
 
             {/* TIMELINE SECTION */}
@@ -260,14 +331,7 @@ const HealthFeed = () => {
                 </div>
               ) : (
                 filteredLogs.map((log, index) => {
-                  const logDate = new Date(log.timestamp);
-                  const timeFormatted = isNaN(logDate.getTime()) 
-                    ? 'Recent' 
-                    : logDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                  const dateFormatted = isNaN(logDate.getTime()) 
-                    ? 'Today' 
-                    : logDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-
+                  const timeInfo = formatSubmittedTime(log.timestamp || log.logged_at);
                   const isVitals = log.type === 'vitals';
                   const condition = log.overall_condition || 'STABLE';
 
@@ -283,37 +347,49 @@ const HealthFeed = () => {
                       {/* Card Content */}
                       <div className="hf-log-card">
                         
-                        {/* Header: Title, Timestamp, Logged By */}
+                        {/* Header: Title, Real-Time Submitted Timestamp, Caregiver */}
                         <div className="hf-log-card-header">
-                          <div>
+                          <div className="hf-log-header-left">
                             <div className="hf-log-title-row">
                               <h4 className="hf-log-title">
-                                {isVitals ? 'Daily Clinical Health & Vitals Check' : log.title || 'Health Activity Log'}
+                                {isVitals ? 'Clinical Health & Vitals Check' : log.title || 'Health Activity Log'}
                               </h4>
                               <span className={`hf-condition-badge ${getConditionClass(condition)}`}>
                                 {condition}
                               </span>
+                              {log.mood && (
+                                <div className="hf-mood-pill" title={`Mood: ${log.mood}`}>
+                                  {log.mood === 'happy' && <><Smile size={14} color="#16a34a"/> <span>Good Spirits</span></>}
+                                  {log.mood === 'neutral' && <><Meh size={14} color="#0284c7"/> <span>Calm / Neutral</span></>}
+                                  {log.mood === 'sad' && <><Frown size={14} color="#dc2626"/> <span>Distressed / Low</span></>}
+                                </div>
+                              )}
                             </div>
-                            <p className="hf-log-meta-text">
-                              <Clock size={12} /> {dateFormatted} at {timeFormatted} • Recorded by <strong>{log.logged_by || 'Caregiver'}</strong>
-                            </p>
+                            <div className="hf-log-caregiver-info">
+                              <span className="hf-cg-tag">
+                                <User size={12} /> Logged by <strong>{log.logged_by || 'Assigned Caregiver'}</strong>
+                              </span>
+                            </div>
                           </div>
 
-                          {log.mood && (
-                            <div className="hf-mood-pill" title={`Mood: ${log.mood}`}>
-                              {log.mood === 'happy' && <><Smile size={15} color="#16a34a"/> <span>Good Spirits</span></>}
-                              {log.mood === 'neutral' && <><Meh size={15} color="#0284c7"/> <span>Calm / Neutral</span></>}
-                              {log.mood === 'sad' && <><Frown size={15} color="#dc2626"/> <span>Distressed / Low</span></>}
+                          <div className="hf-log-header-right">
+                            <div className="hf-time-pill" title={`Recorded at: ${timeInfo.full}`}>
+                              <Clock size={13} className="text-teal" />
+                              <span className="hf-time-exact">{timeInfo.exactDisplay}</span>
+                              <span className="hf-time-rel">({timeInfo.relative})</span>
                             </div>
-                          )}
+                          </div>
                         </div>
 
                         {/* Vitals Grid (If vitals exist) */}
                         {(log.blood_pressure || log.heart_rate || log.temperature) && (
                           <div className="hf-vitals-display-grid">
                             {log.blood_pressure && (
-                              <div className="hf-vital-box">
-                                <span className="hf-vb-label"><Activity size={13}/> Blood Pressure</span>
+                              <div className="hf-vital-box bp">
+                                <div className="hf-vb-top">
+                                  <span className="hf-vb-label"><Activity size={13}/> Blood Pressure</span>
+                                  <span className="hf-vb-indicator teal"></span>
+                                </div>
                                 <div className="hf-vb-val-row">
                                   <span className="hf-vb-val">{log.blood_pressure}</span>
                                   <span className="hf-vb-unit">mmHg</span>
@@ -322,8 +398,11 @@ const HealthFeed = () => {
                             )}
 
                             {log.heart_rate && (
-                              <div className="hf-vital-box">
-                                <span className="hf-vb-label"><Heart size={13}/> Heart Rate</span>
+                              <div className="hf-vital-box hr">
+                                <div className="hf-vb-top">
+                                  <span className="hf-vb-label"><Heart size={13}/> Heart Rate</span>
+                                  <span className="hf-vb-indicator rose"></span>
+                                </div>
                                 <div className="hf-vb-val-row">
                                   <span className="hf-vb-val">{log.heart_rate}</span>
                                   <span className="hf-vb-unit">bpm</span>
@@ -332,8 +411,11 @@ const HealthFeed = () => {
                             )}
 
                             {log.temperature && (
-                              <div className="hf-vital-box">
-                                <span className="hf-vb-label"><Thermometer size={13}/> Temperature</span>
+                              <div className="hf-vital-box temp">
+                                <div className="hf-vb-top">
+                                  <span className="hf-vb-label"><Thermometer size={13}/> Temperature</span>
+                                  <span className="hf-vb-indicator amber"></span>
+                                </div>
                                 <div className="hf-vb-val-row">
                                   <span className="hf-vb-val">{log.temperature}</span>
                                   <span className="hf-vb-unit">°F</span>
@@ -352,17 +434,17 @@ const HealthFeed = () => {
                                 <span className="hf-nm-title"><Utensils size={13}/> Meals:</span>
                                 {log.breakfast_status && (
                                   <span className={`hf-meal-tag ${log.breakfast_status.toLowerCase()}`}>
-                                    <Coffee size={11} /> B: {log.breakfast_status}
+                                    <Coffee size={11} /> Breakfast: {log.breakfast_status}
                                   </span>
                                 )}
                                 {log.lunch_status && (
                                   <span className={`hf-meal-tag ${log.lunch_status.toLowerCase()}`}>
-                                    <Utensils size={11} /> L: {log.lunch_status}
+                                    <Utensils size={11} /> Lunch: {log.lunch_status}
                                   </span>
                                 )}
                                 {log.dinner_status && (
                                   <span className={`hf-meal-tag ${log.dinner_status.toLowerCase()}`}>
-                                    <Moon size={11} /> D: {log.dinner_status}
+                                    <Moon size={11} /> Dinner: {log.dinner_status}
                                   </span>
                                 )}
                               </div>
@@ -385,32 +467,57 @@ const HealthFeed = () => {
                         {/* Clinical / Caregiver Notes */}
                         {log.description && (
                           <div className="hf-clinical-notes-box">
+                            <span className="hf-cn-label">Caregiver Clinical Observations:</span>
                             <p className="hf-cn-text">"{log.description}"</p>
                           </div>
                         )}
 
-                        {/* Attachment Link */}
+                        {/* Rich Medical Document Attachment Card */}
                         {log.attachment_url && (() => {
                           const isPdf = log.attachment_url.toLowerCase().includes('.pdf');
                           const docUrl = getAttachmentUrl(log.attachment_url);
                           return (
-                            <div className="hf-attachment-row">
-                              <button 
-                                type="button"
-                                onClick={() => setPreviewDoc({
-                                  url: docUrl,
-                                  isPdf,
-                                  name: `Medical-Report-${log.id || 'attachment'}`,
-                                  logDate: log.timestamp || log.logged_at,
-                                  elderName: feedData.parent?.name || activeParent?.name,
-                                  vitals: `${log.blood_pressure ? `BP: ${log.blood_pressure} ` : ''}${log.heart_rate ? `• HR: ${log.heart_rate}bpm ` : ''}${log.temperature ? `• Temp: ${log.temperature}°F` : ''}`
-                                })}
-                                className="hf-attachment-link"
-                              >
-                                <FileText size={15} color="#0d9488" />
-                                <span>{isPdf ? 'View Medical PDF Document' : 'View Attached Medical Image'}</span>
-                                <Eye size={13} style={{ marginLeft: 4, opacity: 0.8 }} />
-                              </button>
+                            <div className="hf-attachment-card">
+                              <div className="hf-att-left">
+                                <div className={`hf-att-icon-box ${isPdf ? 'pdf' : 'img'}`}>
+                                  <FileText size={18} />
+                                </div>
+                                <div className="hf-att-info">
+                                  <div className="hf-att-name-row">
+                                    <span className={`hf-att-badge ${isPdf ? 'pdf' : 'img'}`}>
+                                      {isPdf ? 'PDF DOCUMENT' : 'IMAGE ATTACHMENT'}
+                                    </span>
+                                    <span className="hf-att-title">Medical Record / Attachment</span>
+                                  </div>
+                                  <span className="hf-att-date">Uploaded with vital check on {timeInfo.exactDisplay}</span>
+                                </div>
+                              </div>
+                              <div className="hf-att-actions">
+                                <button 
+                                  type="button"
+                                  onClick={() => setPreviewDoc({
+                                    url: docUrl,
+                                    isPdf,
+                                    name: `Medical-Report-${log.id || 'attachment'}`,
+                                    logDate: log.timestamp || log.logged_at,
+                                    elderName: feedData.parent?.name || activeParent?.name,
+                                    vitals: `${log.blood_pressure ? `BP: ${log.blood_pressure} ` : ''}${log.heart_rate ? `• HR: ${log.heart_rate}bpm ` : ''}${log.temperature ? `• Temp: ${log.temperature}°F` : ''}`
+                                  })}
+                                  className="hf-att-btn preview"
+                                >
+                                  <Eye size={14} /> Preview Record
+                                </button>
+                                <a 
+                                  href={docUrl} 
+                                  target="_blank" 
+                                  rel="noreferrer" 
+                                  className="hf-att-btn download"
+                                  download
+                                  title="Download file"
+                                >
+                                  <Download size={14} />
+                                </a>
+                              </div>
                             </div>
                           );
                         })()}
