@@ -461,68 +461,90 @@ const Messages = () => {
                     </div>
                   ) : (
                     <>
-                      {/* Date divider */}
-                      <div className="mc-date-sep">
-                        <span>{formatDateDivider(messages[0]?.created_at)}</span>
-                      </div>
-
                       {messages.map((msg, index) => {
                         const currentUserId = user?.id || (typeof window !== 'undefined' && JSON.parse(localStorage.getItem('fc_user') || '{}')?.id);
+                        const contactId = selected?.id;
+
+                        // Outgoing (Me - Right Side):
+                        // 1. Pending optimistic message
+                        // 2. Sender ID matches current user ID
+                        // 3. Receiver ID matches selected contact ID
+                        // 4. Sender ID is different from contact ID
                         const isMe = Boolean(
                           msg.pending ||
-                          (currentUserId && Number(msg.sender_id) === Number(currentUserId))
+                          (currentUserId && Number(msg.sender_id) === Number(currentUserId)) ||
+                          (contactId && Number(msg.receiver_id) === Number(contactId)) ||
+                          (contactId && msg.sender_id && Number(msg.sender_id) !== Number(contactId))
                         );
 
-                        const senderDisplayName = isMe ? 'You' : (msg.sender_name || selected?.name || 'Contact');
+                        const isFirstOfDate = index === 0 || 
+                          (msg.created_at && messages[index - 1]?.created_at && 
+                           new Date(msg.created_at).toDateString() !== new Date(messages[index - 1].created_at).toDateString());
+
+                        const senderDisplayName = isMe 
+                          ? 'You' 
+                          : (msg.sender_name || selected?.name || 'Contact');
                         const canDelete = isMe && !msg.pending && msg.id && !String(msg.id).startsWith('opt-');
 
                         return (
-                          <div 
-                            key={msg.id || index} 
-                            className={`mc-bubble-row ${isMe ? 'sent' : 'received'}`}
-                          >
-                            {!isMe && (
-                              <img 
-                                src={avatarUrl(selected.name)} 
-                                alt="avatar" 
-                                className="mc-msg-avatar"
-                              />
+                          <React.Fragment key={msg.id || index}>
+                            {isFirstOfDate && (
+                              <div className="mc-date-sep">
+                                <span>{formatDateDivider(msg.created_at)}</span>
+                              </div>
                             )}
 
-                            <div className="mc-bubble-group">
-                              <div className={`mc-bubble ${isMe ? 'me-bg' : 'them-bg'} ${msg.pending ? 'pending' : ''} ${msg.failed ? 'failed' : ''}`}>
-                                
-                                {/* WhatsApp-style Sender Label */}
-                                <div className={`mc-sender-label ${isMe ? 'me' : 'them'}`}>
-                                  {senderDisplayName}
-                                </div>
-
-                                <p className="mc-bubble-content">{msg.message}</p>
-                                
-                                <div className="mc-bubble-footer">
-                                  <span className="mc-msg-time">{formatTime(msg.created_at)}</span>
-                                  {isMe && !msg.failed && (
-                                    <span className="mc-read-check" title="Delivered">
-                                      <CheckCheck size={14} />
-                                    </span>
-                                  )}
-                                  {msg.failed && (
-                                    <span className="mc-fail-badge">Failed</span>
-                                  )}
-                                </div>
-                              </div>
-
-                              {canDelete && (
-                                <button 
-                                  className="mc-msg-delete" 
-                                  onClick={() => handleDeleteMessage(msg)}
-                                  title="Delete message"
-                                >
-                                  <Trash2 size={13} />
-                                </button>
+                            <div 
+                              className={`mc-bubble-row ${isMe ? 'sent' : 'received'}`}
+                            >
+                              {!isMe && (
+                                <img 
+                                  src={avatarUrl(selected.name)} 
+                                  alt={selected.name} 
+                                  className="mc-msg-avatar"
+                                />
                               )}
+
+                              <div className="mc-bubble-group">
+                                <div className={`mc-bubble ${isMe ? 'me-bg' : 'them-bg'} ${msg.pending ? 'pending' : ''} ${msg.failed ? 'failed' : ''}`}>
+                                  
+                                  {/* Sender Label */}
+                                  <div className={`mc-sender-label ${isMe ? 'me' : 'them'}`}>
+                                    <span>{senderDisplayName}</span>
+                                    {!isMe && selected?.role && (
+                                      <span className="mc-sender-role-pill">
+                                        {selected.role === 'caregiver' ? 'Caregiver' : 'Family Member'}
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  <p className="mc-bubble-content">{msg.message}</p>
+                                  
+                                  <div className="mc-bubble-footer">
+                                    <span className="mc-msg-time">{formatTime(msg.created_at)}</span>
+                                    {isMe && !msg.failed && (
+                                      <span className="mc-read-check" title="Delivered">
+                                        <CheckCheck size={14} />
+                                      </span>
+                                    )}
+                                    {msg.failed && (
+                                      <span className="mc-fail-badge">Failed</span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {canDelete && (
+                                  <button 
+                                    className="mc-msg-delete" 
+                                    onClick={() => handleDeleteMessage(msg)}
+                                    title="Delete message"
+                                  >
+                                    <Trash2 size={13} />
+                                  </button>
+                                )}
+                              </div>
                             </div>
-                          </div>
+                          </React.Fragment>
                         );
                       })}
                     </>

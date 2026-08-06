@@ -685,9 +685,9 @@
 
 /* Base Bubble */
 .mc-bubble {
-  padding: 11px 16px;
+  padding: 9px 13px 7px 13px;
   font-size: 0.88rem;
-  line-height: 1.5;
+  line-height: 1.45;
   word-break: break-word;
   position: relative;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
@@ -697,34 +697,49 @@
 .mc-bubble.me-bg {
   background: #d9fdd3;
   color: #111b21;
-  border-radius: 8px 0px 8px 8px;
-  box-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
+  border-radius: 14px 14px 2px 14px;
+  box-shadow: 0 1px 2px rgba(11, 20, 26, 0.12);
+  border: 1px solid rgba(0, 168, 150, 0.18);
 }
 
 /* RECEIVER BUBBLE (THEM - LEFT - WHATSAPP PURE WHITE) */
 .mc-bubble.them-bg {
   background: #ffffff;
   color: #111b21;
-  border: 1px solid rgba(11, 20, 26, 0.06);
-  border-radius: 0px 8px 8px 8px;
-  box-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
+  border: 1px solid rgba(11, 20, 26, 0.09);
+  border-radius: 14px 14px 14px 2px;
+  box-shadow: 0 1px 2px rgba(11, 20, 26, 0.08);
 }
 
 .mc-sender-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-size: 0.72rem;
   font-weight: 800;
   line-height: 1.2;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 
 .mc-sender-label.me {
   color: #0b8043;
-  text-align: right;
+  justify-content: flex-end;
 }
 
 .mc-sender-label.them {
   color: #008069;
-  text-align: left;
+  justify-content: flex-start;
+}
+
+.mc-sender-role-pill {
+  font-size: 0.62rem;
+  font-weight: 700;
+  background: #e2e8f0;
+  color: #475569;
+  padding: 1px 5px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .mc-bubble.pending {
