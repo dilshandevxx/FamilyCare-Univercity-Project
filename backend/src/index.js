@@ -73,6 +73,107 @@ async function runMigrations() {
     }
   } catch (err) { console.warn('⚠️  Migration (messages.is_read):', err.message); }
 
+  // ── users table extensions ────────────────────────────────────
+  const userFields = [
+    ['avatar_url',    'ADD COLUMN avatar_url VARCHAR(500) DEFAULT NULL'],
+    ['tfa_secret',    'ADD COLUMN tfa_secret VARCHAR(255) DEFAULT NULL'],
+    ['tfa_enabled',   'ADD COLUMN tfa_enabled TINYINT(1) DEFAULT 0'],
+    ['google_id',     'ADD COLUMN google_id VARCHAR(100) DEFAULT NULL'],
+    ['auth_provider', "ADD COLUMN auth_provider VARCHAR(50) DEFAULT 'local'"],
+  ];
+  for (const [col, ddl] of userFields) {
+    try {
+      if (!(await columnExists('users', col))) {
+        await pool.query(`ALTER TABLE users ${ddl}`);
+        console.log(`✅ Migration: added users.${col}`);
+      }
+    } catch (err) { console.warn(`⚠️  Migration (users.${col}):`, err.message); }
+  }
+
+  // ── caregivers table extensions ───────────────────────────────
+  const caregiverFields = [
+    ['status',            "ADD COLUMN status ENUM('pending','approved','rejected') DEFAULT 'approved'"],
+    ['approved_at',       'ADD COLUMN approved_at DATETIME NULL'],
+    ['rejected_at',       'ADD COLUMN rejected_at DATETIME NULL'],
+    ['rejection_reason',  'ADD COLUMN rejection_reason TEXT NULL'],
+    ['monthly_rate',      'ADD COLUMN monthly_rate DECIMAL(10,2) DEFAULT 350.00'],
+    ['plan_title',        "ADD COLUMN plan_title VARCHAR(150) DEFAULT 'Comprehensive Monthly Care Plan'"],
+    ['plan_description',  'ADD COLUMN plan_description TEXT NULL'],
+    ['plan_features',     'ADD COLUMN plan_features TEXT NULL'],
+    ['max_capacity',      'ADD COLUMN max_capacity INT DEFAULT 4'],
+    ['rating',            'ADD COLUMN rating DECIMAL(2,1) DEFAULT 4.9'],
+    ['total_reviews',     'ADD COLUMN total_reviews INT DEFAULT 18'],
+    ['location',          "ADD COLUMN location VARCHAR(100) DEFAULT 'In-Home & Clinical Visits'"],
+    ['languages',         "ADD COLUMN languages VARCHAR(200) DEFAULT 'English, Sinhala'"],
+  ];
+  for (const [col, ddl] of caregiverFields) {
+    try {
+      if (!(await columnExists('caregivers', col))) {
+        await pool.query(`ALTER TABLE caregivers ${ddl}`);
+        console.log(`✅ Migration: added caregivers.${col}`);
+      }
+    } catch (err) { console.warn(`⚠️  Migration (caregivers.${col}):`, err.message); }
+  }
+
+  // Ensure default plans and approved status for existing caregivers
+  try {
+    await pool.query(`
+      UPDATE caregivers SET 
+        status = 'approved',
+        monthly_rate = COALESCE(monthly_rate, 350.00),
+        plan_title = COALESCE(plan_title, 'Comprehensive Monthly Care Plan'),
+        plan_description = COALESCE(plan_description, 'Full-spectrum daily elder care, vital signs logging, and continuous health monitoring.'),
+        plan_features = COALESCE(plan_features, 'Daily Vital Signs Logging\\nMedication Reminders & Tracking\\n24/7 Priority Emergency Support\\nWeekly Family Health Progress Reports'),
+        max_capacity = COALESCE(max_capacity, 4),
+        rating = COALESCE(rating, 4.9),
+        total_reviews = COALESCE(total_reviews, 18),
+        location = COALESCE(location, 'In-Home & Clinical Visits'),
+        languages = COALESCE(languages, 'English, Sinhala')
+      WHERE status IS NULL OR status = 'pending' OR monthly_rate IS NULL
+    `);
+  } catch (err) { console.warn('⚠️  Migration (caregivers data defaults):', err.message); }
+
+  // ── parents table extensions ──────────────────────────────────
+  const parentFields = [
+    ['room_number',           'ADD COLUMN room_number VARCHAR(20) DEFAULT NULL'],
+    ['care_status',           'ADD COLUMN care_status VARCHAR(50) DEFAULT NULL'],
+    ['assignment_status',     "ADD COLUMN assignment_status ENUM('pending','accepted','rejected') DEFAULT 'accepted'"],
+    ['rejection_reason',      'ADD COLUMN rejection_reason VARCHAR(255) DEFAULT NULL'],
+    ['subscription_id',       'ADD COLUMN subscription_id INT DEFAULT NULL'],
+    ['subscription_status',   "ADD COLUMN subscription_status ENUM('active','expired','unpaid','none') DEFAULT 'none'"],
+    ['subscription_end_date', 'ADD COLUMN subscription_end_date DATETIME DEFAULT NULL'],
+  ];
+  for (const [col, ddl] of parentFields) {
+    try {
+      if (!(await columnExists('parents', col))) {
+        await pool.query(`ALTER TABLE parents ${ddl}`);
+        console.log(`✅ Migration: added parents.${col}`);
+      }
+    } catch (err) { console.warn(`⚠️  Migration (parents.${col}):`, err.message); }
+  }
+
+  // ── subscription_payments table ───────────────────────────────
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS subscription_payments (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        subscription_id INT NULL,
+        child_id INT NOT NULL,
+        parent_id INT NOT NULL,
+        caregiver_id INT NOT NULL,
+        amount DECIMAL(10,2) NOT NULL,
+        currency VARCHAR(10) NOT NULL DEFAULT 'LKR',
+        payment_gateway VARCHAR(50) DEFAULT 'PayHere Sandbox',
+        payhere_order_id VARCHAR(100) NOT NULL,
+        payhere_payment_id VARCHAR(100) NULL,
+        payment_status ENUM('succeeded','pending','failed','refunded') DEFAULT 'succeeded',
+        raw_response TEXT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    console.log('✅ Migration: ensured subscription_payments table');
+  } catch (err) { console.warn('⚠️  Migration (subscription_payments):', err.message); }
+
   // ── health_logs extended fields ───────────────────────────────
   const healthExtFields = [
     ['breakfast_status',  "ADD COLUMN breakfast_status  ENUM('Completed','Skipped','Pending') DEFAULT 'Pending'"],
@@ -94,33 +195,7 @@ async function runMigrations() {
     } catch (err) { console.warn(`⚠️  Migration (health_logs.${col}):`, err.message); }
   }
 
-  // ── caregivers.status (approval workflow) ─────────────────────
-  try {
-    if (!(await columnExists('caregivers', 'status'))) {
-      await pool.query(
-        "ALTER TABLE caregivers ADD COLUMN status ENUM('pending','approved','rejected') DEFAULT 'pending'"
-      );
-      // Existing caregivers are already in use — mark them approved
-      await pool.query("UPDATE caregivers SET status = 'approved' WHERE status IS NULL OR status = 'pending'");
-      console.log('✅ Migration: added caregivers.status (existing rows set to approved)');
-    }
-  } catch (err) { console.warn('⚠️  Migration (caregivers.status):', err.message); }
-
-  // ── caregivers audit-trail columns ────────────────────────────
-  const cgAuditCols = [
-    ['approved_at',       'ADD COLUMN approved_at DATETIME NULL'],
-    ['rejected_at',       'ADD COLUMN rejected_at DATETIME NULL'],
-    ['rejection_reason',  'ADD COLUMN rejection_reason TEXT NULL'],
-  ];
-  for (const [col, ddl] of cgAuditCols) {
-    try {
-      if (!(await columnExists('caregivers', col))) {
-        await pool.query(`ALTER TABLE caregivers ${ddl}`);
-        console.log(`✅ Migration: added caregivers.${col}`);
-      }
-    } catch (err) { console.warn(`⚠️  Migration (caregivers.${col}):`, err.message); }
-  }
-  // ── settings table ──────────────────────────────────────────────
+  // ── settings table ────────────────────────────────────────────
   try {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS settings (
@@ -128,7 +203,6 @@ async function runMigrations() {
         v VARCHAR(255) NOT NULL
       )
     `);
-    // Insert defaults if empty
     await pool.query(`
       INSERT IGNORE INTO settings (k, v) VALUES 
       ('twoFactor', 'false'),
