@@ -7,6 +7,7 @@ import {
   Calendar, Pill, FileText, Download, MessageSquarePlus,
   LayoutGrid, Users, ClipboardList, MessageSquare,
   MessageCircle, Loader2, ChevronLeft, X, PenSquare, Trash2,
+  CheckCheck, Smile, Paperclip, Sparkles, Heart
 } from 'lucide-react';
 import './caregiverMessage.css';
 
@@ -24,8 +25,21 @@ const formatTime = (dateStr) => {
   return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 };
 
+const formatDateDivider = (dateStr) => {
+  if (!dateStr) return 'Today';
+  const date = new Date(dateStr);
+  const now = new Date();
+  if (date.toDateString() === now.toDateString()) return 'Today';
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
+  return date.toLocaleDateString([], { weekday: 'long', month: 'short', day: 'numeric' });
+};
+
 const avatarUrl = (seed) =>
   `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(seed || 'user')}`;
+
+const EMOJI_LIST = ['😊', '👍', '❤️', '🙏', '💊', '🩺', '✅', '👋'];
 
 /* ── skeleton loader ─────────────────────────────────────── */
 
@@ -60,6 +74,7 @@ const CaregiverMessage = () => {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sending,         setSending]         = useState(false);
   const [showChat,        setShowChat]        = useState(false); // mobile
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   // compose modal
   const [showCompose,     setShowCompose]     = useState(false);
@@ -76,12 +91,19 @@ const CaregiverMessage = () => {
   const inputRef       = useRef(null);
   const pollingRef     = useRef(null);
 
+  const quickCareReplies = [
+    selected?.elder_name ? `Daily vitals for ${selected.elder_name} have been checked.` : 'Daily vitals checked and normal.',
+    'Medication has been administered on schedule.',
+    'Resting comfortably now.',
+    'I will call you shortly to discuss.'
+  ];
+
   /* load contacts list */
   const loadContacts = useCallback(async (silent = false) => {
     if (!silent) setLoadingContacts(true);
     try {
       const { data } = await api.get('/messages/contacts');
-      setContacts(data);
+      setContacts(data || []);
     } catch (err) {
       console.error('loadContacts:', err);
     } finally {
@@ -97,7 +119,7 @@ const CaregiverMessage = () => {
     if (!quiet) setLoadingMessages(true);
     try {
       const { data } = await api.get(`/messages/${contactId}`);
-      setMessages(data);
+      setMessages(data || []);
     } catch (err) {
       console.error('loadMessages:', err);
     } finally {
@@ -105,26 +127,12 @@ const CaregiverMessage = () => {
     }
   }, []);
 
-  /* load elder sidebar data when a contact with an elder is selected */
-  const loadSidebarData = useCallback(async (elderId) => {
-    if (!elderId) { setSidebarData(null); return; }
-    setSidebarData(null);
-    setLoadingSidebar(true);
-    try {
-      const { data } = await api.get(`/messages/elder-sidebar/${elderId}`);
-      setSidebarData(data);
-    } catch (err) {
-      console.error('loadSidebarData:', err);
-    } finally {
-      setLoadingSidebar(false);
-    }
-  }, []);
-
-  useEffect(() => { loadSidebarData(selected?.elder_id ?? null); }, [selected, loadSidebarData]);
-
-  /* polling: refresh messages + contacts every 5 s while a chat is open */
+  /* polling every 5s */
   useEffect(() => {
-    if (!selected) { clearInterval(pollingRef.current); return; }
+    if (!selected) {
+      clearInterval(pollingRef.current);
+      return;
+    }
     pollingRef.current = setInterval(() => {
       loadMessages(selected.id, true);
       loadContacts(true);
@@ -132,50 +140,83 @@ const CaregiverMessage = () => {
     return () => clearInterval(pollingRef.current);
   }, [selected, loadMessages, loadContacts]);
 
-  /* auto-scroll to bottom whenever messages change */
+  /* auto-scroll to bottom */
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  /* select a conversation */
+  /* fetch right-sidebar data when contact / elder changes */
+  const fetchSidebarData = useCallback(async (contact) => {
+    if (!contact?.elder_id) {
+      setSidebarData(null);
+      return;
+    }
+    setLoadingSidebar(true);
+    try {
+      const [vitalsRes, medsRes, docsRes] = await Promise.allSettled([
+        api.get(`/vitals/parent/${contact.elder_id}`).catch(() => ({ data: [] })),
+        api.get(`/medications/parent/${contact.elder_id}`).catch(() => ({ data: [] })),
+        api.get(`/documents/parent/${contact.elder_id}`).catch(() => ({ data: [] })),
+      ]);
+      setSidebarData({
+        vitals:    vitalsRes.status === 'fulfilled' ? vitalsRes.value.data    : [],
+        meds:      medsRes.status   === 'fulfilled' ? medsRes.value.data      : [],
+        documents: docsRes.status   === 'fulfilled' ? docsRes.value.data      : [],
+      });
+    } catch (err) {
+      console.error('fetchSidebarData error:', err);
+    } finally {
+      setLoadingSidebar(false);
+    }
+  }, []);
+
+  /* select a contact */
   const handleSelect = async (contact) => {
     setSelected(contact);
     setShowChat(true);
     setLoadingMessages(true);
+    setSendError('');
 
-    // Clear unread badge optimistically
+    // Clear unread count locally
     setContacts((prev) =>
       prev.map((c) => (c.id === contact.id ? { ...c, unreadCount: 0 } : c))
     );
 
     try {
       const { data } = await api.get(`/messages/${contact.id}`);
-      setMessages(data);
+      setMessages(data || []);
     } catch (err) {
       console.error('handleSelect:', err);
     } finally {
       setLoadingMessages(false);
-      setTimeout(() => inputRef.current?.focus(), 100);
+      setTimeout(() => inputRef.current?.focus(), 80);
     }
+
+    fetchSidebarData(contact);
   };
 
   /* send message */
-  const handleSend = async () => {
+  const handleSend = async (e) => {
+    if (e) e.preventDefault();
     const text = newMessage.trim();
     if (!text || !selected || sending) return;
 
     setSendError('');
     setNewMessage('');
+    setShowEmojiPicker(false);
     setSending(true);
 
-    // Optimistic bubble — mark it pending so we can show a failed state
+    // Optimistic bubble
     const optimisticId = `opt-${Date.now()}`;
+    const myId = user?.id || 'me';
+
     setMessages((prev) => [
       ...prev,
       {
         id:          optimisticId,
-        sender_id:   user?.id,
+        sender_id:   myId,
         receiver_id: selected.id,
+        sender_name: user?.name || 'You',
         message:     text,
         created_at:  new Date().toISOString(),
         pending:     true,
@@ -187,7 +228,6 @@ const CaregiverMessage = () => {
       await loadMessages(selected.id, true);
       loadContacts(true);
     } catch (err) {
-      // Mark the optimistic bubble as failed instead of silently removing it
       setMessages((prev) =>
         prev.map((m) =>
           m.id === optimisticId ? { ...m, failed: true, pending: false } : m
@@ -197,9 +237,8 @@ const CaregiverMessage = () => {
       const msg =
         err?.response?.data?.error ||
         err?.message ||
-        'Could not send message. Is the server running?';
+        'Could not send message.';
       setSendError(msg);
-      // Auto-dismiss error after 5 s
       setTimeout(() => setSendError(''), 5000);
       console.error('handleSend:', err);
     } finally {
@@ -211,432 +250,504 @@ const CaregiverMessage = () => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
 
-  /* delete a message (own messages only) */
+  /* delete a message */
   const handleDelete = async (msg) => {
-    // Local-only optimistic/failed bubble — nothing saved server-side yet
     if (typeof msg.id === 'string' && msg.id.startsWith('opt-')) {
       setMessages((prev) => prev.filter((m) => m.id !== msg.id));
       return;
     }
-
-    const prevMessages = messages;
-    setMessages((prev) => prev.filter((m) => m.id !== msg.id));
-
+    if (!window.confirm('Delete this message?')) return;
     try {
       await api.delete(`/messages/${msg.id}`);
+      setMessages((prev) => prev.filter((m) => m.id !== msg.id));
       loadContacts(true);
     } catch (err) {
-      setMessages(prevMessages);
-      console.error('handleDelete:', err);
+      console.error('handleDelete error:', err);
     }
   };
 
-  /* compose: open modal + fetch all users */
-  const openCompose = async () => {
+  /* compose modal */
+  const handleOpenCompose = async () => {
     setShowCompose(true);
-    setUserSearch('');
-    if (allUsers.length > 0) return; // already loaded
     setLoadingUsers(true);
     try {
       const { data } = await api.get('/messages/all-users');
-      setAllUsers(data);
+      setAllUsers(data || []);
     } catch (err) {
-      console.error('openCompose:', err);
+      console.error('handleOpenCompose:', err);
     } finally {
       setLoadingUsers(false);
     }
   };
 
-  /* start a chat directly with a chosen user */
-  const startChatWith = (user) => {
+  const handleStartConversation = (targetUser) => {
     setShowCompose(false);
-    setUserSearch('');
-    // Build a minimal contact shape so the chat column renders
-    const contact = {
-      id:         user.id,
-      name:       user.name,
-      email:      user.email,
-      role:       user.role,
-      elder_name: null,
-      elder_id:   null,
-      unreadCount: 0,
-      lastMessage: null,
-    };
-    // Add to contacts list if not already there
-    setContacts((prev) =>
-      prev.find((c) => c.id === user.id) ? prev : [contact, ...prev]
-    );
-    handleSelect(contact);
+    const existing = contacts.find((c) => c.id === targetUser.id);
+    if (existing) {
+      handleSelect(existing);
+    } else {
+      const virtualContact = {
+        id:          targetUser.id,
+        name:        targetUser.name,
+        email:       targetUser.email,
+        role:        targetUser.role,
+        elder_name:  null,
+        elder_id:    null,
+        lastMessage: null,
+        unreadCount: 0,
+      };
+      setContacts((prev) => [virtualContact, ...prev]);
+      handleSelect(virtualContact);
+    }
   };
 
-  const filteredContacts = contacts.filter(
-    (c) =>
-      c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (c.elder_name && c.elder_name.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredContacts = contacts.filter((c) => {
+    const q = searchQuery.toLowerCase();
+    return (
+      c.name.toLowerCase().includes(q) ||
+      (c.elder_name && c.elder_name.toLowerCase().includes(q))
+    );
+  });
 
-  /* ── render ──────────────────────────────────────────── */
+  const filteredUsers = allUsers.filter((u) => {
+    const q = userSearch.toLowerCase();
+    return (
+      u.name.toLowerCase().includes(q) ||
+      u.email.toLowerCase().includes(q) ||
+      (u.role && u.role.toLowerCase().includes(q))
+    );
+  });
+
   return (
     <CaregiverLayout title="Messages">
-      <div className="messages-container">
+      <div className="wa-shell">
+        <div className="wa-card">
 
-        {/* ── LEFT: conversations list ── */}
-        <div className={`conversations-column${showChat ? ' hidden-mobile' : ''}`}>
-          <div className="conv-column-header">
-            <div className="search-bar">
-              <Search size={18} className="search-icon" />
-              <input
-                type="text"
-                placeholder="Search conversations..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              {searchQuery && (
-                <button className="search-clear" onClick={() => setSearchQuery('')}>
-                  <X size={14} />
-                </button>
-              )}
+          {/* ════════ LEFT: CONTACTS SIDEBAR ════════ */}
+          <div className={`wa-sidebar ${showChat ? 'hide-mobile' : ''}`}>
+            
+            {/* Sidebar Top Bar */}
+            <div className="wa-sb-header">
+              <div className="wa-sb-profile">
+                <img src={avatarUrl(user?.name)} alt={user?.name} className="wa-sb-my-avatar" />
+                <span className="wa-sb-title">Chats</span>
+              </div>
+              <button
+                className="wa-icon-action-btn"
+                onClick={handleOpenCompose}
+                title="New Chat"
+              >
+                <MessageSquarePlus size={20} />
+              </button>
             </div>
-            <button className="compose-btn" onClick={openCompose} title="New message">
-              <PenSquare size={18} />
-            </button>
-          </div>
 
-          <div className="conversations-list">
-            {loadingContacts ? (
-              <ContactSkeleton />
-            ) : filteredContacts.length === 0 ? (
-              <div className="empty-contacts">
-                <MessageCircle size={44} className="empty-icon" />
-                <p>{searchQuery ? 'No conversations match your search' : 'No contacts yet'}</p>
-                {!searchQuery && (
-                  <span>Contacts appear once elders are assigned to you</span>
+            {/* Search Box */}
+            <div className="wa-search-wrap">
+              <div className="wa-search-input-box">
+                <Search size={16} className="wa-search-ico" />
+                <input
+                  type="text"
+                  placeholder="Search or start new chat"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                {searchQuery && (
+                  <button className="wa-clear-btn" onClick={() => setSearchQuery('')}>
+                    <X size={14} />
+                  </button>
                 )}
               </div>
-            ) : (
-              filteredContacts.map((contact) => (
-                <div
-                  key={contact.id}
-                  className={`conversation-item${selected?.id === contact.id ? ' active' : ''}`}
-                  onClick={() => handleSelect(contact)}
-                >
-                  {/* avatar (visible on mobile only via CSS) */}
-                  <div className="conv-avatar-wrapper">
-                    <img
-                      src={avatarUrl(contact.name)}
-                      alt={contact.name}
-                      className="conv-avatar"
-                    />
-                    <span className="online-indicator" />
-                  </div>
+            </div>
 
-                  <div className="conv-details">
-                    <div className="conv-header">
-                      <span className="conv-name">{contact.name}</span>
-                      <span className="conv-time">
-                        {contact.lastMessage
-                          ? formatTime(contact.lastMessage.created_at)
-                          : ''}
+            {/* Contacts List */}
+            <div className="wa-contact-list">
+              {loadingContacts ? (
+                <ContactSkeleton />
+              ) : filteredContacts.length === 0 ? (
+                <div className="wa-empty-sidebar">
+                  <MessageSquare size={36} color="#8696a0" />
+                  <p>No chats found</p>
+                  <button className="wa-start-btn" onClick={handleOpenCompose}>
+                    <Plus size={14} /> Start a conversation
+                  </button>
+                </div>
+              ) : (
+                filteredContacts.map((c) => {
+                  const isSelected = selected?.id === c.id;
+                  return (
+                    <div
+                      key={c.id}
+                      className={`wa-contact-item ${isSelected ? 'active' : ''}`}
+                      onClick={() => handleSelect(c)}
+                    >
+                      <div className="wa-avatar-box">
+                        <img
+                          src={avatarUrl(c.name)}
+                          alt={c.name}
+                          className="wa-contact-avatar"
+                        />
+                        <span className="wa-online-dot" />
+                      </div>
+
+                      <div className="wa-contact-info">
+                        <div className="wa-c-row-top">
+                          <span className="wa-contact-name">{c.name}</span>
+                          <span className="wa-contact-time">
+                            {c.lastMessage ? formatTime(c.lastMessage.created_at) : ''}
+                          </span>
+                        </div>
+
+                        <div className="wa-c-row-mid">
+                          <span className={`wa-preview ${c.unreadCount > 0 ? 'unread' : ''}`}>
+                            {c.lastMessage?.message || 'Tap to chat'}
+                          </span>
+                          {c.unreadCount > 0 && (
+                            <span className="wa-unread-pill">{c.unreadCount}</span>
+                          )}
+                        </div>
+
+                        {c.elder_name && (
+                          <div className="wa-c-row-bottom">
+                            <span className="wa-regarding-tag">
+                              <Heart size={10} /> {c.elder_name}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          {/* ════════ CENTER: WHATSAPP CHAT AREA ════════ */}
+          <div className={`wa-chat-area ${!showChat ? 'hide-mobile' : ''}`}>
+            {selected ? (
+              <>
+                {/* Chat Top Header */}
+                <div className="wa-chat-header">
+                  <div className="wa-chat-header-left">
+                    <button className="wa-mobile-back" onClick={() => setShowChat(false)}>
+                      <ChevronLeft size={22} />
+                    </button>
+                    <img
+                      src={avatarUrl(selected.name)}
+                      alt={selected.name}
+                      className="wa-chat-header-avatar"
+                    />
+                    <div className="wa-chat-header-text">
+                      <div className="wa-header-name-box">
+                        <span className="wa-header-name">{selected.name}</span>
+                        <span className="wa-header-role">{selected.role === 'child' ? 'Family Member' : 'Caregiver'}</span>
+                      </div>
+                      <span className="wa-header-status">
+                        {selected.elder_name ? `Regarding: ${selected.elder_name} • online` : 'online'}
                       </span>
                     </div>
+                  </div>
 
-                    {contact.elder_name && (
-                      <>
-                        <div className="conv-regarding-desktop">
-                          Regarding: {contact.elder_name}
-                        </div>
-                        <div className="conv-regarding-mobile">
-                          Elder: {contact.elder_name}
-                        </div>
-                      </>
-                    )}
-
-                    <div className="conv-preview-row">
-                      <p className="conv-preview">
-                        {contact.lastMessage?.message || 'No messages yet'}
-                      </p>
-                      {contact.unreadCount > 0 && (
-                        <span className="unread-badge">{contact.unreadCount}</span>
-                      )}
-                    </div>
+                  <div className="wa-chat-header-right">
+                    <button className="wa-header-icon-btn" title="Call" onClick={() => alert(`Calling ${selected.name}...`)}>
+                      <Phone size={18} />
+                    </button>
+                    <button className="wa-header-icon-btn" title="Contact Info">
+                      <Info size={18} />
+                    </button>
                   </div>
                 </div>
-              ))
+
+                {/* WhatsApp Messages Feed */}
+                <div className="wa-chat-messages">
+                  {loadingMessages ? (
+                    <div className="wa-messages-loading">
+                      <Loader2 size={32} className="spin" color="#00a884" />
+                      <p>Loading messages...</p>
+                    </div>
+                  ) : messages.length === 0 ? (
+                    <div className="wa-empty-chat">
+                      <div className="wa-lock-notice">
+                        🔒 Messages are end-to-end encrypted for patient privacy.
+                      </div>
+                      <p>No messages yet. Send a message to start chatting with {selected.name}!</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="wa-date-divider">
+                        <span>{formatDateDivider(messages[0]?.created_at)}</span>
+                      </div>
+
+                      {messages.map((msg, index) => {
+                        // Infallible Sender Check
+                        const isMe = Boolean(
+                          msg.pending ||
+                          (user?.id && Number(msg.sender_id) === Number(user.id)) ||
+                          (selected?.id && Number(msg.sender_id) !== Number(selected.id))
+                        );
+
+                        const senderDisplayName = isMe ? 'You' : (msg.sender_name || selected.name);
+                        const canDelete = isMe && !msg.pending && msg.id && !String(msg.id).startsWith('opt-');
+
+                        return (
+                          <div 
+                            key={msg.id || index} 
+                            className={`wa-msg-row ${isMe ? 'outgoing' : 'incoming'}`}
+                          >
+                            <div className={`wa-bubble ${isMe ? 'wa-bubble-me' : 'wa-bubble-them'} ${msg.pending ? 'pending' : ''} ${msg.failed ? 'failed' : ''}`}>
+                              
+                              {/* Distinct Sender Name Label (WhatsApp Style) */}
+                              <div className={`wa-sender-label ${isMe ? 'me-label' : 'them-label'}`}>
+                                {senderDisplayName}
+                              </div>
+
+                              <p className="wa-msg-text">{msg.message}</p>
+
+                              <div className="wa-msg-meta">
+                                <span className="wa-msg-time">{formatTime(msg.created_at)}</span>
+                                {isMe && !msg.failed && (
+                                  <span className="wa-blue-ticks" title="Delivered">
+                                    <CheckCheck size={14} />
+                                  </span>
+                                )}
+                                {msg.failed && (
+                                  <span className="wa-fail-badge">Failed</span>
+                                )}
+                              </div>
+
+                              {canDelete && (
+                                <button
+                                  className="wa-bubble-delete"
+                                  onClick={() => handleDelete(msg)}
+                                  title="Delete message"
+                                >
+                                  <Trash2 size={12} />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Quick Care Reply Suggestions */}
+                <div className="wa-quick-replies">
+                  <Sparkles size={14} className="wa-sparkle-ico" />
+                  <div className="wa-quick-scroll">
+                    {quickCareReplies.map((reply, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        className="wa-reply-chip"
+                        onClick={() => {
+                          setNewMessage(reply);
+                          inputRef.current?.focus();
+                        }}
+                      >
+                        {reply}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Error banner */}
+                {sendError && (
+                  <div className="wa-error-banner">
+                    <span>⚠ {sendError}</span>
+                    <button onClick={() => setSendError('')}><X size={14} /></button>
+                  </div>
+                )}
+
+                {/* Emoji Tray */}
+                {showEmojiPicker && (
+                  <div className="wa-emoji-tray">
+                    {EMOJI_LIST.map((emoji) => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        className="wa-emoji-btn"
+                        onClick={() => setNewMessage((prev) => prev + emoji)}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* WhatsApp Chat Input Bar */}
+                <form onSubmit={handleSend} className="wa-input-bar">
+                  <button
+                    type="button"
+                    className={`wa-bar-icon-btn ${showEmojiPicker ? 'active' : ''}`}
+                    onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    title="Insert Emoji"
+                  >
+                    <Smile size={22} />
+                  </button>
+
+                  <button
+                    type="button"
+                    className="wa-bar-icon-btn"
+                    title="Attach File / Health Record"
+                    onClick={() => alert('Attachments: Share health records, photos, and vitals.')}
+                  >
+                    <Paperclip size={22} />
+                  </button>
+
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    placeholder="Type a message"
+                    className="wa-text-field"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    disabled={sending}
+                  />
+
+                  <button
+                    type="submit"
+                    className={`wa-send-btn ${sending ? 'sending' : ''}`}
+                    disabled={!newMessage.trim() || sending}
+                    title="Send (Enter)"
+                  >
+                    {sending ? (
+                      <Loader2 size={20} className="spin" color="white" />
+                    ) : (
+                      <Send size={18} color="white" />
+                    )}
+                  </button>
+                </form>
+              </>
+            ) : (
+              <div className="wa-no-chat">
+                <div className="wa-no-chat-inner">
+                  <div className="wa-big-icon">
+                    <MessageSquare size={64} color="#00a884" />
+                  </div>
+                  <h3>FamilyCare WhatsApp Messenger</h3>
+                  <p>Send and receive messages with families and caregivers. Keep everyone informed in real time.</p>
+                  <button className="wa-primary-compose-btn" onClick={handleOpenCompose}>
+                    <Plus size={16} /> Start a conversation
+                  </button>
+                </div>
+              </div>
             )}
           </div>
 
-          <button className="mobile-fab" onClick={openCompose} title="New message">
-            <MessageSquarePlus size={24} color="white" />
-          </button>
-        </div>
-
-        {/* ── MIDDLE: chat window ── */}
-        <div className={`chat-column${!showChat ? ' hidden-mobile' : ''}`}>
-          {selected ? (
-            <>
-              {/* header */}
-              <div className="chat-header">
-                <div className="chat-header-info">
-                  <button className="back-btn" onClick={() => setShowChat(false)}>
-                    <ChevronLeft size={20} />
-                  </button>
-                  <img
-                    src={avatarUrl(selected.name)}
-                    alt={selected.name}
-                    className="chat-avatar"
-                  />
-                  <div>
-                    <h3 className="chat-name">
-                      {selected.name}
-                      <span className="status-badge">ONLINE</span>
-                    </h3>
-                    {selected.elder_name && (
-                      <p className="chat-regarding">
-                        Regarding: <strong>{selected.elder_name}</strong>
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="chat-actions">
-                  <button className="icon-btn"><Phone size={20} /></button>
-                  <button className="icon-btn"><Info  size={20} /></button>
-                </div>
+          {/* ════════ RIGHT: PATIENT & CONTACT SIDEBAR ════════ */}
+          {selected && (
+            <div className="wa-info-sidebar hide-tablet">
+              <div className="wa-info-header">
+                <img
+                  src={avatarUrl(selected.elder_name || selected.name)}
+                  alt="Patient"
+                  className="wa-info-avatar"
+                />
+                <h3 className="wa-info-title">{selected.elder_name || selected.name}</h3>
+                <span className="wa-info-badge">
+                  {selected.elder_name ? 'Assigned Elder' : 'Family Contact'}
+                </span>
+                <p className="wa-info-sub">{selected.email}</p>
               </div>
 
-              {/* messages */}
-              <div className="chat-messages">
-                {loadingMessages ? (
-                  <div className="messages-loading">
-                    <Loader2 size={28} className="spin" />
+              {selected.elder_name && (
+                <div className="wa-info-section">
+                  <h4 className="wa-sec-title">Elder Overview</h4>
+                  <div className="wa-info-box">
+                    <div className="wa-info-row">
+                      <span className="wa-info-k">Patient Name:</span>
+                      <span className="wa-info-v">{selected.elder_name}</span>
+                    </div>
+                    <div className="wa-info-row">
+                      <span className="wa-info-k">Family Contact:</span>
+                      <span className="wa-info-v">{selected.name}</span>
+                    </div>
+                    <div className="wa-info-row">
+                      <span className="wa-info-k">Status:</span>
+                      <span className="wa-info-v status-ok">Active Monitoring</span>
+                    </div>
                   </div>
-                ) : messages.length === 0 ? (
-                  <div className="empty-messages">
-                    <MessageCircle size={44} />
-                    <p>No messages yet — say hello!</p>
-                  </div>
-                ) : (
-                  messages.map((msg) => {
-                    const isMe = Boolean(
-                      msg.pending ||
-                      (user?.id && Number(msg.sender_id) === Number(user.id)) ||
-                      (selected?.id && Number(msg.sender_id) !== Number(selected.id))
-                    );
-                    const canDelete = isMe && !msg.pending;
-                    return (
-                      <div key={msg.id} className={`message-row ${isMe ? 'me' : 'them'}`}>
-                        {canDelete && (
-                          <button
-                            className="msg-delete-btn"
-                            onClick={() => handleDelete(msg)}
-                            title="Delete message"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        )}
-                        <div
-                          className={`message-bubble ${isMe ? 'me' : 'them'}${msg.failed ? ' failed' : ''}${msg.pending ? ' pending' : ''}`}
-                        >
-                          <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{msg.message}</p>
-                          {msg.failed && (
-                            <span className="msg-failed-label">⚠ Failed to send</span>
-                          )}
-                          <div className="message-time">
-                            <span>{formatTime(msg.created_at)}</span>
-                            {isMe && !msg.failed && (
-                              <span style={{ marginLeft: '4px', opacity: 0.85 }}>✓✓</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-
-              {/* error banner */}
-              {sendError && (
-                <div className="send-error-banner">
-                  <span>⚠ {sendError}</span>
-                  <button onClick={() => setSendError('')}><X size={14} /></button>
                 </div>
               )}
 
-              {/* input */}
-              <div className="chat-input-area">
-                <button className="icon-btn"><Plus      size={20} /></button>
-                <button className="icon-btn"><ImageIcon size={20} /></button>
-                <input
-                  ref={inputRef}
-                  type="text"
-                  placeholder="Type message..."
-                  className="chat-input"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                />
-                <button
-                  className={`send-btn${sending ? ' sending' : ''}`}
-                  onClick={handleSend}
-                  disabled={!newMessage.trim() || sending}
-                >
-                  {sending
-                    ? <Loader2 size={18} color="white" className="spin" />
-                    : <Send    size={18} color="white" />}
+              <div className="wa-info-section">
+                <h4 className="wa-sec-title">Quick Care Tools</h4>
+                <div className="wa-action-list">
+                  <a href="/caregiver/health-log" className="wa-action-row">
+                    <Heart size={16} color="#00a884" />
+                    <span>Add Daily Health Log</span>
+                  </a>
+                  <a href="/caregiver/assigned-elders" className="wa-action-row">
+                    <Users size={16} color="#00a884" />
+                    <span>View Elder Care Profile</span>
+                  </a>
+                  <a href="/caregiver/visits" className="wa-action-row">
+                    <Calendar size={16} color="#00a884" />
+                    <span>Care Visit History</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+
+        </div>
+
+        {/* ════════ COMPOSE MODAL ════════ */}
+        {showCompose && (
+          <div className="wa-modal-overlay" onClick={() => setShowCompose(false)}>
+            <div className="wa-modal-card" onClick={(e) => e.stopPropagation()}>
+              <div className="wa-modal-header">
+                <h3>New Conversation</h3>
+                <button className="wa-modal-close" onClick={() => setShowCompose(false)}>
+                  <X size={18} />
                 </button>
               </div>
-            </>
-          ) : (
-            <div className="no-conversation">
-              <MessageSquare size={60} className="no-conv-icon" />
-              <h3>Select a Conversation</h3>
-              <p>Choose a contact from the list to start messaging</p>
-            </div>
-          )}
-        </div>
 
-        {/* ── RIGHT: patient info sidebar ── */}
-        <div className="patient-info-column">
-          {selected ? (
-            <>
-              <div className="patient-profile">
-                <img
-                  src={avatarUrl(selected.elder_name || 'Elder')}
-                  alt={selected.elder_name || 'Patient'}
-                  className="patient-avatar-large"
+              <div className="wa-modal-search">
+                <Search size={16} className="wa-modal-search-ico" />
+                <input
+                  type="text"
+                  placeholder="Search user by name, role or email..."
+                  value={userSearch}
+                  onChange={(e) => setUserSearch(e.target.value)}
+                  autoFocus
                 />
-                <h3 className="patient-name">{selected.elder_name || 'Patient'}</h3>
-                <p className="patient-id">
-                  Patient ID: #FC-{String(selected.elder_id || 0).padStart(4, '0')}
-                </p>
               </div>
 
-              <div className="info-section">
-                <h4 className="section-subtitle">QUICK ACTIONS</h4>
-                <div className="quick-actions-grid">
-                  <button className="action-card">
-                    <Calendar size={20} />
-                    <span>Schedule</span>
-                  </button>
-                  <button className="action-card">
-                    <Pill size={20} />
-                    <span>Meds</span>
-                  </button>
-                </div>
-              </div>
-
-<div className="info-section">
-                <h4 className="section-subtitle">SHARED DOCUMENTS</h4>
-                {loadingSidebar ? (
-                  <div className="sidebar-section-loading">
-                    <Loader2 size={18} className="spin" />
+              <div className="wa-modal-user-list">
+                {loadingUsers ? (
+                  <div className="wa-modal-loading">
+                    <Loader2 size={24} className="spin" color="#00a884" />
+                    <p>Loading users...</p>
                   </div>
-                ) : sidebarData?.documents?.length > 0 ? (
-                  <div className="document-list">
-                    {sidebarData.documents.map((doc) => {
-                      const filename = doc.attachment_url.split('/').pop();
-                      const docUrl   = api.defaults.baseURL.replace(/\/api$/, '') + doc.attachment_url;
-                      return (
-                        <div key={doc.id} className="document-card">
-                          <div className="doc-info">
-                            <FileText size={18} className="doc-icon" />
-                            <span className="doc-name">{filename}</span>
-                          </div>
-                          <a href={docUrl} target="_blank" rel="noopener noreferrer" download className="download-btn">
-                            <Download size={16} />
-                          </a>
-                        </div>
-                      );
-                    })}
-                  </div>
+                ) : filteredUsers.length === 0 ? (
+                  <div className="wa-modal-empty">No users found.</div>
                 ) : (
-                  <p className="sidebar-section-empty">No attachments yet</p>
+                  filteredUsers.map((u) => (
+                    <div
+                      key={u.id}
+                      className="wa-modal-user-row"
+                      onClick={() => handleStartConversation(u)}
+                    >
+                      <img src={avatarUrl(u.name)} alt={u.name} className="wa-modal-user-avatar" />
+                      <div className="wa-modal-user-details">
+                        <span className="wa-modal-name">{u.name}</span>
+                        <span className="wa-modal-sub">{u.email}</span>
+                      </div>
+                      <span className={`wa-modal-role-tag ${u.role === 'caregiver' ? 'cg' : 'child'}`}>
+                        {u.role}
+                      </span>
+                    </div>
+                  ))
                 )}
               </div>
-            </>
-          ) : (
-            <div className="sidebar-empty">
-              <Users size={44} className="sidebar-empty-icon" />
-              <p>Select a conversation to see patient details</p>
-            </div>
-          )}
-        </div>
-
-      </div>
-
-      {/* ── Compose / New Message modal ── */}
-      {showCompose && (
-        <div className="compose-overlay" onClick={() => setShowCompose(false)}>
-          <div className="compose-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="compose-modal-header">
-              <h3>New Message</h3>
-              <button className="icon-btn" onClick={() => setShowCompose(false)}>
-                <X size={18} />
-              </button>
-            </div>
-            <div className="compose-search-wrap">
-              <Search size={16} className="compose-search-icon" />
-              <input
-                autoFocus
-                type="text"
-                placeholder="Search people..."
-                className="compose-search-input"
-                value={userSearch}
-                onChange={(e) => setUserSearch(e.target.value)}
-              />
-            </div>
-            <div className="compose-user-list">
-              {loadingUsers ? (
-                <div className="compose-loading">
-                  <Loader2 size={22} className="spin" />
-                </div>
-              ) : (
-                allUsers
-                  .filter((u) =>
-                    u.name.toLowerCase().includes(userSearch.toLowerCase()) ||
-                    u.email.toLowerCase().includes(userSearch.toLowerCase())
-                  )
-                  .map((u) => (
-                    <button
-                      key={u.id}
-                      className="compose-user-item"
-                      onClick={() => startChatWith(u)}
-                    >
-                      <img
-                        src={avatarUrl(u.name)}
-                        alt={u.name}
-                        className="compose-user-avatar"
-                      />
-                      <div className="compose-user-info">
-                        <span className="compose-user-name">{u.name}</span>
-                        <span className="compose-user-role">{u.role}</span>
-                      </div>
-                    </button>
-                  ))
-              )}
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* ── mobile bottom nav ── */}
-      <div className="mobile-bottom-nav">
-        <div className="bottom-nav-item">
-          <LayoutGrid size={24} />
-          <span>Dashboard</span>
-        </div>
-        <div className="bottom-nav-item">
-          <Users size={24} />
-          <span>Elders</span>
-        </div>
-        <div className="bottom-nav-item">
-          <ClipboardList size={24} />
-          <span>Logs</span>
-        </div>
-        <div className="bottom-nav-item active">
-          <MessageSquare size={24} fill="currentColor" />
-          <span>Chat</span>
-        </div>
       </div>
     </CaregiverLayout>
   );

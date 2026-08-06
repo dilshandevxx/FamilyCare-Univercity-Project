@@ -467,16 +467,13 @@ const Messages = () => {
                       </div>
 
                       {messages.map((msg, index) => {
-                        // Infallible sender check:
-                        // 1. Matched by ID
-                        // 2. Or is pending
-                        // 3. Or in 1-on-1 chat, not sent by the other user
                         const isMe = Boolean(
                           msg.pending ||
                           (user?.id && Number(msg.sender_id) === Number(user.id)) ||
                           (selected?.id && Number(msg.sender_id) !== Number(selected.id))
                         );
 
+                        const senderDisplayName = isMe ? 'You' : (msg.sender_name || selected.name);
                         const canDelete = isMe && !msg.pending && msg.id && !String(msg.id).startsWith('opt-');
 
                         return (
@@ -494,13 +491,19 @@ const Messages = () => {
 
                             <div className="mc-bubble-group">
                               <div className={`mc-bubble ${isMe ? 'me-bg' : 'them-bg'} ${msg.pending ? 'pending' : ''} ${msg.failed ? 'failed' : ''}`}>
+                                
+                                {/* WhatsApp-style Sender Label */}
+                                <div className={`mc-sender-label ${isMe ? 'me' : 'them'}`}>
+                                  {senderDisplayName}
+                                </div>
+
                                 <p className="mc-bubble-content">{msg.message}</p>
                                 
                                 <div className="mc-bubble-footer">
                                   <span className="mc-msg-time">{formatTime(msg.created_at)}</span>
                                   {isMe && !msg.failed && (
-                                    <span className="mc-read-check">
-                                      <CheckCheck size={13} />
+                                    <span className="mc-read-check" title="Delivered">
+                                      <CheckCheck size={14} />
                                     </span>
                                   )}
                                   {msg.failed && (
