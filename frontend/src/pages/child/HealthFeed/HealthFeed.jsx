@@ -6,7 +6,7 @@ import {
   MessageSquare, Plus, CheckCircle2, Clock, 
   AlertTriangle, FileText, Download, Smile, 
   Meh, Frown, Coffee, Utensils, Moon, Check, 
-  ShieldCheck, RefreshCw, User, Eye
+  ShieldCheck, RefreshCw, User, Eye, X
 } from 'lucide-react';
 import ChildLayout from '../../../layouts/ChildLayout';
 import api from '../../../services/api';
@@ -22,6 +22,15 @@ const getConditionClass = (cond) => {
   return 'hf-badge-stable';
 };
 
+const getAttachmentUrl = (url) => {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const rawBase = api.defaults.baseURL || import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const cleanBase = rawBase.replace(/\/api\/?$/, '');
+  const cleanPath = url.startsWith('/') ? url : `/${url}`;
+  return `${cleanBase}${cleanPath}`;
+};
+
 const HealthFeed = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -31,6 +40,7 @@ const HealthFeed = () => {
   const [selectedParentId, setSelectedParentId] = useState(initialParentId);
   const [feedData, setFeedData] = useState({ parent: null, logs: [] });
   const [filterType, setFilterType] = useState('All'); // All, Vitals, Medication, Meals, Attachments
+  const [previewDoc, setPreviewDoc] = useState(null);
   const [loading, setLoading] = useState(true);
   const [parentsLoading, setParentsLoading] = useState(true);
   const [error, setError] = useState('');
@@ -382,14 +392,19 @@ const HealthFeed = () => {
                         {/* Attachment Link */}
                         {log.attachment_url && (
                           <div className="hf-attachment-row">
-                            <a 
-                              href={log.attachment_url.startsWith('http') ? log.attachment_url : `${api.defaults.baseURL || ''}${log.attachment_url}`} 
-                              target="_blank" 
-                              rel="noreferrer" 
+                            <button 
+                              type="button"
+                              onClick={() => setPreviewDoc({
+                                url: getAttachmentUrl(log.attachment_url),
+                                name: `Medical-Report-${log.id || 'attachment'}`,
+                                logDate: log.logged_at,
+                                elderName: feedData.parent?.name || activeParent?.name,
+                                vitals: `${log.blood_pressure ? `BP: ${log.blood_pressure} ` : ''}${log.heart_rate ? `• HR: ${log.heart_rate}bpm ` : ''}${log.temperature ? `• Temp: ${log.temperature}°F` : ''}`
+                              })}
                               className="hf-attachment-link"
                             >
                               <FileText size={14} /> View Attached Medical Record / Report <Eye size={13}/>
-                            </a>
+                            </button>
                           </div>
                         )}
 
@@ -515,6 +530,86 @@ const HealthFeed = () => {
         </div>
 
       </div>
+
+      {/* Interactive Medical Document Preview Modal */}
+      {previewDoc && (
+        <div className="hf-doc-modal-overlay" onClick={() => setPreviewDoc(null)}>
+          <div className="hf-doc-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="hf-doc-modal-header">
+              <div className="hf-doc-modal-title">
+                <FileText size={20} color="#0d9488" />
+                <div>
+                  <h4>Attached Medical Record / Document</h4>
+                  <p>
+                    {previewDoc.elderName ? `Resident: ${previewDoc.elderName} ` : ''}
+                    {previewDoc.logDate ? `• ${new Date(previewDoc.logDate).toLocaleDateString()}` : ''}
+                  </p>
+                </div>
+              </div>
+              <div className="hf-doc-modal-actions">
+                <a
+                  href={previewDoc.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hf-doc-action-btn"
+                  title="Open full document in new tab"
+                >
+                  <Eye size={15} /> Open Full View
+                </a>
+                <a
+                  href={previewDoc.url}
+                  download
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hf-doc-action-btn primary"
+                  title="Download attachment"
+                >
+                  <Download size={15} /> Download
+                </a>
+                <button
+                  className="hf-doc-close-btn"
+                  onClick={() => setPreviewDoc(null)}
+                  title="Close viewer"
+                  aria-label="Close modal"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+            </div>
+
+            <div className="hf-doc-modal-body">
+              {previewDoc.url.toLowerCase().endsWith('.pdf') ? (
+                <iframe
+                  src={previewDoc.url}
+                  title="Medical Document PDF Preview"
+                  className="hf-doc-iframe-preview"
+                />
+              ) : (
+                <div className="hf-doc-image-wrap">
+                  <img
+                    src={previewDoc.url}
+                    alt="Attached Medical Record"
+                    className="hf-doc-img-preview"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      const fb = document.getElementById('hf-preview-fallback');
+                      if (fb) fb.style.display = 'flex';
+                    }}
+                  />
+                  <div id="hf-preview-fallback" className="hf-doc-fallback" style={{ display: 'none' }}>
+                    <FileText size={48} color="#0d9488" />
+                    <h5>Document Ready for Viewing</h5>
+                    <p>Click below to open or download the attached medical file directly.</p>
+                    <a href={previewDoc.url} target="_blank" rel="noreferrer" className="hf-doc-download-btn">
+                      <Eye size={16} /> Open Document File
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </ChildLayout>
   );
 };
