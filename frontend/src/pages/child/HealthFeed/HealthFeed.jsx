@@ -31,10 +31,30 @@ const getAttachmentUrl = (url) => {
   return `${cleanBase}${cleanPath}`;
 };
 
+/**
+ * Parse a timestamp from the backend.
+ *
+ * MySQL TIMESTAMP columns are stored in UTC and returned as
+ *   "2026-08-06 07:15:00"  (space separator, no timezone marker)
+ *
+ * JavaScript's Date constructor treats that format inconsistently across
+ * browsers (some local, some UTC). We normalise it to a proper ISO-8601 UTC
+ * string so Date always interprets it as UTC, and toLocaleTimeString()
+ * then converts to the visitor's local timezone automatically.
+ */
+const parseUTCTimestamp = (raw) => {
+  if (!raw) return null;
+  if (typeof raw !== 'string') return new Date(raw); // already a Date / epoch
+  // "2026-08-06 07:15:00"  →  "2026-08-06T07:15:00Z"
+  const iso = raw.includes('T') ? raw : raw.replace(' ', 'T');
+  const utc = iso.endsWith('Z') || /[+-]\d{2}:\d{2}$/.test(iso) ? iso : iso + 'Z';
+  return new Date(utc);
+};
+
 const formatSubmittedTime = (rawIso) => {
   if (!rawIso) return { display: 'Recent', relative: 'Just now', exactDisplay: 'Recent log', full: 'Recently logged' };
-  const d = new Date(rawIso);
-  if (isNaN(d.getTime())) return { display: 'Recent', relative: 'Just now', exactDisplay: 'Recent log', full: 'Recently logged' };
+  const d = parseUTCTimestamp(rawIso);
+  if (!d || isNaN(d.getTime())) return { display: 'Recent', relative: 'Just now', exactDisplay: 'Recent log', full: 'Recently logged' };
 
   const now = new Date();
   const diffSec = Math.max(0, Math.floor((now - d) / 1000));
@@ -42,6 +62,7 @@ const formatSubmittedTime = (rawIso) => {
   const diffHour = Math.floor(diffMin / 60);
   const diffDay = Math.floor(diffHour / 24);
 
+  // toLocaleTimeString uses the *browser's* local timezone — correct for Sri Lanka UTC+5:30
   const timeString = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const dateString = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 
@@ -60,8 +81,17 @@ const formatSubmittedTime = (rawIso) => {
     relative = dateString;
   }
 
-  const isToday = d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  const exactDisplay = isToday ? `Today, ${timeString}` : diffDay === 1 ? `Yesterday, ${timeString}` : `${dateString}, ${timeString}`;
+  const nowLocal = new Date();
+  const isToday = d.toDateString() === nowLocal.toDateString();
+  const yesterdayDate = new Date(nowLocal);
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const isYesterday = d.toDateString() === yesterdayDate.toDateString();
+
+  const exactDisplay = isToday
+    ? `Today, ${timeString}`
+    : isYesterday
+    ? `Yesterday, ${timeString}`
+    : `${dateString}, ${timeString}`;
 
   return {
     relative,
