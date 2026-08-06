@@ -390,23 +390,30 @@ const HealthFeed = () => {
                         )}
 
                         {/* Attachment Link */}
-                        {log.attachment_url && (
-                          <div className="hf-attachment-row">
-                            <button 
-                              type="button"
-                              onClick={() => setPreviewDoc({
-                                url: getAttachmentUrl(log.attachment_url),
-                                name: `Medical-Report-${log.id || 'attachment'}`,
-                                logDate: log.logged_at,
-                                elderName: feedData.parent?.name || activeParent?.name,
-                                vitals: `${log.blood_pressure ? `BP: ${log.blood_pressure} ` : ''}${log.heart_rate ? `• HR: ${log.heart_rate}bpm ` : ''}${log.temperature ? `• Temp: ${log.temperature}°F` : ''}`
-                              })}
-                              className="hf-attachment-link"
-                            >
-                              <FileText size={14} /> View Attached Medical Record / Report <Eye size={13}/>
-                            </button>
-                          </div>
-                        )}
+                        {log.attachment_url && (() => {
+                          const isPdf = log.attachment_url.toLowerCase().includes('.pdf');
+                          const docUrl = getAttachmentUrl(log.attachment_url);
+                          return (
+                            <div className="hf-attachment-row">
+                              <button 
+                                type="button"
+                                onClick={() => setPreviewDoc({
+                                  url: docUrl,
+                                  isPdf,
+                                  name: `Medical-Report-${log.id || 'attachment'}`,
+                                  logDate: log.timestamp || log.logged_at,
+                                  elderName: feedData.parent?.name || activeParent?.name,
+                                  vitals: `${log.blood_pressure ? `BP: ${log.blood_pressure} ` : ''}${log.heart_rate ? `• HR: ${log.heart_rate}bpm ` : ''}${log.temperature ? `• Temp: ${log.temperature}°F` : ''}`
+                                })}
+                                className="hf-attachment-link"
+                              >
+                                <FileText size={15} color="#0d9488" />
+                                <span>{isPdf ? 'View Medical PDF Document' : 'View Attached Medical Image'}</span>
+                                <Eye size={13} style={{ marginLeft: 4, opacity: 0.8 }} />
+                              </button>
+                            </div>
+                          );
+                        })()}
 
                       </div>
                     </div>
@@ -578,12 +585,14 @@ const HealthFeed = () => {
             </div>
 
             <div className="hf-doc-modal-body">
-              {previewDoc.url.toLowerCase().endsWith('.pdf') ? (
-                <iframe
-                  src={previewDoc.url}
-                  title="Medical Document PDF Preview"
-                  className="hf-doc-iframe-preview"
-                />
+              {(previewDoc.isPdf || previewDoc.url.toLowerCase().includes('.pdf')) ? (
+                <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  <iframe
+                    src={previewDoc.url}
+                    title="Medical Document PDF Preview"
+                    className="hf-doc-iframe-preview"
+                  />
+                </div>
               ) : (
                 <div className="hf-doc-image-wrap">
                   <img
