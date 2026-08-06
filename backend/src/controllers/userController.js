@@ -264,7 +264,9 @@ const updateCaregiverPassword = async (req, res) => {
 // POST /api/users/avatar
 const uploadAvatar = async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
-  const avatarUrl = `/uploads/avatars/${req.file.filename}`;
+  const avatarUrl = req.file.path?.startsWith('http')
+    ? req.file.path
+    : `/uploads/avatars/${req.file.filename}`;
   try {
     await pool.query('UPDATE users SET avatar_url = ? WHERE id = ?', [avatarUrl, req.user.id]);
     res.json({ avatar_url: avatarUrl });
