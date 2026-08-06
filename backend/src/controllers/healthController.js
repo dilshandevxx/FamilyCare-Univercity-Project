@@ -68,7 +68,17 @@ const addLog = async (req, res) => {
     // ── Step 1: Safe INSERT using only original schema columns ────
     // These columns are guaranteed to exist (schema.sql + add_resident_fields.sql).
     // This works even if add_health_log_fields.sql migration has NOT been run yet.
-    const loggedAtValue = logged_at || null; // null → MySQL uses DEFAULT CURRENT_TIMESTAMP
+    //
+    // MySQL TIMESTAMP columns do NOT accept ISO 8601 "Z" suffix or milliseconds.
+    // Convert "2026-08-06T07:26:00.000Z"  →  "2026-08-06 07:26:00" (UTC, space-separated)
+    let loggedAtValue = null;
+    if (logged_at) {
+      const d = new Date(logged_at);
+      if (!isNaN(d.getTime())) {
+        // Format as "YYYY-MM-DD HH:MM:SS" in UTC — MySQL stores TIMESTAMP in UTC
+        loggedAtValue = d.toISOString().slice(0, 19).replace('T', ' ');
+      }
+    }
 
     const [result] = await pool.query(
       `INSERT INTO health_logs
