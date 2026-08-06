@@ -416,7 +416,11 @@ const CaregiverMessage = () => {
                   </div>
                 ) : (
                   messages.map((msg) => {
-                    const isMe = Number(msg.sender_id) === Number(user?.id);
+                    const isMe = Boolean(
+                      msg.pending ||
+                      (user?.id && Number(msg.sender_id) === Number(user.id)) ||
+                      (selected?.id && Number(msg.sender_id) !== Number(selected.id))
+                    );
                     const canDelete = isMe && !msg.pending;
                     return (
                       <div key={msg.id} className={`message-row ${isMe ? 'me' : 'them'}`}>
@@ -432,11 +436,16 @@ const CaregiverMessage = () => {
                         <div
                           className={`message-bubble ${isMe ? 'me' : 'them'}${msg.failed ? ' failed' : ''}${msg.pending ? ' pending' : ''}`}
                         >
-                          {msg.message}
+                          <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{msg.message}</p>
                           {msg.failed && (
                             <span className="msg-failed-label">⚠ Failed to send</span>
                           )}
-                          <div className="message-time">{formatTime(msg.created_at)}</div>
+                          <div className="message-time">
+                            <span>{formatTime(msg.created_at)}</span>
+                            {isMe && !msg.failed && (
+                              <span style={{ marginLeft: '4px', opacity: 0.85 }}>✓✓</span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     );
