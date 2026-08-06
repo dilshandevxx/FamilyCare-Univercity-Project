@@ -44,6 +44,15 @@ const addLog = async (req, res) => {
 
   if (!parent_id) return res.status(400).json({ error: 'parent_id is required' });
 
+  // ── Temperature validation ─────────────────────────────────
+  // DECIMAL(5,2) supports up to 999.99 — reject obviously bad values early
+  const tempNum = temperature ? parseFloat(temperature) : null;
+  if (temperature && (isNaN(tempNum) || tempNum < 90 || tempNum > 115)) {
+    return res.status(400).json({
+      error: `Invalid temperature value "${temperature}". Please enter a value between 90°F and 115°F (e.g. 98.6)`,
+    });
+  }
+
   // File attachment uploaded via multipart/form-data (Cloudinary HTTPS or local fallback)
   const attachment_url = req.file
     ? (req.file.path?.startsWith('http') ? req.file.path : `/uploads/health-attachments/${req.file.filename}`)
@@ -68,8 +77,8 @@ const addLog = async (req, res) => {
       [
         parent_id,
         blood_pressure || null,
-        heart_rate     || null,
-        temperature    || null,
+        heart_rate     ? parseInt(heart_rate, 10) : null,
+        tempNum,
         notes          || clinical_notes || null,
         req.user.id,
         ...(loggedAtValue ? [loggedAtValue] : []),
@@ -102,13 +111,16 @@ const addLog = async (req, res) => {
           clinical_notes    || null,
           mood              || null,
           overall_condition || 'STABLE',
-          attachment_url,
+          // Truncate to 1000 chars as a safety measure — migration should have made this TEXT
+          attachment_url ? attachment_url.substring(0, 1000) : null,
           newId,
         ]
       );
     } catch (_extErr) {
-      // Extended columns not yet available — run add_health_log_fields.sql migration
-      console.warn('[health] Extended columns missing — run add_health_log_fields.sql');
+      // Log the actual error so it's visible in server logs
+      console.error('[health] Extended UPDATE failed:', _extErr.message);
+      console.warn('[health] If this is a column-missing error, run add_health_log_fields.sql');
+      console.warn('[health] If this is a data-too-long error, run fix_health_log_columns.sql');
     }
 
     // ── Step 3: Sync parents.care_status with overall_condition ──
