@@ -111,7 +111,7 @@ const AddHealthLog = () => {
   // ── helpers ───────────────────────────────────────────────────
   const showToast = (type, message) => {
     setToast({ type, message });
-    setTimeout(() => setToast(null), 3500);
+    setTimeout(() => setToast(null), type === 'success' ? 5000 : 4000);
   };
 
   const toggleMeal = (meal, status) =>
@@ -125,6 +125,15 @@ const AddHealthLog = () => {
   // ── submit ────────────────────────────────────────────────────
   const handleSubmit = async () => {
     if (!selectedId) { showToast('error', 'Please select a resident'); return; }
+
+    // ── Client-side temperature validation ────────────────────
+    if (temp) {
+      const tNum = parseFloat(temp);
+      if (isNaN(tNum) || tNum < 90 || tNum > 115) {
+        showToast('error', `Invalid temperature "${temp}". Use a value between 90–115 °F (e.g. 98.6)`);
+        return;
+      }
+    }
 
     setSubmitting(true);
     try {
@@ -149,7 +158,7 @@ const AddHealthLog = () => {
       // Overriding it strips the boundary and breaks multer on the backend.
       await api.post('/health', form);
 
-      showToast('success', 'Health log submitted successfully!');
+      showToast('success', '✓ Health log submitted successfully! Family dashboard updated.');
       // reset form
       setBp(''); setTemp(''); setHeartRate('');
       setMealStatus({ breakfast: 'Completed', lunch: 'Completed', dinner: 'Pending' });
@@ -166,7 +175,8 @@ const AddHealthLog = () => {
           .catch(() => {});
       }
     } catch (err) {
-      showToast('error', err?.response?.data?.error || 'Failed to submit log');
+      const errMsg = err?.response?.data?.error || 'Failed to submit log. Please try again.';
+      showToast('error', errMsg);
     } finally {
       setSubmitting(false);
     }
