@@ -139,7 +139,19 @@ const AddHealthLog = () => {
     try {
       const form = new FormData();
       form.append('parent_id',         selectedId);
-      form.append('logged_at',         loggedAt || '');
+
+      // Convert datetime-local value (browser local time) → UTC ISO string.
+      // datetime-local gives "2026-08-06T12:54" with NO timezone — new Date()
+      // treats it as LOCAL time, so .toISOString() correctly shifts to UTC.
+      // This prevents the double +5:30 shift when the backend stores it as UTC.
+      let loggedAtUTC = '';
+      if (loggedAt) {
+        const localDate = new Date(loggedAt);
+        if (!isNaN(localDate.getTime())) {
+          loggedAtUTC = localDate.toISOString(); // e.g. "2026-08-06T07:24:00.000Z"
+        }
+      }
+      form.append('logged_at', loggedAtUTC);
       form.append('blood_pressure',    bp);
       form.append('temperature',       temp);
       form.append('heart_rate',        heartRate);
