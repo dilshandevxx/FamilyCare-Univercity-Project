@@ -44,9 +44,9 @@ const addLog = async (req, res) => {
 
   if (!parent_id) return res.status(400).json({ error: 'parent_id is required' });
 
-  // File attachment uploaded via multipart/form-data
+  // File attachment uploaded via multipart/form-data (Cloudinary HTTPS or local fallback)
   const attachment_url = req.file
-    ? `/uploads/health-attachments/${req.file.filename}`
+    ? (req.file.path?.startsWith('http') ? req.file.path : `/uploads/health-attachments/${req.file.filename}`)
     : null;
 
   // Normalise booleans that arrive as strings from FormData

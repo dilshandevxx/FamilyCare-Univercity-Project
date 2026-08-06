@@ -11,7 +11,7 @@ const {
   updateCaregiverAvailability,
   updateCaregiverNotifications,
   updateCaregiverPassword,
-  uploadAvatar,
+  uploadAvatar: uploadAvatarController,
   get2FAStatus,
   setup2FA,
   verify2FA,
@@ -30,22 +30,11 @@ const {
   getChildSubscriptions,
 } = require('../controllers/userController');
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, path.join(__dirname, '../../uploads/avatars')),
-  filename: (req, file, cb) => cb(null, `user_${req.user.id}_${Date.now()}${path.extname(file.originalname)}`),
-});
-const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
-  fileFilter: (req, file, cb) => {
-    if (!file.mimetype.startsWith('image/')) return cb(new Error('Only images are allowed'));
-    cb(null, true);
-  },
-});
+const { uploadAvatar } = require('../config/cloudinary');
 
 router.get('/profile',  protect, getProfile);
 router.put('/profile',  protect, updateProfile);
-router.post('/avatar',  protect, upload.single('avatar'), uploadAvatar);
+router.post('/avatar',  protect, uploadAvatar.single('avatar'), uploadAvatarController);
 
 // Caregiver settings
 router.get('/caregiver-settings',                    protect, getCaregiverSettings);
