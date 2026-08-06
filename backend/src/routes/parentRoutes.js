@@ -16,6 +16,7 @@ router.get('/',             protect, getParents);
 router.get('/:id',          protect, getParentById);
 router.put('/:id',          protect, updateParent);
 router.delete('/:id',       protect, deleteParent);
-router.put('/:id/assign',   protect, assignCaregiver);
+router.put('/:id/assign',            protect, assignCaregiver);
+router.patch('/:id/assign-caregiver', protect, assignCaregiver);
 
 module.exports = router;
