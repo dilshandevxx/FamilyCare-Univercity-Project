@@ -476,8 +476,10 @@
 /* WhatsApp Message Row & Alignment */
 .wa-msg-row {
   display: flex;
+  align-items: flex-end;
+  gap: 8px;
   width: 100%;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
   animation: waFadeIn 0.15s ease;
 }
 
@@ -496,26 +498,51 @@
   justify-content: flex-start;
 }
 
+.wa-msg-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--wa-border);
+  background: #ffffff;
+  flex-shrink: 0;
+  margin-bottom: 2px;
+}
+
+.wa-bubble-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 68%;
+  position: relative;
+}
+
+.wa-msg-row.outgoing .wa-bubble-group {
+  flex-direction: row-reverse;
+}
+
 /* WhatsApp Bubble Base */
 .wa-bubble {
   position: relative;
-  max-width: 65%;
-  min-width: 90px;
-  padding: 6px 9px 5px 9px;
-  box-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
+  min-width: 100px;
+  padding: 8px 12px 6px 12px;
   word-break: break-word;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 /* WHATSAPP OUTGOING BUBBLE (YOU - LIGHT GREEN) */
 .wa-bubble.wa-bubble-me {
   background-color: var(--wa-bubble-me);
-  border-radius: 8px 0px 8px 8px;
+  border: 1px solid rgba(0, 168, 132, 0.2);
+  border-radius: 14px 14px 2px 14px;
+  box-shadow: 0 1px 2px rgba(11, 20, 26, 0.12);
 }
 
 /* WHATSAPP INCOMING BUBBLE (THEM - PURE WHITE) */
 .wa-bubble.wa-bubble-them {
   background-color: var(--wa-bubble-them);
-  border-radius: 0px 8px 8px 8px;
+  border: 1px solid rgba(11, 20, 26, 0.09);
+  border-radius: 14px 14px 14px 2px;
+  box-shadow: 0 1px 2px rgba(11, 20, 26, 0.08);
 }
 
 .wa-bubble.pending {
@@ -529,20 +556,34 @@
 
 /* Sender Name Header Label */
 .wa-sender-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-size: 0.72rem;
   font-weight: 800;
   line-height: 1.2;
-  margin-bottom: 3px;
+  margin-bottom: 4px;
 }
 
 .wa-sender-label.me-label {
   color: #0b8043;
-  text-align: right;
+  justify-content: flex-end;
 }
 
 .wa-sender-label.them-label {
   color: #008069;
-  text-align: left;
+  justify-content: flex-start;
+}
+
+.wa-sender-role-pill {
+  font-size: 0.62rem;
+  font-weight: 700;
+  background: #e2e8f0;
+  color: #334155;
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .wa-msg-text {
@@ -559,7 +600,7 @@
   align-items: center;
   justify-content: flex-end;
   gap: 3px;
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
 .wa-msg-time {
@@ -580,30 +621,31 @@
 }
 
 .wa-bubble-delete {
-  position: absolute;
-  top: 4px;
-  right: -24px;
   background: #ffffff;
   border: 1px solid var(--wa-border);
   color: var(--wa-text-secondary);
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 0.15s ease;
+  transform: scale(0.85);
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-.wa-bubble:hover .wa-bubble-delete {
+.wa-bubble-group:hover .wa-bubble-delete {
   opacity: 1;
+  transform: scale(1);
 }
 
 .wa-bubble-delete:hover {
   background: #fee2e2;
   color: #dc2626;
+  border-color: #fca5a5;
 }
 
 /* ════════ QUICK CARE CHIPS & INPUT BAR ════════ */

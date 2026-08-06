@@ -473,57 +473,90 @@ const CaregiverMessage = () => {
                     </div>
                   ) : (
                     <>
-                      <div className="wa-date-divider">
-                        <span>{formatDateDivider(messages[0]?.created_at)}</span>
-                      </div>
-
                       {messages.map((msg, index) => {
                         const currentUserId = user?.id || (typeof window !== 'undefined' && JSON.parse(localStorage.getItem('fc_user') || '{}')?.id);
+                        const contactId = selected?.id;
+
+                        // Outgoing (Me - Right Side):
+                        // 1. Pending optimistic message
+                        // 2. Sender ID matches current user ID
+                        // 3. Receiver ID matches selected contact ID
+                        // 4. Sender ID is different from contact ID
                         const isMe = Boolean(
                           msg.pending ||
-                          (currentUserId && Number(msg.sender_id) === Number(currentUserId))
+                          (currentUserId && Number(msg.sender_id) === Number(currentUserId)) ||
+                          (contactId && Number(msg.receiver_id) === Number(contactId)) ||
+                          (contactId && msg.sender_id && Number(msg.sender_id) !== Number(contactId))
                         );
 
-                        const senderDisplayName = isMe ? 'You' : (msg.sender_name || selected?.name || 'Contact');
+                        const isFirstOfDate = index === 0 || 
+                          (msg.created_at && messages[index - 1]?.created_at && 
+                           new Date(msg.created_at).toDateString() !== new Date(messages[index - 1].created_at).toDateString());
+
+                        const senderDisplayName = isMe 
+                          ? 'You' 
+                          : (msg.sender_name || selected?.name || 'Contact');
                         const canDelete = isMe && !msg.pending && msg.id && !String(msg.id).startsWith('opt-');
 
                         return (
-                          <div 
-                            key={msg.id || index} 
-                            className={`wa-msg-row ${isMe ? 'outgoing' : 'incoming'}`}
-                          >
-                            <div className={`wa-bubble ${isMe ? 'wa-bubble-me' : 'wa-bubble-them'} ${msg.pending ? 'pending' : ''} ${msg.failed ? 'failed' : ''}`}>
-                              
-                              {/* Distinct Sender Name Label (WhatsApp Style) */}
-                              <div className={`wa-sender-label ${isMe ? 'me-label' : 'them-label'}`}>
-                                {senderDisplayName}
+                          <React.Fragment key={msg.id || index}>
+                            {isFirstOfDate && (
+                              <div className="wa-date-divider">
+                                <span>{formatDateDivider(msg.created_at)}</span>
                               </div>
+                            )}
 
-                              <p className="wa-msg-text">{msg.message}</p>
-
-                              <div className="wa-msg-meta">
-                                <span className="wa-msg-time">{formatTime(msg.created_at)}</span>
-                                {isMe && !msg.failed && (
-                                  <span className="wa-blue-ticks" title="Delivered">
-                                    <CheckCheck size={14} />
-                                  </span>
-                                )}
-                                {msg.failed && (
-                                  <span className="wa-fail-badge">Failed</span>
-                                )}
-                              </div>
-
-                              {canDelete && (
-                                <button
-                                  className="wa-bubble-delete"
-                                  onClick={() => handleDelete(msg)}
-                                  title="Delete message"
-                                >
-                                  <Trash2 size={12} />
-                                </button>
+                            <div 
+                              className={`wa-msg-row ${isMe ? 'outgoing' : 'incoming'}`}
+                            >
+                              {!isMe && (
+                                <img 
+                                  src={avatarUrl(selected.name)} 
+                                  alt={selected.name} 
+                                  className="wa-msg-avatar"
+                                />
                               )}
+
+                              <div className="wa-bubble-group">
+                                <div className={`wa-bubble ${isMe ? 'wa-bubble-me' : 'wa-bubble-them'} ${msg.pending ? 'pending' : ''} ${msg.failed ? 'failed' : ''}`}>
+                                  
+                                  {/* Distinct Sender Name Label (WhatsApp Style) */}
+                                  <div className={`wa-sender-label ${isMe ? 'me-label' : 'them-label'}`}>
+                                    <span>{senderDisplayName}</span>
+                                    {!isMe && selected?.role && (
+                                      <span className="wa-sender-role-pill">
+                                        {selected.role === 'child' ? 'Family' : 'Caregiver'}
+                                      </span>
+                                    )}
+                                  </div>
+
+                                  <p className="wa-msg-text">{msg.message}</p>
+
+                                  <div className="wa-msg-meta">
+                                    <span className="wa-msg-time">{formatTime(msg.created_at)}</span>
+                                    {isMe && !msg.failed && (
+                                      <span className="wa-blue-ticks" title="Delivered">
+                                        <CheckCheck size={14} />
+                                      </span>
+                                    )}
+                                    {msg.failed && (
+                                      <span className="wa-fail-badge">Failed</span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {canDelete && (
+                                  <button
+                                    className="wa-bubble-delete"
+                                    onClick={() => handleDelete(msg)}
+                                    title="Delete message"
+                                  >
+                                    <Trash2 size={13} />
+                                  </button>
+                                )}
+                              </div>
                             </div>
-                          </div>
+                          </React.Fragment>
                         );
                       })}
                     </>
