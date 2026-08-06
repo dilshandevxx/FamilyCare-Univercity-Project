@@ -478,14 +478,13 @@ const CaregiverMessage = () => {
                       </div>
 
                       {messages.map((msg, index) => {
-                        // Infallible Sender Check
+                        const currentUserId = user?.id || (typeof window !== 'undefined' && JSON.parse(localStorage.getItem('fc_user') || '{}')?.id);
                         const isMe = Boolean(
                           msg.pending ||
-                          (user?.id && Number(msg.sender_id) === Number(user.id)) ||
-                          (selected?.id && Number(msg.sender_id) !== Number(selected.id))
+                          (currentUserId && Number(msg.sender_id) === Number(currentUserId))
                         );
 
-                        const senderDisplayName = isMe ? 'You' : (msg.sender_name || selected.name);
+                        const senderDisplayName = isMe ? 'You' : (msg.sender_name || selected?.name || 'Contact');
                         const canDelete = isMe && !msg.pending && msg.id && !String(msg.id).startsWith('opt-');
 
                         return (
