@@ -481,7 +481,7 @@ const HealthFeed = () => {
                 <div className="hf-caregiver-widget unassigned">
                   <div className="hf-cg-info">
                     <h4 className="hf-cg-name text-gray">No Caregiver Assigned</h4>
-                    <p className="hf-cg-duty">Subscribe to a care plan</p>
+                    <p className="hf-cg-duty">Assign a dedicated caregiver</p>
                   </div>
                   <div className="hf-cg-actions">
                     <Link to="/caregivers-list" className="hf-cg-assign-btn">Assign</Link>
