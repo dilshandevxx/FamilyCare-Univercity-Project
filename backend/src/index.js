@@ -26,6 +26,8 @@ app.use(logMiddleware);
 app.use(passport.initialize());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/uploads/health-attachments', express.static(path.join(__dirname, '../uploads/health-attachments')));
+app.use('/api/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/api/uploads/health-attachments', express.static(path.join(__dirname, '../uploads/health-attachments')));
 
 // ── Routes ────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);

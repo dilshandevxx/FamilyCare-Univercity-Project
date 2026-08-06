@@ -465,16 +465,11 @@ const Messages = () => {
                         const currentUserId = user?.id || (typeof window !== 'undefined' && JSON.parse(localStorage.getItem('fc_user') || '{}')?.id);
                         const contactId = selected?.id;
 
-                        // Outgoing (Me - Right Side):
-                        // 1. Pending optimistic message
-                        // 2. Sender ID matches current user ID
-                        // 3. Receiver ID matches selected contact ID
-                        // 4. Sender ID is different from contact ID
+                        // Check if message was sent by current user (Right) or contact (Left)
                         const isMe = Boolean(
                           msg.pending ||
                           (currentUserId && Number(msg.sender_id) === Number(currentUserId)) ||
-                          (contactId && Number(msg.receiver_id) === Number(contactId)) ||
-                          (contactId && msg.sender_id && Number(msg.sender_id) !== Number(contactId))
+                          (contactId && Number(msg.receiver_id) === Number(contactId) && Number(msg.sender_id) !== Number(contactId))
                         );
 
                         const isFirstOfDate = index === 0 || 

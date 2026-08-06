@@ -265,7 +265,7 @@ const AdminHealthLogsV2 = () => {
                     <Paperclip size={16} color="#00A896" />
                     <span>Attached Document / Report:</span>
                     <a 
-                      href={selectedLog.attachmentUrl.startsWith('http') ? selectedLog.attachmentUrl : `${import.meta.env.VITE_API_URL || ''}${selectedLog.attachmentUrl}`} 
+                      href={selectedLog.attachmentUrl.startsWith('http') ? selectedLog.attachmentUrl : `${(import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/api\/?$/, '')}${selectedLog.attachmentUrl.startsWith('/') ? selectedLog.attachmentUrl : `/${selectedLog.attachmentUrl}`}`} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="attachment-link"
